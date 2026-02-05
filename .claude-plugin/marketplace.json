@@ -1,0 +1,53 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "bria-skills",
+  "owner": {
+    "name": "Bria AI",
+    "url": "https://bria.ai"
+  },
+  "metadata": {
+    "description": "Official skills from Bria AI for visual asset generation - image generation, editing, background removal, VGL structured prompts, and image utilities",
+    "version": "1.1.0",
+    "repository": "https://github.com/bria-ai/bria-skills",
+    "license": "MIT",
+    "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "image-editing", "vgl"]
+  },
+  "plugins": [
+    {
+      "name": "bria-ai",
+      "description": "AI-powered image generation and editing using Bria.ai APIs - FIBO text-to-image, FIBO-Edit image editing, RMBG-2.0 background removal, and product photography",
+      "source": "./skills/bria-ai",
+      "strict": false,
+      "skills": [
+        "./skills/bria-ai"
+      ],
+      "author": {
+        "name": "Bria AI"
+      }
+    },
+    {
+      "name": "vgl",
+      "description": "Write structured VGL (Visual Generation Language) JSON prompts for precise, deterministic control over Bria FIBO image generation",
+      "source": "./skills/vgl",
+      "strict": false,
+      "skills": [
+        "./skills/vgl"
+      ],
+      "author": {
+        "name": "Bria AI"
+      }
+    },
+    {
+      "name": "image-utils",
+      "description": "Classic image manipulation utilities - resize, crop, composite, watermarks, format conversion for post-processing AI-generated images",
+      "source": "./skills/image-utils",
+      "strict": false,
+      "skills": [
+        "./skills/image-utils"
+      ],
+      "author": {
+        "name": "Bria AI"
+      }
+    }
+  ]
+}
