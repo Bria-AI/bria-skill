@@ -255,49 +255,6 @@ Only change what the edit strictly requires.
 5. **Be specific** - Use concrete values ("85mm portrait lens") not vague terms ("nice camera")
 6. **Null for irrelevant** - Human-specific fields should be `null` for non-human objects
 
----
-
-## Using VGL with Bria API
-
-### Generate Image with Structured Prompt
-
-Pass VGL JSON to the `structured_prompt` parameter:
-
-```python
-from bria_client import BriaClient
-
-client = BriaClient()
-
-vgl_prompt = {
-    "short_description": "Professional businesswoman in modern office...",
-    "objects": [...],
-    # ... full VGL JSON
-}
-
-# Use structured_prompt for deterministic generation
-result = client.refine(
-    structured_prompt=json.dumps(vgl_prompt),
-    instruction="Generate this scene",
-    aspect_ratio="16:9"
-)
-print(result['result']['image_url'])
-```
-
-### Refine Existing Generation
-
-After generation, Bria returns a `structured_prompt` you can modify and regenerate:
-
-```python
-# Initial generation
-result = client.generate("A cozy coffee shop interior")
-structured = result['result']['structured_prompt']
-
-# Modify and regenerate
-result = client.refine(
-    structured_prompt=structured,
-    instruction="Change the lighting to golden hour"
-)
-```
 
 ### curl Example
 
