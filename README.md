@@ -1,42 +1,37 @@
-# Bria AI Skills for Claude Code
+# Bria AI Skills for AI agents
 
-Official Claude Code skills for [Bria AI](https://bria.ai) visual asset generation and image processing utilities.
+Official agent skills for [Bria AI](https://bria.ai) visual asset generation and image processing utilities.
 
 ## Skills Included
 
 | Skill | Description |
 |-------|-------------|
-| **[bria-ai](./skills/bria-ai/SKILL.md)** | AI-powered image generation and editing using Bria.ai APIs |
-| **[vgl](./skills/vgl/SKILL.md)** | Write structured VGL prompts for precise, deterministic image generation |
-| **[image-utils](./skills/image-utils/SKILL.md)** | Classic image manipulation (resize, crop, composite, watermarks) |
+| **bria-ai** | AI-powered image generation and editing using Bria.ai APIs |
+| **image-utils** | Classic image manipulation (resize, crop, composite, watermarks) |
 
 ## Installation
 
-### From GitHub (Recommended)
+### for Cursor
+Download the skill's folder to ~/.cursor/skills/ 
+Each skill is be a folder containing a SKILL.md file 
+
+### for Claude code
+Install from GitHub:
 
 ```bash
-claude /install gh:bria-ai/bria-skills
+claude /install gh:your-username/bria-skills
 ```
 
-This installs all skills from the pack.
-
-### Install Individual Skills
-
-After adding the marketplace, install specific skills:
+Or add as a marketplace and install individual skills:
 
 ```bash
-claude /install bria-ai      # Image generation & editing
-claude /install vgl          # VGL structured prompts
-claude /install image-utils  # Classic image utilities
+# Add marketplace
+claude /install gh:your-username/bria-skills
+
+# Install specific skill
+claude /install bria-ai
+claude /install image-utils
 ```
-
-### For Organizations
-
-Share with your team by:
-1. Fork/clone this repo to your org's GitHub
-2. Team members install via: `claude /install gh:your-org/bria-skills`
-
-Or upload directly to Claude for Organizations console.
 
 ## When to Use
 
@@ -161,12 +156,6 @@ Transform images into different artistic styles:
 - [Complete Guide](./skills/bria-ai/references/guide.md)
 - [API Endpoints](./skills/bria-ai/references/api-endpoints.md)
 - [Python Client](./skills/bria-ai/references/code-examples/bria_client.py)
-- [TypeScript Client](./skills/bria-ai/references/code-examples/bria_client.ts)
-- [curl/Bash Client](./skills/bria-ai/references/code-examples/bria_client.sh)
-
-### VGL (Visual Generation Language)
-- [Skill Reference](./skills/vgl/SKILL.md)
-- [Schema Reference](./skills/vgl/references/schema-reference.md)
 
 ### Image Utils
 - [Skill Reference](./skills/image-utils/SKILL.md)
