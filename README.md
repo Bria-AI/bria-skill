@@ -12,13 +12,25 @@ Official Claude Code skills for [Bria AI](https://bria.ai) visual asset generati
 
 ## Installation
 
-### From GitHub (Recommended)
+### Via npx (Recommended)
+
+```bash
+npx bria-skills
+```
+
+This downloads and installs all skills to `~/.claude/skills/bria-skills/`.
+
+To uninstall:
+
+```bash
+npx bria-skills uninstall
+```
+
+### From GitHub
 
 ```bash
 claude /install gh:bria-ai/bria-skills
 ```
-
-This installs all skills from the pack.
 
 ### Install Individual Skills
 

@@ -8,7 +8,7 @@
   "metadata": {
     "description": "Official skills from Bria AI for visual asset generation - image generation, editing, background removal, VGL structured prompts, and image utilities",
     "version": "1.1.0",
-    "repository": "https://github.com/bria-ai/bria-skills",
+    "repository": "https://github.com/bria-ai/bria-skill",
     "license": "MIT",
     "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "image-editing", "vgl"]
   },

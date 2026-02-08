@@ -23,6 +23,10 @@ venv/
 *.tmp
 *.log
 
+# Node
+node_modules/
+*.tgz
+
 # Build artifacts
 dist/
 build/
