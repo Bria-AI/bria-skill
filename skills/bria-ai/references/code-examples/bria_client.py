@@ -21,7 +21,9 @@ Usage:
 """
 
 import os
+import base64
 import time
+import mimetypes
 import requests
 from typing import Optional, Dict, Any
 
@@ -41,6 +43,45 @@ class BriaClient:
         self.api_key = api_key or os.environ.get("BRIA_API_KEY")
         if not self.api_key:
             raise ValueError("API key required. Set BRIA_API_KEY or pass api_key.")
+
+    @staticmethod
+    def _resolve_image(image: str, as_data_url: bool = False) -> str:
+        """
+        Resolve an image input to a value the API accepts.
+
+        If the input is a URL or already base64-encoded, it is returned as-is.
+        If it is a local file path, the file is read and base64-encoded.
+
+        Args:
+            image: URL, base64 string, or local file path
+            as_data_url: If True, return as data URL (data:image/<ext>;base64,...)
+                         Required for the /v2/image/edit endpoint.
+
+        Returns:
+            URL or base64-encoded string ready for the API
+        """
+        # Already a URL
+        if image.startswith(("http://", "https://")):
+            return image
+
+        # Already a data URL
+        if image.startswith("data:image"):
+            return image
+
+        # Check if it's a local file path
+        if os.path.isfile(image):
+            with open(image, "rb") as f:
+                raw = base64.b64encode(f.read()).decode("utf-8")
+
+            if as_data_url:
+                mime, _ = mimetypes.guess_type(image)
+                mime = mime or "image/png"
+                return f"data:{mime};base64,{raw}"
+
+            return raw
+
+        # Assume it's already a raw base64 string
+        return image
 
     def _headers(self) -> Dict[str, str]:
         return {
@@ -145,7 +186,7 @@ class BriaClient:
         Generate variations inspired by a reference image.
 
         Args:
-            image_url: Reference image URL
+            image_url: Reference image URL, base64 string, or local file path
             prompt: Creative direction
             aspect_ratio: Output aspect ratio
             wait: Wait for completion
@@ -153,7 +194,7 @@ class BriaClient:
         Returns:
             Dict with image_url
         """
-        data = {"image_url": image_url, "prompt": prompt, "aspect_ratio": aspect_ratio}
+        data = {"image_url": self._resolve_image(image_url), "prompt": prompt, "aspect_ratio": aspect_ratio}
         return self._request("/v2/image/generate", data, wait)
 
     # ==================== RMBG-2.0 - Background Removal ====================
@@ -163,13 +204,13 @@ class BriaClient:
         Remove background from image.
 
         Args:
-            image_url: Source image URL
+            image_url: Source image URL, base64 string, or local file path
             wait: Wait for completion
 
         Returns:
             Dict with transparent PNG image_url
         """
-        return self._request("/v2/image/edit/remove_background", {"image": image_url}, wait)
+        return self._request("/v2/image/edit/remove_background", {"image": self._resolve_image(image_url)}, wait)
 
     # ==================== FIBO-Edit - Image Editing ====================
 
@@ -197,8 +238,8 @@ class BriaClient:
             Dict with edited image_url
         """
         data = {
-            "image": image_url,
-            "mask": mask_url,
+            "image": self._resolve_image(image_url),
+            "mask": self._resolve_image(mask_url),
             "prompt": prompt,
             "mask_type": mask_type
         }
@@ -219,7 +260,7 @@ class BriaClient:
         Returns:
             Dict with edited image_url
         """
-        return self._request("/v2/image/edit/erase", {"image": image_url, "mask": mask_url}, wait)
+        return self._request("/v2/image/edit/erase", {"image": self._resolve_image(image_url), "mask": self._resolve_image(mask_url)}, wait)
 
     def erase_foreground(self, image_url: str, wait: bool = True) -> Dict[str, Any]:
         """
@@ -232,7 +273,7 @@ class BriaClient:
         Returns:
             Dict with edited image_url
         """
-        return self._request("/v2/image/edit/erase_foreground", {"image": image_url}, wait)
+        return self._request("/v2/image/edit/erase_foreground", {"image": self._resolve_image(image_url)}, wait)
 
     def replace_background(
         self,
@@ -251,7 +292,7 @@ class BriaClient:
         Returns:
             Dict with edited image_url
         """
-        return self._request("/v2/image/edit/replace_background", {"image": image_url, "prompt": prompt}, wait)
+        return self._request("/v2/image/edit/replace_background", {"image": self._resolve_image(image_url), "prompt": prompt}, wait)
 
     def expand_image(
         self,
@@ -272,7 +313,7 @@ class BriaClient:
         Returns:
             Dict with expanded image_url
         """
-        data = {"image": image_url, "aspect_ratio": aspect_ratio}
+        data = {"image": self._resolve_image(image_url), "aspect_ratio": aspect_ratio}
         if prompt:
             data["prompt"] = prompt
         return self._request("/v2/image/edit/expand", data, wait)
@@ -288,7 +329,7 @@ class BriaClient:
         Returns:
             Dict with enhanced image_url
         """
-        return self._request("/v2/image/edit/enhance", {"image": image_url}, wait)
+        return self._request("/v2/image/edit/enhance", {"image": self._resolve_image(image_url)}, wait)
 
     def increase_resolution(
         self,
@@ -307,7 +348,7 @@ class BriaClient:
         Returns:
             Dict with upscaled image_url
         """
-        return self._request("/v2/image/edit/increase_resolution", {"image": image_url, "scale": scale}, wait)
+        return self._request("/v2/image/edit/increase_resolution", {"image": self._resolve_image(image_url), "scale": scale}, wait)
 
     def lifestyle_shot(
         self,
@@ -329,7 +370,7 @@ class BriaClient:
             Dict with lifestyle shot image_url
         """
         return self._request("/v2/image/edit/lifestyle_shot_by_text", {
-            "image": image_url,
+            "image": self._resolve_image(image_url),
             "prompt": prompt,
             "placement_type": placement_type
         }, wait)
@@ -354,8 +395,8 @@ class BriaClient:
             Dict with composited image_url
         """
         return self._request("/v2/image/edit/shot_by_image", {
-            "image": image_url,
-            "background": background_url,
+            "image": self._resolve_image(image_url),
+            "background": self._resolve_image(background_url),
             "placement_type": placement_type
         }, wait)
 
@@ -370,7 +411,7 @@ class BriaClient:
         Returns:
             Dict with blurred background image_url
         """
-        return self._request("/v2/image/edit/blur_background", {"image": image_url}, wait)
+        return self._request("/v2/image/edit/blur_background", {"image": self._resolve_image(image_url)}, wait)
 
     def edit_image(
         self,
@@ -391,9 +432,9 @@ class BriaClient:
         Returns:
             Dict with edited image_url
         """
-        data = {"images": [image_url], "instruction": instruction}
+        data = {"images": [self._resolve_image(image_url, as_data_url=True)], "instruction": instruction}
         if mask_url:
-            data["mask"] = mask_url
+            data["mask"] = self._resolve_image(mask_url, as_data_url=True)
         return self._request("/v2/image/edit", data, wait)
 
     # ==================== Text-Based Object Editing ====================
@@ -416,7 +457,7 @@ class BriaClient:
             Dict with edited image_url
         """
         return self._request("/v2/image/edit/add_object_by_text", {
-            "image": image_url,
+            "image": self._resolve_image(image_url),
             "instruction": instruction
         }, wait)
 
@@ -438,7 +479,7 @@ class BriaClient:
             Dict with edited image_url
         """
         return self._request("/v2/image/edit/replace_object_by_text", {
-            "image": image_url,
+            "image": self._resolve_image(image_url),
             "instruction": instruction
         }, wait)
 
@@ -460,7 +501,7 @@ class BriaClient:
             Dict with edited image_url
         """
         return self._request("/v2/image/edit/erase_by_text", {
-            "image": image_url,
+            "image": self._resolve_image(image_url),
             "object_name": object_name
         }, wait)
 
@@ -486,8 +527,8 @@ class BriaClient:
             Dict with blended image_url
         """
         return self._request("/v2/image/edit/blend", {
-            "image": image_url,
-            "overlay": overlay_url,
+            "image": self._resolve_image(image_url),
+            "overlay": self._resolve_image(overlay_url),
             "instruction": instruction
         }, wait)
 
@@ -509,7 +550,7 @@ class BriaClient:
             Dict with reseasoned image_url
         """
         return self._request("/v2/image/edit/reseason", {
-            "image": image_url,
+            "image": self._resolve_image(image_url),
             "season": season
         }, wait)
 
@@ -534,7 +575,7 @@ class BriaClient:
             Dict with restyled image_url
         """
         return self._request("/v2/image/edit/restyle", {
-            "image": image_url,
+            "image": self._resolve_image(image_url),
             "style": style
         }, wait)
 
@@ -557,7 +598,7 @@ class BriaClient:
             Dict with relit image_url
         """
         return self._request("/v2/image/edit/relight", {
-            "image": image_url,
+            "image": self._resolve_image(image_url),
             "light_type": light_type
         }, wait)
 
@@ -581,7 +622,7 @@ class BriaClient:
             Dict with edited image_url
         """
         return self._request("/v2/image/edit/replace_text", {
-            "image": image_url,
+            "image": self._resolve_image(image_url),
             "new_text": new_text
         }, wait)
 
@@ -604,7 +645,7 @@ class BriaClient:
         Returns:
             Dict with realistic image_url
         """
-        data = {"image": image_url}
+        data = {"image": self._resolve_image(image_url)}
         if prompt:
             data["prompt"] = prompt
         return self._request("/v2/image/edit/sketch_to_image", data, wait)
@@ -620,7 +661,7 @@ class BriaClient:
         Returns:
             Dict with restored image_url
         """
-        return self._request("/v2/image/edit/restore", {"image": image_url}, wait)
+        return self._request("/v2/image/edit/restore", {"image": self._resolve_image(image_url)}, wait)
 
     def colorize(
         self,
@@ -640,7 +681,7 @@ class BriaClient:
             Dict with colorized image_url
         """
         return self._request("/v2/image/edit/colorize", {
-            "image": image_url,
+            "image": self._resolve_image(image_url),
             "style": style
         }, wait)
 
@@ -655,7 +696,7 @@ class BriaClient:
         Returns:
             Dict with cropped image_url
         """
-        return self._request("/v2/image/edit/crop_foreground", {"image": image_url}, wait)
+        return self._request("/v2/image/edit/crop_foreground", {"image": self._resolve_image(image_url)}, wait)
 
     # ==================== Structured Instructions ====================
 
@@ -679,9 +720,9 @@ class BriaClient:
         Returns:
             Dict with structured_instruction JSON
         """
-        data = {"images": [image_url], "instruction": instruction}
+        data = {"images": [self._resolve_image(image_url)], "instruction": instruction}
         if mask_url:
-            data["mask"] = mask_url
+            data["mask"] = self._resolve_image(mask_url)
         return self._request("/v2/structured_instruction/generate", data, wait)
 
 

@@ -84,6 +84,9 @@ export interface ColorizeOptions {
 
 // ==================== Client ====================
 
+import * as fs from "fs";
+import * as path from "path";
+
 export class BriaClient {
   private readonly baseUrl = "https://engine.prod.bria-api.com";
   private readonly apiKey: string;
@@ -104,6 +107,53 @@ export class BriaClient {
       api_token: this.apiKey,
       "Content-Type": "application/json",
     };
+  }
+
+  /**
+   * Resolve an image input to a value the API accepts.
+   *
+   * If the input is a URL or already base64-encoded, it is returned as-is.
+   * If it is a local file path, the file is read and base64-encoded.
+   *
+   * @param image - URL, base64 string, or local file path
+   * @param asDataUrl - If true, return as data URL (data:image/<ext>;base64,...)
+   *                    Required for the /v2/image/edit endpoint.
+   * @returns URL or base64-encoded string ready for the API
+   */
+  private resolveImage(image: string, asDataUrl = false): string {
+    // Already a URL
+    if (image.startsWith("http://") || image.startsWith("https://")) {
+      return image;
+    }
+
+    // Already a data URL
+    if (image.startsWith("data:image")) {
+      return image;
+    }
+
+    // Check if it's a local file path
+    if (fs.existsSync(image)) {
+      const raw = fs.readFileSync(image).toString("base64");
+
+      if (asDataUrl) {
+        const extToMime: Record<string, string> = {
+          ".png": "image/png",
+          ".jpg": "image/jpeg",
+          ".jpeg": "image/jpeg",
+          ".webp": "image/webp",
+          ".gif": "image/gif",
+          ".bmp": "image/bmp",
+        };
+        const ext = path.extname(image).toLowerCase();
+        const mime = extToMime[ext] || "image/png";
+        return `data:${mime};base64,${raw}`;
+      }
+
+      return raw;
+    }
+
+    // Assume it's already a raw base64 string
+    return image;
   }
 
   private async request(
@@ -230,7 +280,7 @@ export class BriaClient {
     return this.request(
       "/v2/image/generate",
       {
-        image_url: imageUrl,
+        image_url: this.resolveImage(imageUrl),
         prompt,
         aspect_ratio: aspectRatio,
       },
@@ -247,7 +297,7 @@ export class BriaClient {
    * @returns Response with transparent PNG image_url
    */
   async removeBackground(imageUrl: string, wait = true): Promise<BriaResponse> {
-    return this.request("/v2/image/edit/remove_background", { image: imageUrl }, wait);
+    return this.request("/v2/image/edit/remove_background", { image: this.resolveImage(imageUrl) }, wait);
   }
 
   // ==================== FIBO-Edit - Image Editing ====================
@@ -269,8 +319,8 @@ export class BriaClient {
     const { maskType = "manual", negativePrompt, wait = true } = options;
 
     const data: Record<string, unknown> = {
-      image: imageUrl,
-      mask: maskUrl,
+      image: this.resolveImage(imageUrl),
+      mask: this.resolveImage(maskUrl),
       prompt,
       mask_type: maskType,
     };
@@ -293,7 +343,7 @@ export class BriaClient {
   ): Promise<BriaResponse> {
     return this.request(
       "/v2/image/edit/erase",
-      { image: imageUrl, mask: maskUrl },
+      { image: this.resolveImage(imageUrl), mask: this.resolveImage(maskUrl) },
       wait
     );
   }
@@ -305,7 +355,7 @@ export class BriaClient {
    * @returns Response with edited image_url
    */
   async eraseForeground(imageUrl: string, wait = true): Promise<BriaResponse> {
-    return this.request("/v2/image/edit/erase_foreground", { image: imageUrl }, wait);
+    return this.request("/v2/image/edit/erase_foreground", { image: this.resolveImage(imageUrl) }, wait);
   }
 
   /**
@@ -322,7 +372,7 @@ export class BriaClient {
   ): Promise<BriaResponse> {
     return this.request(
       "/v2/image/edit/replace_background",
-      { image: imageUrl, prompt },
+      { image: this.resolveImage(imageUrl), prompt },
       wait
     );
   }
@@ -340,7 +390,7 @@ export class BriaClient {
     const { aspectRatio = "16:9", prompt, wait = true } = options;
 
     const data: Record<string, unknown> = {
-      image: imageUrl,
+      image: this.resolveImage(imageUrl),
       aspect_ratio: aspectRatio,
     };
     if (prompt) data.prompt = prompt;
@@ -355,7 +405,7 @@ export class BriaClient {
    * @returns Response with enhanced image_url
    */
   async enhanceImage(imageUrl: string, wait = true): Promise<BriaResponse> {
-    return this.request("/v2/image/edit/enhance", { image: imageUrl }, wait);
+    return this.request("/v2/image/edit/enhance", { image: this.resolveImage(imageUrl) }, wait);
   }
 
   /**
@@ -372,7 +422,7 @@ export class BriaClient {
   ): Promise<BriaResponse> {
     return this.request(
       "/v2/image/edit/increase_resolution",
-      { image: imageUrl, scale },
+      { image: this.resolveImage(imageUrl), scale },
       wait
     );
   }
@@ -394,7 +444,7 @@ export class BriaClient {
     return this.request(
       "/v2/image/edit/lifestyle_shot_by_text",
       {
-        image: imageUrl,
+        image: this.resolveImage(imageUrl),
         prompt,
         placement_type: placementType,
       },
@@ -419,8 +469,8 @@ export class BriaClient {
     return this.request(
       "/v2/image/edit/shot_by_image",
       {
-        image: imageUrl,
-        background: backgroundUrl,
+        image: this.resolveImage(imageUrl),
+        background: this.resolveImage(backgroundUrl),
         placement_type: placementType,
       },
       wait
@@ -434,7 +484,7 @@ export class BriaClient {
    * @returns Response with blurred background image_url
    */
   async blurBackground(imageUrl: string, wait = true): Promise<BriaResponse> {
-    return this.request("/v2/image/edit/blur_background", { image: imageUrl }, wait);
+    return this.request("/v2/image/edit/blur_background", { image: this.resolveImage(imageUrl) }, wait);
   }
 
   /**
@@ -452,10 +502,10 @@ export class BriaClient {
     wait = true
   ): Promise<BriaResponse> {
     const data: Record<string, unknown> = {
-      images: [imageUrl],
+      images: [this.resolveImage(imageUrl, true)],
       instruction,
     };
-    if (maskUrl) data.mask = maskUrl;
+    if (maskUrl) data.mask = this.resolveImage(maskUrl, true);
 
     return this.request("/v2/image/edit", data, wait);
   }
@@ -476,7 +526,7 @@ export class BriaClient {
   ): Promise<BriaResponse> {
     return this.request(
       "/v2/image/edit/add_object_by_text",
-      { image: imageUrl, instruction },
+      { image: this.resolveImage(imageUrl), instruction },
       wait
     );
   }
@@ -495,7 +545,7 @@ export class BriaClient {
   ): Promise<BriaResponse> {
     return this.request(
       "/v2/image/edit/replace_object_by_text",
-      { image: imageUrl, instruction },
+      { image: this.resolveImage(imageUrl), instruction },
       wait
     );
   }
@@ -514,7 +564,7 @@ export class BriaClient {
   ): Promise<BriaResponse> {
     return this.request(
       "/v2/image/edit/erase_by_text",
-      { image: imageUrl, object_name: objectName },
+      { image: this.resolveImage(imageUrl), object_name: objectName },
       wait
     );
   }
@@ -537,7 +587,7 @@ export class BriaClient {
   ): Promise<BriaResponse> {
     return this.request(
       "/v2/image/edit/blend",
-      { image: imageUrl, overlay: overlayUrl, instruction },
+      { image: this.resolveImage(imageUrl), overlay: this.resolveImage(overlayUrl), instruction },
       wait
     );
   }
@@ -554,7 +604,7 @@ export class BriaClient {
     season: "spring" | "summer" | "autumn" | "winter",
     wait = true
   ): Promise<BriaResponse> {
-    return this.request("/v2/image/edit/reseason", { image: imageUrl, season }, wait);
+    return this.request("/v2/image/edit/reseason", { image: this.resolveImage(imageUrl), season }, wait);
   }
 
   /**
@@ -568,7 +618,7 @@ export class BriaClient {
     options: RestyleOptions
   ): Promise<BriaResponse> {
     const { style, wait = true } = options;
-    return this.request("/v2/image/edit/restyle", { image: imageUrl, style }, wait);
+    return this.request("/v2/image/edit/restyle", { image: this.resolveImage(imageUrl), style }, wait);
   }
 
   /**
@@ -585,7 +635,7 @@ export class BriaClient {
   ): Promise<BriaResponse> {
     return this.request(
       "/v2/image/edit/relight",
-      { image: imageUrl, light_type: lightType },
+      { image: this.resolveImage(imageUrl), light_type: lightType },
       wait
     );
   }
@@ -606,7 +656,7 @@ export class BriaClient {
   ): Promise<BriaResponse> {
     return this.request(
       "/v2/image/edit/replace_text",
-      { image: imageUrl, new_text: newText },
+      { image: this.resolveImage(imageUrl), new_text: newText },
       wait
     );
   }
@@ -625,7 +675,7 @@ export class BriaClient {
     prompt?: string,
     wait = true
   ): Promise<BriaResponse> {
-    const data: Record<string, unknown> = { image: imageUrl };
+    const data: Record<string, unknown> = { image: this.resolveImage(imageUrl) };
     if (prompt) data.prompt = prompt;
 
     return this.request("/v2/image/edit/sketch_to_image", data, wait);
@@ -638,7 +688,7 @@ export class BriaClient {
    * @returns Response with restored image_url
    */
   async restoreImage(imageUrl: string, wait = true): Promise<BriaResponse> {
-    return this.request("/v2/image/edit/restore", { image: imageUrl }, wait);
+    return this.request("/v2/image/edit/restore", { image: this.resolveImage(imageUrl) }, wait);
   }
 
   /**
@@ -652,7 +702,7 @@ export class BriaClient {
     options: ColorizeOptions = {}
   ): Promise<BriaResponse> {
     const { style = "color_contemporary", wait = true } = options;
-    return this.request("/v2/image/edit/colorize", { image: imageUrl, style }, wait);
+    return this.request("/v2/image/edit/colorize", { image: this.resolveImage(imageUrl), style }, wait);
   }
 
   /**
@@ -662,7 +712,7 @@ export class BriaClient {
    * @returns Response with cropped image_url
    */
   async cropForeground(imageUrl: string, wait = true): Promise<BriaResponse> {
-    return this.request("/v2/image/edit/crop_foreground", { image: imageUrl }, wait);
+    return this.request("/v2/image/edit/crop_foreground", { image: this.resolveImage(imageUrl) }, wait);
   }
 
   // ==================== Structured Instructions ====================
@@ -683,10 +733,10 @@ export class BriaClient {
     wait = true
   ): Promise<BriaResponse> {
     const data: Record<string, unknown> = {
-      images: [imageUrl],
+      images: [this.resolveImage(imageUrl)],
       instruction,
     };
-    if (maskUrl) data.mask = maskUrl;
+    if (maskUrl) data.mask = this.resolveImage(maskUrl);
 
     return this.request("/v2/structured_instruction/generate", data, wait);
   }
