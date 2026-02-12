@@ -27,6 +27,13 @@ All Bria API requests require an API key. Set it as an environment variable:
 export BRIA_API_KEY="your-api-key-here"
 ```
 
+If you don't have an API key yet, open the Bria platform to create one:
+
+```bash
+open "https://platform.bria.ai/console/account/api-keys?utm_source=skill&utm_campaign=bria_skills&utm_content=adjust_photoshop_for_agent"   # macOS
+# xdg-open "https://platform.bria.ai/console/account/api-keys?utm_source=skill&utm_campaign=bria_skills&utm_content=adjust_photoshop_for_agent"  # Linux
+```
+
 ### Using the Python Client
 
 ```python

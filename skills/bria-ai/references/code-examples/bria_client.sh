@@ -33,6 +33,58 @@ bria_check_api_key() {
   fi
 }
 
+bria_resolve_image() {
+  # Resolve an image input to a value the API accepts.
+  # If the input is a URL or already base64, return as-is.
+  # If it is a local file path, read and base64-encode it.
+  #
+  # Usage: resolved=$(bria_resolve_image "$image_input")
+  #        resolved=$(bria_resolve_image "$image_input" "data_url")
+  #
+  # Args:
+  #   $1 - Image URL, base64 string, or local file path
+  #   $2 - If "data_url", return as data:image/<ext>;base64,...
+  local image="$1"
+  local mode="${2:-raw}"
+
+  # Already a URL
+  if [[ "$image" == http://* || "$image" == https://* ]]; then
+    echo "$image"
+    return
+  fi
+
+  # Already a data URL
+  if [[ "$image" == data:image* ]]; then
+    echo "$image"
+    return
+  fi
+
+  # Check if it's a local file
+  if [[ -f "$image" ]]; then
+    local b64
+    b64=$(base64 < "$image" | tr -d '\n')
+
+    if [[ "$mode" == "data_url" ]]; then
+      local ext="${image##*.}"
+      local mime="image/png"
+      case "$ext" in
+        jpg|jpeg) mime="image/jpeg" ;;
+        png)      mime="image/png" ;;
+        webp)     mime="image/webp" ;;
+        gif)      mime="image/gif" ;;
+        bmp)      mime="image/bmp" ;;
+      esac
+      echo "data:${mime};base64,${b64}"
+    else
+      echo "$b64"
+    fi
+    return
+  fi
+
+  # Assume it's already a raw base64 string
+  echo "$image"
+}
+
 bria_request() {
   local endpoint="$1"
   local data="$2"
@@ -136,7 +188,8 @@ bria_refine() {
 }
 
 bria_inspire() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local prompt="$2"
   local aspect_ratio="${3:-1:1}"
 
@@ -153,7 +206,8 @@ bria_inspire() {
 # ==================== RMBG-2.0 - Background Removal ====================
 
 bria_remove_background() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
 
   local data
   data=$(jq -n --arg image "$image_url" '{image: $image}')
@@ -164,8 +218,10 @@ bria_remove_background() {
 # ==================== FIBO-Edit - Image Editing ====================
 
 bria_gen_fill() {
-  local image_url="$1"
-  local mask_url="$2"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
+  local mask_url
+  mask_url=$(bria_resolve_image "$2")
   local prompt="$3"
   local mask_type="${4:-manual}"
   local negative_prompt="${5:-}"
@@ -186,8 +242,10 @@ bria_gen_fill() {
 }
 
 bria_erase() {
-  local image_url="$1"
-  local mask_url="$2"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
+  local mask_url
+  mask_url=$(bria_resolve_image "$2")
 
   local data
   data=$(jq -n \
@@ -199,7 +257,8 @@ bria_erase() {
 }
 
 bria_erase_foreground() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
 
   local data
   data=$(jq -n --arg image "$image_url" '{image: $image}')
@@ -208,7 +267,8 @@ bria_erase_foreground() {
 }
 
 bria_replace_background() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local prompt="$2"
 
   local data
@@ -221,7 +281,8 @@ bria_replace_background() {
 }
 
 bria_expand_image() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local aspect_ratio="${2:-16:9}"
   local prompt="${3:-}"
 
@@ -239,7 +300,8 @@ bria_expand_image() {
 }
 
 bria_enhance_image() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
 
   local data
   data=$(jq -n --arg image "$image_url" '{image: $image}')
@@ -248,7 +310,8 @@ bria_enhance_image() {
 }
 
 bria_increase_resolution() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local scale="${2:-2}"
 
   local data
@@ -261,7 +324,8 @@ bria_increase_resolution() {
 }
 
 bria_lifestyle_shot() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local prompt="$2"
   local placement_type="${3:-automatic}"
 
@@ -276,8 +340,10 @@ bria_lifestyle_shot() {
 }
 
 bria_shot_by_image() {
-  local image_url="$1"
-  local background_url="$2"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
+  local background_url
+  background_url=$(bria_resolve_image "$2")
   local placement_type="${3:-automatic}"
 
   local data
@@ -291,7 +357,8 @@ bria_shot_by_image() {
 }
 
 bria_blur_background() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
 
   local data
   data=$(jq -n --arg image "$image_url" '{image: $image}')
@@ -300,7 +367,8 @@ bria_blur_background() {
 }
 
 bria_edit_image() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1" "data_url")
   local instruction="$2"
   local mask_url="${3:-}"
 
@@ -311,7 +379,9 @@ bria_edit_image() {
     '{images: [$image], instruction: $inst}')
 
   if [[ -n "$mask_url" ]]; then
-    data=$(echo "$data" | jq --arg mask "$mask_url" '. + {mask: $mask}')
+    local resolved_mask
+    resolved_mask=$(bria_resolve_image "$mask_url" "data_url")
+    data=$(echo "$data" | jq --arg mask "$resolved_mask" '. + {mask: $mask}')
   fi
 
   bria_request "/v2/image/edit" "$data"
@@ -320,7 +390,8 @@ bria_edit_image() {
 # ==================== Text-Based Object Editing ====================
 
 bria_add_object() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local instruction="$2"
 
   local data
@@ -333,7 +404,8 @@ bria_add_object() {
 }
 
 bria_replace_object() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local instruction="$2"
 
   local data
@@ -346,7 +418,8 @@ bria_replace_object() {
 }
 
 bria_erase_object() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local object_name="$2"
 
   local data
@@ -361,8 +434,10 @@ bria_erase_object() {
 # ==================== Image Transformation ====================
 
 bria_blend_images() {
-  local image_url="$1"
-  local overlay_url="$2"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
+  local overlay_url
+  overlay_url=$(bria_resolve_image "$2")
   local instruction="$3"
 
   local data
@@ -376,7 +451,8 @@ bria_blend_images() {
 }
 
 bria_reseason() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local season="$2"  # spring, summer, autumn, winter
 
   local data
@@ -389,7 +465,8 @@ bria_reseason() {
 }
 
 bria_restyle() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local style="$2"  # render_3d, cubism, oil_painting, anime, cartoon, etc.
 
   local data
@@ -402,7 +479,8 @@ bria_restyle() {
 }
 
 bria_relight() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local light_type="$2"
 
   local data
@@ -417,7 +495,8 @@ bria_relight() {
 # ==================== Text in Images ====================
 
 bria_replace_text() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local new_text="$2"
 
   local data
@@ -432,7 +511,8 @@ bria_replace_text() {
 # ==================== Image Restoration & Conversion ====================
 
 bria_sketch_to_image() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local prompt="${2:-}"
 
   local data
@@ -446,7 +526,8 @@ bria_sketch_to_image() {
 }
 
 bria_restore_image() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
 
   local data
   data=$(jq -n --arg image "$image_url" '{image: $image}')
@@ -455,7 +536,8 @@ bria_restore_image() {
 }
 
 bria_colorize() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local style="${2:-color_contemporary}"
 
   local data
@@ -468,7 +550,8 @@ bria_colorize() {
 }
 
 bria_crop_foreground() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
 
   local data
   data=$(jq -n --arg image "$image_url" '{image: $image}')
@@ -479,7 +562,8 @@ bria_crop_foreground() {
 # ==================== Structured Instructions ====================
 
 bria_generate_structured_instruction() {
-  local image_url="$1"
+  local image_url
+  image_url=$(bria_resolve_image "$1")
   local instruction="$2"
   local mask_url="${3:-}"
 
@@ -490,7 +574,9 @@ bria_generate_structured_instruction() {
     '{images: [$image], instruction: $inst}')
 
   if [[ -n "$mask_url" ]]; then
-    data=$(echo "$data" | jq --arg mask "$mask_url" '. + {mask: $mask}')
+    local resolved_mask
+    resolved_mask=$(bria_resolve_image "$mask_url")
+    data=$(echo "$data" | jq --arg mask "$resolved_mask" '. + {mask: $mask}')
   fi
 
   bria_request "/v2/structured_instruction/generate" "$data"
