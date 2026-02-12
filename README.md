@@ -10,6 +10,11 @@ Official agent skills for [Bria AI](https://bria.ai) visual asset generation and
 | **image-utils** | Classic image manipulation (resize, crop, composite, watermarks) |
 
 ## Installation
+For all agents:
+```bash
+npx skills add bria-ai/bria-skill 
+```
+
 
 ### for Cursor
 Download the skill's folder to ~/.cursor/skills/ 
