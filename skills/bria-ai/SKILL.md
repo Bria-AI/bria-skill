@@ -17,6 +17,31 @@ Generate production-ready visual assets for websites, presentations, documents, 
 - **Batch Generation**: Multiple images with different prompts concurrently
 - **Pipeline Workflows**: Chained operations (generate → edit → remove background → lifestyle shot)
 
+## Setup — API Key Check
+
+Before making any Bria API call, verify the `BRIA_API_KEY` environment variable is set:
+
+```bash
+echo $BRIA_API_KEY
+```
+
+If the variable is **empty or not set**, open the Bria API keys page so the user can create one:
+
+```bash
+open "https://platform.bria.ai/console/account/api-keys?utm_source=skill&utm_campaign=bria_skills&utm_content=adjust_photoshop_for_agent"   # macOS
+# xdg-open "https://platform.bria.ai/console/account/api-keys?utm_source=skill&utm_campaign=bria_skills&utm_content=adjust_photoshop_for_agent"  # Linux
+```
+
+Then tell the user:
+> Your `BRIA_API_KEY` environment variable is not set. I've opened the Bria API keys page in your browser. Please create an API key there, then set it with:
+> ```
+> export BRIA_API_KEY="your-api-key-here"
+> ```
+
+**Do not proceed with any image generation or editing until the API key is confirmed set.**
+
+---
+
 ## Core Capabilities
 
 | Need | Capability | Use Case |
