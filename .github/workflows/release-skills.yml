@@ -1,0 +1,63 @@
+name: Release Skills
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Discover skills and create zips
+        id: zip
+        run: |
+          mkdir -p release-assets
+          skills=""
+          for dir in skills/*/; do
+            if [ -f "${dir}SKILL.md" ]; then
+              skill_name=$(basename "$dir")
+              echo "Zipping skill: $skill_name"
+              cd skills
+              zip -r "../release-assets/${skill_name}.zip" "$skill_name" \
+                -x "*/.DS_Store" "*/__pycache__/*" "*.pyc" "*/.DS_Store"
+              cd ..
+              skills="${skills}${skill_name}, "
+            fi
+          done
+          echo "skills=${skills%, }" >> "$GITHUB_OUTPUT"
+
+      - name: Get next version
+        id: version
+        run: |
+          # Fetch the latest release tag
+          latest=$(gh release list --limit 1 --json tagName --jq '.[0].tagName // empty' 2>/dev/null || true)
+          if [ -z "$latest" ]; then
+            next="v1.0.0"
+          else
+            # Strip 'v' prefix, split, increment patch
+            version="${latest#v}"
+            major=$(echo "$version" | cut -d. -f1)
+            minor=$(echo "$version" | cut -d. -f2)
+            patch=$(echo "$version" | cut -d. -f3)
+            next="v${major}.${minor}.$((patch + 1))"
+          fi
+          echo "tag=$next" >> "$GITHUB_OUTPUT"
+          echo "Next version: $next"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          generate_release_notes: true
+          files: release-assets/*.zip
