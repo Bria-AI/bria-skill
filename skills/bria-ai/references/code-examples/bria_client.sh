@@ -339,23 +339,6 @@ bria_lifestyle_shot() {
   bria_request "/v2/image/edit/lifestyle_shot_by_text" "$data"
 }
 
-bria_shot_by_image() {
-  local image_url
-  image_url=$(bria_resolve_image "$1")
-  local background_url
-  background_url=$(bria_resolve_image "$2")
-  local placement_type="${3:-automatic}"
-
-  local data
-  data=$(jq -n \
-    --arg image "$image_url" \
-    --arg bg "$background_url" \
-    --arg pt "$placement_type" \
-    '{image: $image, background: $bg, placement_type: $pt}')
-
-  bria_request "/v2/image/edit/shot_by_image" "$data"
-}
-
 bria_blur_background() {
   local image_url
   image_url=$(bria_resolve_image "$1")
@@ -678,16 +661,6 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/lifestyle_shot_by_t
   -d '{
     "image": "https://example.com/product.png",
     "prompt": "modern kitchen countertop, morning light",
-    "placement_type": "automatic"
-  }'
-
-# --- Shot by Image (Product on Reference BG) ---
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/shot_by_image" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "image": "https://example.com/product.png",
-    "background": "https://example.com/background.jpg",
     "placement_type": "automatic"
   }'
 

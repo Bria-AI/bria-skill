@@ -265,19 +265,6 @@ Place a product in a lifestyle scene using text description.
 }
 ```
 
-### POST /v2/image/edit/shot_by_image
-
-Place a product on a reference background image.
-
-**Request:**
-```json
-{
-  "image": "https://product-image-url",
-  "background": "https://background-image-url",
-  "placement_type": "automatic"
-}
-```
-
 ---
 
 ## Text-Based Object Editing

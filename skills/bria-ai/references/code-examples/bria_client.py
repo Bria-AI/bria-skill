@@ -375,31 +375,6 @@ class BriaClient:
             "placement_type": placement_type
         }, wait)
 
-    def shot_by_image(
-        self,
-        image_url: str,
-        background_url: str,
-        placement_type: str = "automatic",
-        wait: bool = True
-    ) -> Dict[str, Any]:
-        """
-        Place a product on a reference background image.
-
-        Args:
-            image_url: Product image URL
-            background_url: Background reference image URL
-            placement_type: "automatic" or "manual"
-            wait: Wait for completion
-
-        Returns:
-            Dict with composited image_url
-        """
-        return self._request("/v2/image/edit/shot_by_image", {
-            "image": self._resolve_image(image_url),
-            "background": self._resolve_image(background_url),
-            "placement_type": placement_type
-        }, wait)
-
     def blur_background(self, image_url: str, wait: bool = True) -> Dict[str, Any]:
         """
         Apply blur effect to image background.

@@ -453,31 +453,6 @@ export class BriaClient {
   }
 
   /**
-   * Place a product on a reference background image.
-   * @param imageUrl - Product image URL
-   * @param backgroundUrl - Background reference image URL
-   * @param options - Shot by image options
-   * @returns Response with composited image_url
-   */
-  async shotByImage(
-    imageUrl: string,
-    backgroundUrl: string,
-    options: LifeshotOptions = {}
-  ): Promise<BriaResponse> {
-    const { placementType = "automatic", wait = true } = options;
-
-    return this.request(
-      "/v2/image/edit/shot_by_image",
-      {
-        image: this.resolveImage(imageUrl),
-        background: this.resolveImage(backgroundUrl),
-        placement_type: placementType,
-      },
-      wait
-    );
-  }
-
-  /**
    * Apply blur effect to image background.
    * @param imageUrl - Source image URL
    * @param wait - Wait for completion
