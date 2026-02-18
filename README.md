@@ -122,7 +122,6 @@ claude /install image-utils
 | Endpoint | Purpose |
 |----------|---------|
 | `POST /v2/image/edit/lifestyle_shot_by_text` | Place product in scene by text |
-| `POST /v2/image/edit/shot_by_image` | Place product on reference background |
 
 ## Restyle Options
 
