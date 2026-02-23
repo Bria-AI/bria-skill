@@ -1,6 +1,10 @@
 ---
 name: image-utils
-description: Use when performing classic image manipulation - resize, crop, composite, format conversion, watermarks, adjustments. Pillow-based utilities for deterministic pixel-level operations. Use alongside AI image generation (like Bria) for post-processing, or standalone for any image processing task.
+description: Classic image manipulation with Python Pillow - resize, crop, composite, format conversion, watermarks, brightness/contrast adjustments, and web optimization. Use this skill when post-processing AI-generated images, preparing images for web delivery, batch processing image directories, creating responsive image variants, or performing any deterministic pixel-level image operation. Works standalone or alongside bria-ai for post-processing generated images.
+license: MIT
+metadata:
+  author: Bria AI
+  version: "1.2.0"
 ---
 
 # Image Utilities

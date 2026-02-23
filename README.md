@@ -1,180 +1,97 @@
-# Bria AI Skills for AI agents
+# Bria AI Skills — Controllable Image Generation for Coding Agents
 
-Official agent skills for [Bria AI](https://bria.ai) visual asset generation and image processing utilities.
+Generate, edit, and precisely control images directly from your AI coding agent using [Bria.ai](https://bria.ai)'s commercially-safe models. Unlike black-box generators, Bria gives you fine-grained control: edit specific objects, mask regions, control lighting/season/style independently, and chain operations in pipelines.
+
+**Works with:** Claude Code, Cursor, Cline, Codex, and [37+ other agents](https://skills.sh)
+
+## Quick Start
+
+### 1. Install
+
+```bash
+npx skills add bria-ai/bria-skill
+```
+
+### 2. Get a free API key
+
+Sign up at [platform.bria.ai](https://platform.bria.ai/console/account/api-keys?utm_source=skill&utm_campaign=bria_skills&utm_content=readme) and create an API key.
+
+### 3. Set the key
+
+```bash
+export BRIA_API_KEY="your-key-here"
+```
+
+Or just start using the skill — it will walk you through setup automatically.
+
+### 4. Use it
+
+Ask your agent to generate images, remove backgrounds, edit photos, and more. The skill handles the rest.
 
 ## Skills Included
 
 | Skill | Description |
 |-------|-------------|
-| **bria-ai** | AI-powered image generation and editing using Bria.ai APIs |
-| **image-utils** | Classic image manipulation (resize, crop, composite, watermarks) |
+| **[bria-ai](./skills/bria-ai/SKILL.md)** | Controllable image generation & editing — 18+ capabilities including text-to-image, object-level editing, background removal, upscaling, restyling, relighting, and product photography |
+| **[vgl](./skills/vgl/SKILL.md)** | Maximum generation control — structured JSON (Visual Generation Language) that explicitly defines objects, lighting, camera, composition, and style for deterministic, reproducible results |
+| **[image-utils](./skills/image-utils/SKILL.md)** | Classic image manipulation — resize, crop, composite, watermarks, format conversion with Python Pillow |
 
-## Installation
-For all agents:
+## What You Can Control
+
+| Capability | Control Level | Example |
+|------------|---------------|---------|
+| **Generate images from text** | Prompt + aspect ratio + VGL structured JSON | "A modern office with natural lighting, 16:9" |
+| **Edit specific objects** | Object-level — add, replace, or remove by name | "Replace the red mug with a blue one" |
+| **Edit by instruction** | Image-level — natural language control | "Change the mug color to red" |
+| **Edit masked regions** | Pixel-level — paint exactly where to change | Inpaint only the sky, leave everything else |
+| **Remove backgrounds** | Automatic — clean transparent PNGs | One API call, no manual masking |
+| **Control lighting** | Independent — change light without touching content | Golden hour, spotlight, dramatic shadows |
+| **Control style** | Independent — restyle without changing structure | Oil painting, anime, cartoon, 3D render |
+| **Control season** | Independent — change season/weather only | Spring blossoms, winter snow |
+| **Expand images** | Directional — extend boundaries with context | Outpaint to 16:9 from a square |
+| **Product photography** | Scene control — place products in any setting | "Modern kitchen countertop, morning light" |
+| **Upscale resolution** | 2x or 4x — preserves details | Super resolution enhancement |
+| **Pipeline chaining** | Multi-step — compose operations in sequence | Generate -> remove BG -> lifestyle shot |
+
+## Example Use Cases
+
+**Building a website?** Ask: "Generate a hero image for a SaaS landing page, 16:9, modern and clean"
+
+**E-commerce catalog?** Ask: "Remove the background from this product photo and place it in a kitchen scene"
+
+**Batch assets?** Ask: "Generate product photos for these 5 items and create transparent PNGs for each"
+
+**Presentations?** Ask: "Create a slide visual showing data analytics, blue gradient, corporate style"
+
+## Alternative Installation
+
+### Claude Code (direct)
+
 ```bash
-npx skills add bria-ai/bria-skill 
+claude mcp add bria-skills -- npx -y bria-skills
 ```
 
+### Cursor
 
-### for Cursor
-Download the skill's folder to ~/.cursor/skills/ 
-Each skill is be a folder containing a SKILL.md file 
+Download the skill folders to `~/.cursor/skills/`. Each skill is a folder containing a `SKILL.md` file.
 
-### for Claude code
-Install from GitHub:
+### Manual (any agent)
 
-```bash
-claude /install gh:your-username/bria-skills
-```
-
-Or add as a marketplace and install individual skills:
-
-```bash
-# Add marketplace
-claude /install gh:your-username/bria-skills
-
-# Install specific skill
-claude /install bria-ai
-claude /install image-utils
-```
-
-## When to Use
-
-- **Website/App Development**: Hero images, product photos, backgrounds, illustrations
-- **Presentations**: Slide visuals, diagrams, icons, cover images
-- **Documents**: Report graphics, infographics, headers, decorative elements
-- **Marketing**: Social media assets, banners, promotional images
-- **E-commerce**: Product photography, lifestyle shots, catalog images
-
-## Core Capabilities
-
-| Capability | Model | Use Case |
-|------------|-------|----------|
-| **Create new images** | FIBO Generate | Hero images, product shots, illustrations |
-| **Edit by text** | FIBO-Edit | Change colors, modify objects, transform scenes |
-| **Edit with mask** | GenFill/Erase | Precise inpainting, add/replace specific regions |
-| **Add/Replace/Remove objects** | Text-based editing | Add vase, replace apple with pear, remove table |
-| **Transparent backgrounds** | RMBG-2.0 | Extract subjects for overlays, logos, cutouts |
-| **Background operations** | Replace/Blur/Erase | Change, blur, or remove backgrounds |
-| **Expand images** | Outpainting | Extend boundaries, change aspect ratios |
-| **Upscale images** | Super Resolution | Increase resolution 2x or 4x |
-| **Enhance quality** | Enhancement | Improve lighting, colors, details |
-| **Transform style** | Restyle | Oil painting, anime, cartoon, 3D render |
-| **Change lighting** | Relight | Golden hour, spotlight, dramatic lighting |
-| **Change season** | Reseason | Spring, summer, autumn, winter |
-| **Blend/composite** | Image Blending | Apply textures, logos, merge images |
-| **Text replacement** | Rewrite | Change text in images |
-| **Restore photos** | Restoration | Fix old/damaged photos |
-| **Colorize** | Colorization | Add color to B&W, or convert to B&W |
-| **Sketch to photo** | Sketch2Image | Convert drawings to realistic photos |
-| **Product photography** | Lifestyle Shot | Place products in scenes |
-
-## API Endpoints
-
-### Image Generation
-| Endpoint | Purpose |
-|----------|---------|
-| `POST /v2/image/generate` | Generate images from text (FIBO) |
-
-### Edit by Text (No Mask Required)
-| Endpoint | Purpose |
-|----------|---------|
-| `POST /v2/image/edit` | Edit image with natural language instruction |
-| `POST /v2/image/edit/add_object_by_text` | Add objects to image |
-| `POST /v2/image/edit/replace_object_by_text` | Replace objects in image |
-| `POST /v2/image/edit/erase_by_text` | Remove objects by name |
-
-### Edit with Mask
-| Endpoint | Purpose |
-|----------|---------|
-| `POST /v2/image/edit/gen_fill` | Inpaint/generate in masked region |
-| `POST /v2/image/edit/erase` | Erase masked region |
-
-### Background Operations
-| Endpoint | Purpose |
-|----------|---------|
-| `POST /v2/image/edit/remove_background` | Remove background (RMBG-2.0) |
-| `POST /v2/image/edit/replace_background` | Replace with AI-generated background |
-| `POST /v2/image/edit/blur_background` | Apply blur to background |
-| `POST /v2/image/edit/erase_foreground` | Remove foreground, fill background |
-| `POST /v2/image/edit/crop_foreground` | Crop tightly around subject |
-
-### Image Transformation
-| Endpoint | Purpose |
-|----------|---------|
-| `POST /v2/image/edit/expand` | Outpaint to new aspect ratio |
-| `POST /v2/image/edit/enhance` | Enhance quality and details |
-| `POST /v2/image/edit/increase_resolution` | Upscale 2x or 4x |
-| `POST /v2/image/edit/blend` | Blend/merge images or textures |
-| `POST /v2/image/edit/reseason` | Change season/weather |
-| `POST /v2/image/edit/restyle` | Transform artistic style |
-| `POST /v2/image/edit/relight` | Modify lighting |
-
-### Text & Restoration
-| Endpoint | Purpose |
-|----------|---------|
-| `POST /v2/image/edit/replace_text` | Replace text in image |
-| `POST /v2/image/edit/sketch_to_image` | Convert sketch to photo |
-| `POST /v2/image/edit/restore` | Restore old/damaged photos |
-| `POST /v2/image/edit/colorize` | Colorize B&W or convert to B&W |
-
-### Product Photography
-| Endpoint | Purpose |
-|----------|---------|
-| `POST /v2/image/edit/lifestyle_shot_by_text` | Place product in scene by text |
-
-## Restyle Options
-
-Transform images into different artistic styles:
-
-| Style ID | Description |
-|----------|-------------|
-| `render_3d` | 3D rendered look |
-| `oil_painting` | Classic oil painting |
-| `anime` | Anime/manga style |
-| `cartoon` | Cartoon illustration |
-| `coloring_book` | Line art for coloring |
-| `retro_ad` | Vintage advertisement |
-| `pop_art_halftone` | Pop art with halftone dots |
-| `vector_art` | Flat vector graphics |
-| `story_board` | Storyboard sketch |
-| `art_nouveau` | Art nouveau style |
-| `cross_etching` | Cross-hatched etching |
-| `wood_cut` | Woodcut print |
-| `cubism` | Cubist art style |
-
-## Aspect Ratios
-
-| Ratio | Use Case |
-|-------|----------|
-| `1:1` | Social media posts, product photos, icons |
-| `4:3` | Presentations, documents |
-| `16:9` | Hero banners, website headers, videos |
-| `3:4` | Portrait photos, mobile content |
-| `9:16` | Stories, reels, mobile-first content |
-
-## Documentation
-
-### Bria AI
-- [Skill Reference](./skills/bria-ai/SKILL.md)
-- [Complete Guide](./skills/bria-ai/references/guide.md)
-- [API Endpoints](./skills/bria-ai/references/api-endpoints.md)
-- [Python Client](./skills/bria-ai/references/code-examples/bria_client.py)
-
-### Image Utils
-- [Skill Reference](./skills/image-utils/SKILL.md)
-- [Python Module](./skills/image-utils/references/code-examples/image_utils.py)
+Copy the `skills/` directory contents to your agent's skills directory.
 
 ## Requirements
 
-### Bria AI
-- Bria API key (set as `BRIA_API_KEY` environment variable)
-- Get your API key at [https://bria.ai](https://bria.ai)
+- **Bria API key** — Free at [platform.bria.ai](https://platform.bria.ai/console/account/api-keys?utm_source=skill&utm_campaign=bria_skills&utm_content=readme)
+- **For image-utils:** `pip install Pillow requests`
 
-### Image Utils
-```bash
-pip install Pillow requests
-```
+## Documentation
+
+- [bria-ai SKILL.md](./skills/bria-ai/SKILL.md) — Core skill with all capabilities
+- [API Endpoints Reference](./skills/bria-ai/references/api-endpoints.md) — Complete API documentation
+- [Workflows & Pipelines](./skills/bria-ai/references/workflows.md) — Batch generation, parallel pipelines, integration examples
+- [VGL Schema Reference](./skills/vgl/references/schema-reference.md) — Full VGL JSON schema
+- [Python Client](./skills/bria-ai/references/code-examples/bria_client.py) — Full-featured async client
+- [TypeScript Client](./skills/bria-ai/references/code-examples/bria_client.ts) — Typed Node.js client
 
 ## License
 
