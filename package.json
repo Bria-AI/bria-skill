@@ -1,6 +1,6 @@
 {
   "name": "bria-skills",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Official Bria AI skills for Claude Code - image generation, editing, background removal, VGL structured prompts, and image utilities",
   "bin": {
     "bria-skills": "bin/cli.js"
@@ -13,14 +13,20 @@
   "keywords": [
     "claude-code",
     "claude-skills",
+    "agent-skills",
     "bria",
     "ai-images",
     "image-generation",
     "image-editing",
     "background-removal",
+    "text-to-image",
+    "product-photography",
+    "visual-assets",
     "fibo",
     "rmbg",
-    "vgl"
+    "vgl",
+    "upscale",
+    "restyle"
   ],
   "author": {
     "name": "Bria AI",

@@ -6,16 +6,16 @@
     "url": "https://bria.ai"
   },
   "metadata": {
-    "description": "Official skills from Bria AI for visual asset generation - image generation, editing, background removal, VGL structured prompts, and image utilities",
-    "version": "1.1.0",
+    "description": "Official skills from Bria AI for controllable image generation and editing - fine-grained control over generation, object-level editing, background removal, VGL structured prompts, and image utilities",
+    "version": "1.2.1",
     "repository": "https://github.com/bria-ai/bria-skill",
     "license": "MIT",
-    "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "image-editing", "vgl"]
+    "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "image-editing", "vgl", "product-photography", "visual-assets"]
   },
   "plugins": [
     {
       "name": "bria-ai",
-      "description": "AI-powered image generation and editing using Bria.ai APIs - FIBO text-to-image, FIBO-Edit image editing, RMBG-2.0 background removal, and product photography",
+      "description": "Controllable image generation and editing with Bria.ai commercially-safe AI models - edit by text instruction, mask specific regions, add/replace/remove objects, control lighting/season/style independently, RMBG-2.0 background removal, and pipeline workflows",
       "source": "./skills/bria-ai",
       "strict": false,
       "skills": [
@@ -27,7 +27,7 @@
     },
     {
       "name": "vgl",
-      "description": "Write structured VGL (Visual Generation Language) JSON prompts for precise, deterministic control over Bria FIBO image generation",
+      "description": "Maximum control over AI image generation - structured VGL JSON that explicitly defines every visual attribute: object placement, lighting direction, camera angle, composition, color scheme, and artistic style for deterministic, reproducible results",
       "source": "./skills/vgl",
       "strict": false,
       "skills": [
@@ -39,7 +39,7 @@
     },
     {
       "name": "image-utils",
-      "description": "Classic image manipulation utilities - resize, crop, composite, watermarks, format conversion for post-processing AI-generated images",
+      "description": "Classic image manipulation with Python Pillow - resize, crop, composite, watermarks, format conversion, and web optimization for post-processing AI-generated or any images",
       "source": "./skills/image-utils",
       "strict": false,
       "skills": [
