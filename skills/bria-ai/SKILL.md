@@ -4,7 +4,7 @@ description: Controllable image generation and editing with Bria.ai commercially
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 # Bria — Controllable Image Generation & Editing

@@ -4,7 +4,7 @@ description: Maximum control over AI image generation — write structured VGL (
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 # Bria VGL — Full Control Over Image Generation

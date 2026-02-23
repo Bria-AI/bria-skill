@@ -1,6 +1,6 @@
 {
   "name": "bria-skills",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Official Bria AI skills for Claude Code - image generation, editing, background removal, VGL structured prompts, and image utilities",
   "bin": {
     "bria-skills": "bin/cli.js"

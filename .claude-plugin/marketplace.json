@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "Official skills from Bria AI for controllable image generation and editing - fine-grained control over generation, object-level editing, background removal, VGL structured prompts, and image utilities",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "repository": "https://github.com/bria-ai/bria-skill",
     "license": "MIT",
     "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "image-editing", "vgl", "product-photography", "visual-assets"]
