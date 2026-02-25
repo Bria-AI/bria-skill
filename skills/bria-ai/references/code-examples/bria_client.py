@@ -144,6 +144,7 @@ class BriaClient:
         self,
         prompt: str,
         aspect_ratio: str = "1:1",
+        resolution: str = "1MP",
         negative_prompt: Optional[str] = None,
         num_results: int = 1,
         seed: Optional[int] = None,
@@ -155,6 +156,8 @@ class BriaClient:
         Args:
             prompt: Description of desired image
             aspect_ratio: "1:1", "4:3", "16:9", "3:4", "9:16"
+            resolution: Output image resolution. "1MP" or "4MP".
+                        "4MP" improves details (especially photorealism) but adds ~30s latency.
             negative_prompt: What to exclude
             num_results: Number of images (1-4)
             seed: For reproducibility
@@ -168,6 +171,8 @@ class BriaClient:
             "aspect_ratio": aspect_ratio,
             "num_results": num_results,
         }
+        if resolution != "1MP":
+            data["resolution"] = resolution
         if negative_prompt:
             data["negative_prompt"] = negative_prompt
         if seed is not None:
@@ -180,6 +185,7 @@ class BriaClient:
         structured_prompt: str,
         instruction: str,
         aspect_ratio: str = "1:1",
+        resolution: str = "1MP",
         negative_prompt: Optional[str] = None,
         num_results: int = 1,
         seed: Optional[int] = None,
@@ -192,6 +198,8 @@ class BriaClient:
             structured_prompt: JSON from previous generation
             instruction: What to change (e.g., "warmer lighting")
             aspect_ratio: Output aspect ratio
+            resolution: Output image resolution. "1MP" or "4MP".
+                        "4MP" improves details (especially photorealism) but adds ~30s latency.
             negative_prompt: What to exclude
             num_results: Number of images (1-4)
             seed: For reproducibility (use seed from previous generation)
@@ -206,6 +214,8 @@ class BriaClient:
             "aspect_ratio": aspect_ratio,
             "num_results": num_results,
         }
+        if resolution != "1MP":
+            data["resolution"] = resolution
         if negative_prompt:
             data["negative_prompt"] = negative_prompt
         if seed is not None:
@@ -213,7 +223,12 @@ class BriaClient:
         return self._request("/v2/image/generate", data, wait)
 
     def inspire(
-        self, image_url: str, prompt: str, aspect_ratio: str = "1:1", wait: bool = True
+        self,
+        image_url: str,
+        prompt: str,
+        aspect_ratio: str = "1:1",
+        resolution: str = "1MP",
+        wait: bool = True,
     ) -> Dict[str, Any]:
         """
         Generate variations inspired by a reference image.
@@ -222,6 +237,8 @@ class BriaClient:
             image_url: Reference image URL, base64 string, or local file path
             prompt: Creative direction
             aspect_ratio: Output aspect ratio
+            resolution: Output image resolution. "1MP" or "4MP".
+                        "4MP" improves details (especially photorealism) but adds ~30s latency.
             wait: Wait for completion
 
         Returns:
@@ -232,6 +249,8 @@ class BriaClient:
             "prompt": prompt,
             "aspect_ratio": aspect_ratio,
         }
+        if resolution != "1MP":
+            data["resolution"] = resolution
         return self._request("/v2/image/generate", data, wait)
 
     # ==================== RMBG-2.0 - Background Removal ====================
