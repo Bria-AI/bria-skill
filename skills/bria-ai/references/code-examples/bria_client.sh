@@ -25,6 +25,7 @@ BRIA_BASE_URL="${BRIA_BASE_URL:-https://engine.prod.bria-api.com}"
 BRIA_API_KEY="${BRIA_API_KEY:-}"
 BRIA_POLL_INTERVAL="${BRIA_POLL_INTERVAL:-2}"
 BRIA_TIMEOUT="${BRIA_TIMEOUT:-120}"
+BRIA_USER_AGENT="BriaSkills/1.2.1"
 
 # ==================== Helper Functions ====================
 
@@ -110,6 +111,7 @@ bria_request() {
   response=$(curl -s -X POST "${BRIA_BASE_URL}${endpoint}" \
     -H "api_token: ${BRIA_API_KEY}" \
     -H "Content-Type: application/json" \
+    -H "User-Agent: ${BRIA_USER_AGENT}" \
     -d "$data")
 
   # Validate that the response is JSON before parsing
@@ -139,7 +141,8 @@ bria_poll() {
   while [[ $elapsed -lt $timeout ]]; do
     local response
     response=$(curl -s -X GET "$status_url" \
-      -H "api_token: ${BRIA_API_KEY}")
+      -H "api_token: ${BRIA_API_KEY}" \
+      -H "User-Agent: ${BRIA_USER_AGENT}")
 
     local status
     status=$(echo "$response" | jq -r '.status')
