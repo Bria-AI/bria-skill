@@ -70,7 +70,9 @@ class ImageUtils:
                 return Image.open(io.BytesIO(image_bytes))
 
             # Plain base64 string (no data URL prefix)
-            if len(source) > 200 and not source.startswith(("http://", "https://", "/")):
+            if len(source) > 200 and not source.startswith(
+                ("http://", "https://", "/")
+            ):
                 try:
                     image_bytes = base64.b64decode(source)
                     return Image.open(io.BytesIO(image_bytes))
@@ -98,7 +100,9 @@ class ImageUtils:
         Returns:
             PIL Image object
         """
-        response = requests.get(url, timeout=timeout, headers={"User-Agent": "BriaSkills/1.2.1"})
+        response = requests.get(
+            url, timeout=timeout, headers={"User-Agent": "BriaSkills/1.2.2"}
+        )
         response.raise_for_status()
         return Image.open(io.BytesIO(response.content))
 
@@ -107,7 +111,7 @@ class ImageUtils:
         image: Image.Image,
         path: Union[str, Path],
         quality: int = 95,
-        optimize: bool = True
+        optimize: bool = True,
     ) -> None:
         """
         Save image to file with format auto-detection from extension.
@@ -143,11 +147,7 @@ class ImageUtils:
         save_image.save(path, **save_kwargs)
 
     @staticmethod
-    def to_bytes(
-        image: Image.Image,
-        format: str = "PNG",
-        quality: int = 95
-    ) -> bytes:
+    def to_bytes(image: Image.Image, format: str = "PNG", quality: int = 95) -> bytes:
         """
         Convert image to bytes.
 
@@ -177,7 +177,7 @@ class ImageUtils:
         image: Image.Image,
         format: str = "PNG",
         quality: int = 95,
-        include_data_url: bool = False
+        include_data_url: bool = False,
     ) -> str:
         """
         Convert image to base64 string.
@@ -195,7 +195,11 @@ class ImageUtils:
         b64_string = base64.b64encode(image_bytes).decode("utf-8")
 
         if include_data_url:
-            mime_types = {"PNG": "image/png", "JPEG": "image/jpeg", "WEBP": "image/webp"}
+            mime_types = {
+                "PNG": "image/png",
+                "JPEG": "image/jpeg",
+                "WEBP": "image/webp",
+            }
             mime = mime_types.get(format.upper(), "image/png")
             return f"data:{mime};base64,{b64_string}"
 
@@ -209,7 +213,7 @@ class ImageUtils:
         width: Optional[int] = None,
         height: Optional[int] = None,
         maintain_aspect: bool = False,
-        resample: int = Image.Resampling.LANCZOS
+        resample: int = Image.Resampling.LANCZOS,
     ) -> Image.Image:
         """
         Resize image to exact dimensions.
@@ -244,9 +248,7 @@ class ImageUtils:
 
     @staticmethod
     def scale(
-        image: Image.Image,
-        factor: float,
-        resample: int = Image.Resampling.LANCZOS
+        image: Image.Image, factor: float, resample: int = Image.Resampling.LANCZOS
     ) -> Image.Image:
         """
         Scale image by factor.
@@ -268,7 +270,7 @@ class ImageUtils:
     def thumbnail(
         image: Image.Image,
         size: Tuple[int, int],
-        resample: int = Image.Resampling.LANCZOS
+        resample: int = Image.Resampling.LANCZOS,
     ) -> Image.Image:
         """
         Create thumbnail that fits within size, maintaining aspect ratio.
@@ -289,11 +291,7 @@ class ImageUtils:
 
     @staticmethod
     def crop(
-        image: Image.Image,
-        left: int,
-        top: int,
-        right: int,
-        bottom: int
+        image: Image.Image, left: int, top: int, right: int, bottom: int
     ) -> Image.Image:
         """
         Crop image to region.
@@ -311,11 +309,7 @@ class ImageUtils:
         return image.crop((left, top, right, bottom))
 
     @staticmethod
-    def crop_center(
-        image: Image.Image,
-        width: int,
-        height: int
-    ) -> Image.Image:
+    def crop_center(image: Image.Image, width: int, height: int) -> Image.Image:
         """
         Crop from center of image.
 
@@ -334,9 +328,7 @@ class ImageUtils:
 
     @staticmethod
     def crop_to_aspect(
-        image: Image.Image,
-        ratio: Union[str, float],
-        anchor: str = "center"
+        image: Image.Image, ratio: Union[str, float], anchor: str = "center"
     ) -> Image.Image:
         """
         Crop image to target aspect ratio.
@@ -396,7 +388,7 @@ class ImageUtils:
         background: Image.Image,
         foreground: Image.Image,
         position: Tuple[int, int] = (0, 0),
-        use_alpha: bool = True
+        use_alpha: bool = True,
     ) -> Image.Image:
         """
         Paste foreground onto background at position.
@@ -425,7 +417,7 @@ class ImageUtils:
     def composite(
         background: Image.Image,
         foreground: Image.Image,
-        mask: Optional[Image.Image] = None
+        mask: Optional[Image.Image] = None,
     ) -> Image.Image:
         """
         Alpha composite foreground over background.
@@ -453,7 +445,7 @@ class ImageUtils:
         width: int,
         height: int,
         background_color: Tuple[int, int, int, int] = (255, 255, 255, 0),
-        position: str = "center"
+        position: str = "center",
     ) -> Image.Image:
         """
         Fit image onto canvas, letterboxing if needed.
@@ -495,11 +487,7 @@ class ImageUtils:
     # ==================== Format Conversion ====================
 
     @staticmethod
-    def convert_format(
-        image: Image.Image,
-        format: str,
-        quality: int = 95
-    ) -> bytes:
+    def convert_format(image: Image.Image, format: str, quality: int = 95) -> bytes:
         """
         Convert image to different format.
 
@@ -530,16 +518,14 @@ class ImageUtils:
             "mode": image.mode,
             "format": image.format,
             "has_alpha": image.mode in ("RGBA", "LA", "PA"),
-            "aspect_ratio": round(image.width / image.height, 3)
+            "aspect_ratio": round(image.width / image.height, 3),
         }
 
     # ==================== Borders & Padding ====================
 
     @staticmethod
     def add_border(
-        image: Image.Image,
-        width: int,
-        color: Tuple[int, int, int] = (0, 0, 0)
+        image: Image.Image, width: int, color: Tuple[int, int, int] = (0, 0, 0)
     ) -> Image.Image:
         """
         Add solid border around image.
@@ -565,7 +551,7 @@ class ImageUtils:
     def add_padding(
         image: Image.Image,
         padding: Union[int, Tuple[int, int, int, int]],
-        color: Tuple[int, int, int, int] = (255, 255, 255, 255)
+        color: Tuple[int, int, int, int] = (255, 255, 255, 255),
     ) -> Image.Image:
         """
         Add whitespace padding around image.
@@ -603,7 +589,7 @@ class ImageUtils:
         image: Image.Image,
         angle: float,
         expand: bool = True,
-        fill_color: Tuple[int, int, int, int] = (255, 255, 255, 0)
+        fill_color: Tuple[int, int, int, int] = (255, 255, 255, 0),
     ) -> Image.Image:
         """
         Rotate image by degrees (counter-clockwise).
@@ -617,7 +603,12 @@ class ImageUtils:
         Returns:
             New rotated Image
         """
-        return image.rotate(angle, expand=expand, fillcolor=fill_color, resample=Image.Resampling.BICUBIC)
+        return image.rotate(
+            angle,
+            expand=expand,
+            fillcolor=fill_color,
+            resample=Image.Resampling.BICUBIC,
+        )
 
     @staticmethod
     def flip_horizontal(image: Image.Image) -> Image.Image:
@@ -654,7 +645,7 @@ class ImageUtils:
         position: str = "bottom-right",
         font_size: int = 24,
         color: Tuple[int, int, int, int] = (255, 255, 255, 128),
-        margin: int = 10
+        margin: int = 10,
     ) -> Image.Image:
         """
         Add text watermark to image.
@@ -676,10 +667,14 @@ class ImageUtils:
 
         # Try to load a font, fall back to default
         try:
-            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", font_size)
+            font = ImageFont.truetype(
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", font_size
+            )
         except (IOError, OSError):
             try:
-                font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", font_size)
+                font = ImageFont.truetype(
+                    "/System/Library/Fonts/Helvetica.ttc", font_size
+                )
             except (IOError, OSError):
                 font = ImageFont.load_default()
 
@@ -691,11 +686,14 @@ class ImageUtils:
         # Calculate position
         img_width, img_height = result.size
         positions = {
-            "bottom-right": (img_width - text_width - margin, img_height - text_height - margin),
+            "bottom-right": (
+                img_width - text_width - margin,
+                img_height - text_height - margin,
+            ),
             "bottom-left": (margin, img_height - text_height - margin),
             "top-right": (img_width - text_width - margin, margin),
             "top-left": (margin, margin),
-            "center": ((img_width - text_width) // 2, (img_height - text_height) // 2)
+            "center": ((img_width - text_width) // 2, (img_height - text_height) // 2),
         }
         x, y = positions.get(position, positions["bottom-right"])
 
@@ -709,7 +707,7 @@ class ImageUtils:
         position: str = "bottom-right",
         opacity: float = 0.5,
         scale: float = 0.2,
-        margin: int = 10
+        margin: int = 10,
     ) -> Image.Image:
         """
         Add image/logo watermark.
@@ -747,7 +745,7 @@ class ImageUtils:
             "bottom-left": (margin, img_height - wm_h - margin),
             "top-right": (img_width - wm_w - margin, margin),
             "top-left": (margin, margin),
-            "center": ((img_width - wm_w) // 2, (img_height - wm_h) // 2)
+            "center": ((img_width - wm_w) // 2, (img_height - wm_h) // 2),
         }
         x, y = positions.get(position, positions["bottom-right"])
 
@@ -837,7 +835,7 @@ class ImageUtils:
         image: Image.Image,
         max_dimension: int = 1920,
         format: str = "WEBP",
-        quality: int = 85
+        quality: int = 85,
     ) -> bytes:
         """
         Optimize image for web delivery.
@@ -854,7 +852,9 @@ class ImageUtils:
         # Resize if needed
         width, height = image.size
         if width > max_dimension or height > max_dimension:
-            image = ImageUtils.resize(image, max_dimension, max_dimension, maintain_aspect=True)
+            image = ImageUtils.resize(
+                image, max_dimension, max_dimension, maintain_aspect=True
+            )
 
         return ImageUtils.to_bytes(image, format, quality)
 

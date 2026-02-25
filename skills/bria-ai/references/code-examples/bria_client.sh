@@ -25,7 +25,7 @@ BRIA_BASE_URL="${BRIA_BASE_URL:-https://engine.prod.bria-api.com}"
 BRIA_API_KEY="${BRIA_API_KEY:-}"
 BRIA_POLL_INTERVAL="${BRIA_POLL_INTERVAL:-2}"
 BRIA_TIMEOUT="${BRIA_TIMEOUT:-120}"
-BRIA_USER_AGENT="BriaSkills/1.2.1"
+BRIA_USER_AGENT="BriaSkills/1.2.2"
 
 # ==================== Helper Functions ====================
 
