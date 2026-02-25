@@ -105,7 +105,6 @@ Confirm the key is set, then tell the user:
 | Change lighting | Relight | Golden hour, spotlight, dramatic lighting |
 | Change season | Reseason | Spring, summer, autumn, winter |
 | Blend/composite | Image Blending | Apply textures, logos, merge images |
-| Text replacement | Rewrite | Change text in images |
 | Restore photos | Restoration | Fix old/damaged photos |
 | Colorize | Colorization | Add color to B&W, or convert to B&W |
 | Sketch to photo | Sketch2Image | Convert drawings to realistic photos |
@@ -190,7 +189,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution
 ### Product Lifestyle Shot
 
 ```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/lifestyle_shot_by_text" \
+curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -286,18 +285,17 @@ See `references/api-endpoints.md` for complete endpoint documentation.
 | `POST /v2/image/edit/restyle` | Transform artistic style |
 | `POST /v2/image/edit/relight` | Modify lighting |
 
-**Text & Restoration**
+**Restoration**
 | Endpoint | Purpose |
 |----------|---------|
-| `POST /v2/image/edit/replace_text` | Replace text in image |
-| `POST /v2/image/edit/sketch_to_image` | Convert sketch to photo |
+| `POST /v2/image/edit/sketch_to_colored_image` | Convert sketch to photo |
 | `POST /v2/image/edit/restore` | Restore old/damaged photos |
 | `POST /v2/image/edit/colorize` | Colorize B&W or convert to B&W |
 
 **Product Photography**
 | Endpoint | Purpose |
 |----------|---------|
-| `POST /v2/image/edit/lifestyle_shot_by_text` | Place product in scene by text |
+| `POST /v1/product/lifestyle_shot_by_text` | Place product in scene by text |
 
 **Utilities**
 | Endpoint | Purpose |

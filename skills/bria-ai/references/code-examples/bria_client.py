@@ -83,6 +83,27 @@ class BriaClient:
         # Assume it's already a raw base64 string
         return image
 
+    @staticmethod
+    def _to_base64(image: str) -> str:
+        """
+        Resolve an image input to a raw base64 string, downloading URLs if needed.
+
+        Required for v1 endpoints that only accept base64-encoded images.
+        """
+        if image.startswith("data:image"):
+            return image.split(",", 1)[1]
+
+        if image.startswith(("http://", "https://")):
+            resp = requests.get(image)
+            resp.raise_for_status()
+            return base64.b64encode(resp.content).decode("utf-8")
+
+        if os.path.isfile(image):
+            with open(image, "rb") as f:
+                return base64.b64encode(f.read()).decode("utf-8")
+
+        return image
+
     def _headers(self) -> Dict[str, str]:
         return {
             "api_token": self.api_key,
@@ -155,6 +176,9 @@ class BriaClient:
         structured_prompt: str,
         instruction: str,
         aspect_ratio: str = "1:1",
+        negative_prompt: Optional[str] = None,
+        num_results: int = 1,
+        seed: Optional[int] = None,
         wait: bool = True
     ) -> Dict[str, Any]:
         """
@@ -164,16 +188,24 @@ class BriaClient:
             structured_prompt: JSON from previous generation
             instruction: What to change (e.g., "warmer lighting")
             aspect_ratio: Output aspect ratio
+            negative_prompt: What to exclude
+            num_results: Number of images (1-4)
+            seed: For reproducibility (use seed from previous generation)
             wait: Wait for completion
 
         Returns:
-            Dict with refined image_url
+            VGL (structured json prompt) with refined image_url and structured_prompt
         """
         data = {
             "structured_prompt": structured_prompt,
             "prompt": instruction,
-            "aspect_ratio": aspect_ratio
+            "aspect_ratio": aspect_ratio,
+            "num_results": num_results
         }
+        if negative_prompt:
+            data["negative_prompt"] = negative_prompt
+        if seed is not None:
+            data["seed"] = seed
         return self._request("/v2/image/generate", data, wait)
 
     def inspire(
@@ -370,11 +402,15 @@ class BriaClient:
         Returns:
             Dict with lifestyle shot image_url
         """
-        return self._request("/v2/image/edit/lifestyle_shot_by_text", {
-            "image": self._resolve_image(image_url),
-            "prompt": prompt,
-            "placement_type": placement_type
-        }, wait)
+        return self._request(
+            "/v1/product/lifestyle_shot_by_text",
+            {
+                "file": self._to_base64(image_url),
+                "prompt": prompt,
+                "placement_type": placement_type,
+            },
+            wait,
+        )
 
     def blur_background(self, image_url: str, wait: bool = True) -> Dict[str, Any]:
         """
@@ -559,6 +595,7 @@ class BriaClient:
         self,
         image_url: str,
         light_type: str,
+        light_direction: str = "front",
         wait: bool = True
     ) -> Dict[str, Any]:
         """
@@ -566,8 +603,13 @@ class BriaClient:
 
         Args:
             image_url: Source image URL or base64
-            light_type: Lighting description (e.g., "spotlight on subject",
-                        "golden hour", "dramatic side lighting")
+            light_type: Lighting preset. One of:
+                        "midday", "blue hour light", "low-angle sunlight",
+                        "sunrise light", "spotlight on subject", "overcast light",
+                        "soft overcast daylight lighting", "cloud-filtered lighting",
+                        "fog-diffused lighting", "side lighting", "moonlight lighting",
+                        "starlight nighttime", "soft bokeh lighting", "harsh studio lighting"
+            light_direction: Light direction. One of: "front", "side", "bottom", "top-down"
             wait: Wait for completion
 
         Returns:
@@ -575,31 +617,8 @@ class BriaClient:
         """
         return self._request("/v2/image/edit/relight", {
             "image": self._resolve_image(image_url),
-            "light_type": light_type
-        }, wait)
-
-    # ==================== Text in Images ====================
-
-    def replace_text(
-        self,
-        image_url: str,
-        new_text: str,
-        wait: bool = True
-    ) -> Dict[str, Any]:
-        """
-        Replace existing text in an image with new text.
-
-        Args:
-            image_url: Source image URL or base64
-            new_text: The new text to display
-            wait: Wait for completion
-
-        Returns:
-            Dict with edited image_url
-        """
-        return self._request("/v2/image/edit/replace_text", {
-            "image": self._resolve_image(image_url),
-            "new_text": new_text
+            "light_type": light_type,
+            "light_direction": light_direction
         }, wait)
 
     # ==================== Image Restoration & Conversion ====================
@@ -624,7 +643,7 @@ class BriaClient:
         data = {"image": self._resolve_image(image_url)}
         if prompt:
             data["prompt"] = prompt
-        return self._request("/v2/image/edit/sketch_to_image", data, wait)
+        return self._request("/v2/image/edit/sketch_to_colored_image", data, wait)
 
     def restore_image(self, image_url: str, wait: bool = True) -> Dict[str, Any]:
         """
@@ -642,7 +661,7 @@ class BriaClient:
     def colorize(
         self,
         image_url: str,
-        style: str = "color_contemporary",
+        color: str = "contemporary color",
         wait: bool = True
     ) -> Dict[str, Any]:
         """
@@ -650,7 +669,9 @@ class BriaClient:
 
         Args:
             image_url: Source image URL or base64
-            style: Colorization style (e.g., "color_contemporary", "bw")
+            color: Colorization style. One of:
+                   "contemporary color", "vivid color",
+                   "black and white colors", "sepia vintage"
             wait: Wait for completion
 
         Returns:
@@ -658,7 +679,7 @@ class BriaClient:
         """
         return self._request("/v2/image/edit/colorize", {
             "image": self._resolve_image(image_url),
-            "style": style
+            "color": color
         }, wait)
 
     def crop_foreground(self, image_url: str, wait: bool = True) -> Dict[str, Any]:
