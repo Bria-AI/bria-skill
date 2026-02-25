@@ -14,7 +14,10 @@
 #   bria_generate "A modern office workspace"
 #
 
-set -euo pipefail
+# Only set shell options when running as a script, not when sourced as a library
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  set -euo pipefail
+fi
 
 # ==================== Configuration ====================
 
@@ -22,6 +25,7 @@ BRIA_BASE_URL="${BRIA_BASE_URL:-https://engine.prod.bria-api.com}"
 BRIA_API_KEY="${BRIA_API_KEY:-}"
 BRIA_POLL_INTERVAL="${BRIA_POLL_INTERVAL:-2}"
 BRIA_TIMEOUT="${BRIA_TIMEOUT:-120}"
+BRIA_USER_AGENT="BriaSkills/1.2.2"
 
 # ==================== Helper Functions ====================
 
@@ -49,7 +53,18 @@ bria_resolve_image() {
 
   # Already a URL
   if [[ "$image" == http://* || "$image" == https://* ]]; then
-    echo "$image"
+    if [[ "$mode" == "data_url" || "$mode" == "base64" ]]; then
+      # Download and base64-encode the URL
+      local b64
+      b64=$(curl -sL "$image" | base64 | tr -d '\n')
+      if [[ "$mode" == "data_url" ]]; then
+        echo "data:image/png;base64,${b64}"
+      else
+        echo "$b64"
+      fi
+    else
+      echo "$image"
+    fi
     return
   fi
 
@@ -96,7 +111,14 @@ bria_request() {
   response=$(curl -s -X POST "${BRIA_BASE_URL}${endpoint}" \
     -H "api_token: ${BRIA_API_KEY}" \
     -H "Content-Type: application/json" \
+    -H "User-Agent: ${BRIA_USER_AGENT}" \
     -d "$data")
+
+  # Validate that the response is JSON before parsing
+  if ! echo "$response" | jq empty 2>/dev/null; then
+    echo "Error: API returned non-JSON response: $response" >&2
+    return 1
+  fi
 
   if [[ "$wait" == "true" ]]; then
     local status_url
@@ -119,7 +141,8 @@ bria_poll() {
   while [[ $elapsed -lt $timeout ]]; do
     local response
     response=$(curl -s -X GET "$status_url" \
-      -H "api_token: ${BRIA_API_KEY}")
+      -H "api_token: ${BRIA_API_KEY}" \
+      -H "User-Agent: ${BRIA_USER_AGENT}")
 
     local status
     status=$(echo "$response" | jq -r '.status')
@@ -176,13 +199,24 @@ bria_refine() {
   local structured_prompt="$1"
   local instruction="$2"
   local aspect_ratio="${3:-1:1}"
+  local num_results="${4:-1}"
+  local negative_prompt="${5:-}"
+  local seed="${6:-}"
 
   local data
   data=$(jq -n \
     --arg sp "$structured_prompt" \
     --arg prompt "$instruction" \
     --arg ar "$aspect_ratio" \
-    '{structured_prompt: $sp, prompt: $prompt, aspect_ratio: $ar}')
+    --argjson num_results "$num_results" \
+    '{structured_prompt: $sp, prompt: $prompt, aspect_ratio: $ar, num_results: $num_results}')
+
+  if [[ -n "$negative_prompt" ]]; then
+    data=$(echo "$data" | jq --arg np "$negative_prompt" '. + {negative_prompt: $np}')
+  fi
+  if [[ -n "$seed" ]]; then
+    data=$(echo "$data" | jq --argjson seed "$seed" '. + {seed: $seed}')
+  fi
 
   bria_request "/v2/image/generate" "$data"
 }
@@ -324,19 +358,30 @@ bria_increase_resolution() {
 }
 
 bria_lifestyle_shot() {
-  local image_url
-  image_url=$(bria_resolve_image "$1")
+  local image_file
+  image_file=$(bria_resolve_image "$1" "base64")
   local prompt="$2"
   local placement_type="${3:-automatic}"
 
   local data
   data=$(jq -n \
-    --arg image "$image_url" \
+    --arg file "$image_file" \
     --arg prompt "$prompt" \
     --arg pt "$placement_type" \
-    '{image: $image, prompt: $prompt, placement_type: $pt}')
+    '{file: $file, prompt: $prompt, placement_type: $pt}')
 
-  bria_request "/v2/image/edit/lifestyle_shot_by_text" "$data"
+  local raw_response
+  raw_response=$(bria_request "/v1/product/lifestyle_shot_by_text" "$data")
+
+  # Normalize v1 product response to standard format
+  local image_url
+  image_url=$(echo "$raw_response" | jq -r '.result[0][0] // empty')
+  if [[ -n "$image_url" ]]; then
+    echo "$raw_response" | jq --arg url "$image_url" \
+      '{status: "COMPLETED", result: {image_url: $url}}'
+  else
+    echo "$raw_response"
+  fi
 }
 
 bria_blur_background() {
@@ -464,31 +509,17 @@ bria_restyle() {
 bria_relight() {
   local image_url
   image_url=$(bria_resolve_image "$1")
-  local light_type="$2"
+  local light_type="$2"  # midday, blue hour light, sunrise light, spotlight on subject, etc.
+  local light_direction="${3:-front}"  # front, side, bottom, top-down
 
   local data
   data=$(jq -n \
     --arg image "$image_url" \
     --arg lt "$light_type" \
-    '{image: $image, light_type: $lt}')
+    --arg ld "$light_direction" \
+    '{image: $image, light_type: $lt, light_direction: $ld}')
 
   bria_request "/v2/image/edit/relight" "$data"
-}
-
-# ==================== Text in Images ====================
-
-bria_replace_text() {
-  local image_url
-  image_url=$(bria_resolve_image "$1")
-  local new_text="$2"
-
-  local data
-  data=$(jq -n \
-    --arg image "$image_url" \
-    --arg text "$new_text" \
-    '{image: $image, new_text: $text}')
-
-  bria_request "/v2/image/edit/replace_text" "$data"
 }
 
 # ==================== Image Restoration & Conversion ====================
@@ -505,7 +536,7 @@ bria_sketch_to_image() {
     data=$(echo "$data" | jq --arg p "$prompt" '. + {prompt: $p}')
   fi
 
-  bria_request "/v2/image/edit/sketch_to_image" "$data"
+  bria_request "/v2/image/edit/sketch_to_colored_image" "$data"
 }
 
 bria_restore_image() {
@@ -521,13 +552,13 @@ bria_restore_image() {
 bria_colorize() {
   local image_url
   image_url=$(bria_resolve_image "$1")
-  local style="${2:-color_contemporary}"
+  local color="${2:-contemporary color}"  # contemporary color, vivid color, black and white colors, sepia vintage
 
   local data
   data=$(jq -n \
     --arg image "$image_url" \
-    --arg style "$style" \
-    '{image: $image, style: $style}')
+    --arg color "$color" \
+    '{image: $image, color: $color}')
 
   bria_request "/v2/image/edit/colorize" "$data"
 }
@@ -655,11 +686,11 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution
   }'
 
 # --- Lifestyle Shot (Product Photography) ---
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/lifestyle_shot_by_text" \
+curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "image": "https://example.com/product.png",
+    "file": "BASE64_ENCODED_IMAGE",
     "prompt": "modern kitchen countertop, morning light",
     "placement_type": "automatic"
   }'
@@ -734,20 +765,12 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/relight" \
   -H "Content-Type: application/json" \
   -d '{
     "image": "https://example.com/image.jpg",
-    "light_type": "golden hour"
-  }'
-
-# --- Replace Text ---
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/replace_text" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "image": "https://example.com/image.jpg",
-    "new_text": "SALE 50% OFF"
+    "light_type": "sunrise light",
+    "light_direction": "front"
   }'
 
 # --- Sketch to Image ---
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/sketch_to_image" \
+curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/sketch_to_colored_image" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -769,7 +792,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/colorize" \
   -H "Content-Type: application/json" \
   -d '{
     "image": "https://example.com/bw-photo.jpg",
-    "style": "color_contemporary"
+    "color": "contemporary color"
   }'
 
 # --- Crop Foreground ---

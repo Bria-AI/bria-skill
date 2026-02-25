@@ -40,14 +40,14 @@ jobs:
           # Fetch the latest release tag
           latest=$(gh release list --limit 1 --json tagName --jq '.[0].tagName // empty' 2>/dev/null || true)
           if [ -z "$latest" ]; then
-            next="v1.0.0"
+            next="1.0.0"
           else
-            # Strip 'v' prefix, split, increment patch
+            # Strip 'v' prefix if present, split, increment patch
             version="${latest#v}"
             major=$(echo "$version" | cut -d. -f1)
             minor=$(echo "$version" | cut -d. -f2)
             patch=$(echo "$version" | cut -d. -f3)
-            next="v${major}.${minor}.$((patch + 1))"
+            next="${major}.${minor}.$((patch + 1))"
           fi
           echo "tag=$next" >> "$GITHUB_OUTPUT"
           echo "Next version: $next"

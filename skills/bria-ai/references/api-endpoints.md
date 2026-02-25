@@ -33,13 +33,22 @@ Generate images from text prompts using FIBO's structured prompt system.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `prompt` | string | required | Image description |
+| `prompt` | string | required* | Image description (* or use `structured_prompt`) |
 | `aspect_ratio` | string | "1:1" | "1:1", "4:3", "16:9", "3:4", "9:16" |
 | `negative_prompt` | string | - | What to exclude |
 | `num_results` | int | 1 | Number of images (1-4) |
 | `seed` | int | random | For reproducibility |
-| `structured_prompt` | string | - | JSON from previous generation (for refinement) |
+| `structured_prompt` | string | - | JSON from previous generation (for refinement). Use with `prompt` to refine, or alone with `seed` to recreate. |
 | `image_url` | string | - | Reference image (for inspire mode) |
+
+**Input Combination Rules** (mutually exclusive):
+- `prompt` — Generate from text
+- `image_url` — Generate inspired by a reference image
+- `image_url` + `prompt` — Generate inspired by image, guided by text
+- `structured_prompt` + `seed` — Recreate a previous image exactly
+- `structured_prompt` + `prompt` + `seed` — Refine a previous image with new instructions
+
+All combinations support `aspect_ratio`, `negative_prompt`, `num_results`, and `seed`.
 
 **Response:**
 ```json
@@ -252,14 +261,14 @@ Upscale image resolution.
 | `image` | string | required | Source image URL |
 | `scale` | int | 2 | Upscale factor (2 or 4) |
 
-### POST /v2/image/edit/lifestyle_shot_by_text
+### POST /v1/product/lifestyle_shot_by_text
 
 Place a product in a lifestyle scene using text description.
 
 **Request:**
 ```json
 {
-  "image": "https://product-image-url",
+  "file": "BASE64_ENCODED_IMAGE",
   "prompt": "modern kitchen countertop, natural lighting",
   "placement_type": "automatic"
 }
@@ -358,31 +367,26 @@ Modify the lighting setup of an image.
 ```json
 {
   "image": "base64-or-url",
-  "light_type": "spotlight on subject, keep background settings"
+  "light_type": "sunrise light",
+  "light_direction": "front"
 }
 ```
 
----
+**Parameters:**
 
-## Text in Images
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `image` | string | required | Source image URL or base64 |
+| `light_type` | string | required | Lighting preset (see values below) |
+| `light_direction` | string | required | `front`, `side`, `bottom`, `top-down` |
 
-### POST /v2/image/edit/replace_text
-
-Replace existing text in an image with new text.
-
-**Request:**
-```json
-{
-  "image": "base64-or-url",
-  "new_text": "FIBO Edit!"
-}
-```
+**Light Types:** `midday`, `blue hour light`, `low-angle sunlight`, `sunrise light`, `spotlight on subject`, `overcast light`, `soft overcast daylight lighting`, `cloud-filtered lighting`, `fog-diffused lighting`, `side lighting`, `moonlight lighting`, `starlight nighttime`, `soft bokeh lighting`, `harsh studio lighting`
 
 ---
 
 ## Image Restoration & Conversion
 
-### POST /v2/image/edit/sketch_to_image
+### POST /v2/image/edit/sketch_to_colored_image
 
 Convert a sketch or line drawing to a photorealistic image.
 
@@ -413,11 +417,11 @@ Add color to B&W photos or convert to B&W.
 ```json
 {
   "image": "base64-or-url",
-  "style": "color_contemporary"
+  "color": "contemporary color"
 }
 ```
 
-**Styles:** `color_contemporary`, `bw`
+**Colors:** `contemporary color`, `vivid color`, `black and white colors`, `sepia vintage`
 
 ### POST /v2/image/edit/crop_foreground
 
