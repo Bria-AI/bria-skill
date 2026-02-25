@@ -23,6 +23,7 @@ Generate images from text prompts using FIBO's structured prompt system.
 {
   "prompt": "string (required)",
   "aspect_ratio": "1:1",
+  "resolution": "1MP",
   "negative_prompt": "string",
   "num_results": 1,
   "seed": null
@@ -35,6 +36,7 @@ Generate images from text prompts using FIBO's structured prompt system.
 |-----------|------|---------|-------------|
 | `prompt` | string | required* | Image description (* or use `structured_prompt`) |
 | `aspect_ratio` | string | "1:1" | "1:1", "4:3", "16:9", "3:4", "9:16" |
+| `resolution` | string | "1MP" | Output image resolution. "1MP" or "4MP". "4MP" improves image details, especially for photorealism, but increases latency by ~30 seconds. |
 | `negative_prompt` | string | - | What to exclude |
 | `num_results` | int | 1 | Number of images (1-4) |
 | `seed` | int | random | For reproducibility |

@@ -35,6 +35,7 @@ export interface BriaResponse {
 
 export interface GenerateOptions {
   aspectRatio?: "1:1" | "4:3" | "16:9" | "3:4" | "9:16";
+  resolution?: "1MP" | "4MP";
   negativePrompt?: string;
   numResults?: number;
   seed?: number;
@@ -222,6 +223,7 @@ export class BriaClient {
   ): Promise<BriaResponse> {
     const {
       aspectRatio = "1:1",
+      resolution = "1MP",
       negativePrompt,
       numResults = 1,
       seed,
@@ -233,6 +235,7 @@ export class BriaClient {
       aspect_ratio: aspectRatio,
       num_results: numResults,
     };
+    if (resolution !== "1MP") data.resolution = resolution;
     if (negativePrompt) data.negative_prompt = negativePrompt;
     if (seed !== undefined) data.seed = seed;
 
@@ -253,6 +256,7 @@ export class BriaClient {
   ): Promise<BriaResponse> {
     const {
       aspectRatio = "1:1",
+      resolution = "1MP",
       negativePrompt,
       numResults = 1,
       seed,
@@ -265,6 +269,7 @@ export class BriaClient {
       aspect_ratio: aspectRatio,
       num_results: numResults,
     };
+    if (resolution !== "1MP") data.resolution = resolution;
     if (negativePrompt) data.negative_prompt = negativePrompt;
     if (seed !== undefined) data.seed = seed;
 
@@ -283,17 +288,17 @@ export class BriaClient {
     imageUrl: string,
     prompt: string,
     aspectRatio = "1:1",
+    resolution: "1MP" | "4MP" = "1MP",
     wait = true
   ): Promise<BriaResponse> {
-    return this.request(
-      "/v2/image/generate",
-      {
-        image_url: this.resolveImage(imageUrl),
-        prompt,
-        aspect_ratio: aspectRatio,
-      },
-      wait
-    );
+    const data: Record<string, unknown> = {
+      image_url: this.resolveImage(imageUrl),
+      prompt,
+      aspect_ratio: aspectRatio,
+    };
+    if (resolution !== "1MP") data.resolution = resolution;
+
+    return this.request("/v2/image/generate", data, wait);
   }
 
   // ==================== RMBG-2.0 - Background Removal ====================

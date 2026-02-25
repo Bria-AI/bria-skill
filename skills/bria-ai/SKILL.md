@@ -120,11 +120,14 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "your description",
-    "aspect_ratio": "16:9"
+    "aspect_ratio": "16:9",
+    "resolution": "1MP"
   }'
 ```
 
 **Aspect ratios**: `1:1` (square), `16:9` (hero/banner), `4:3` (presentation), `9:16` (mobile/story), `3:4` (portrait)
+
+**Resolution**: `1MP` (default) or `4MP` (improved details for photorealism, adds ~30s latency)
 
 > **Advanced**: For precise, deterministic control over generation, use **[VGL structured prompts](../vgl/SKILL.md)** instead of natural language. VGL defines every visual attribute (objects, lighting, composition) as explicit JSON.
 

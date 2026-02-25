@@ -177,6 +177,7 @@ bria_generate() {
   local num_results="${3:-1}"
   local negative_prompt="${4:-}"
   local seed="${5:-}"
+  local resolution="${6:-1MP}"
 
   local data
   data=$(jq -n \
@@ -185,6 +186,9 @@ bria_generate() {
     --argjson num_results "$num_results" \
     '{prompt: $prompt, aspect_ratio: $aspect_ratio, num_results: $num_results}')
 
+  if [[ "$resolution" != "1MP" && -n "$resolution" ]]; then
+    data=$(echo "$data" | jq --arg res "$resolution" '. + {resolution: $res}')
+  fi
   if [[ -n "$negative_prompt" ]]; then
     data=$(echo "$data" | jq --arg np "$negative_prompt" '. + {negative_prompt: $np}')
   fi
@@ -202,6 +206,7 @@ bria_refine() {
   local num_results="${4:-1}"
   local negative_prompt="${5:-}"
   local seed="${6:-}"
+  local resolution="${7:-1MP}"
 
   local data
   data=$(jq -n \
@@ -211,6 +216,9 @@ bria_refine() {
     --argjson num_results "$num_results" \
     '{structured_prompt: $sp, prompt: $prompt, aspect_ratio: $ar, num_results: $num_results}')
 
+  if [[ "$resolution" != "1MP" && -n "$resolution" ]]; then
+    data=$(echo "$data" | jq --arg res "$resolution" '. + {resolution: $res}')
+  fi
   if [[ -n "$negative_prompt" ]]; then
     data=$(echo "$data" | jq --arg np "$negative_prompt" '. + {negative_prompt: $np}')
   fi
@@ -226,6 +234,7 @@ bria_inspire() {
   image_url=$(bria_resolve_image "$1")
   local prompt="$2"
   local aspect_ratio="${3:-1:1}"
+  local resolution="${4:-1MP}"
 
   local data
   data=$(jq -n \
@@ -233,6 +242,10 @@ bria_inspire() {
     --arg prompt "$prompt" \
     --arg ar "$aspect_ratio" \
     '{image_url: $url, prompt: $prompt, aspect_ratio: $ar}')
+
+  if [[ "$resolution" != "1MP" && -n "$resolution" ]]; then
+    data=$(echo "$data" | jq --arg res "$resolution" '. + {resolution: $res}')
+  fi
 
   bria_request "/v2/image/generate" "$data"
 }
@@ -613,6 +626,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
   -d '{
     "prompt": "Modern tech startup office, developers collaborating",
     "aspect_ratio": "16:9",
+    "resolution": "1MP",
     "num_results": 1,
     "negative_prompt": "cluttered, dark"
   }'
