@@ -78,6 +78,21 @@ export interface RestyleOptions {
   wait?: boolean;
 }
 
+export interface ProductPlacement {
+  image: string;
+  coordinates: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+}
+
+export interface IntegrateProductsOptions {
+  seed?: number;
+  wait?: boolean;
+}
+
 export interface ColorizeOptions {
   color?: "contemporary color" | "vivid color" | "black and white colors" | "sepia vintage";
   wait?: boolean;
@@ -463,6 +478,35 @@ export class BriaClient {
       },
       wait
     );
+  }
+
+  /**
+   * Integrate and embed one or more products into a scene at precise coordinates.
+   * Products are automatically cut out and matched to the scene's lighting and perspective.
+   * @param scene - Scene image URL, base64 string, or local file path
+   * @param products - Array of product placements with image and coordinates
+   * @param options - Integration options
+   * @returns Response with integrated scene image_url
+   */
+  async integrateProducts(
+    scene: string,
+    products: ProductPlacement[],
+    options: IntegrateProductsOptions = {}
+  ): Promise<BriaResponse> {
+    const { seed, wait = true } = options;
+
+    const resolvedProducts = products.map((p) => ({
+      image: this.resolveImage(p.image),
+      coordinates: p.coordinates,
+    }));
+
+    const data: Record<string, unknown> = {
+      scene: this.resolveImage(scene),
+      products: resolvedProducts,
+    };
+    if (seed !== undefined) data.seed = seed;
+
+    return this.request("/image/edit/product/integrate", data, wait);
   }
 
   /**

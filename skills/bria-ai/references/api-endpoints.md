@@ -276,6 +276,61 @@ Place a product in a lifestyle scene using text description.
 }
 ```
 
+### POST /image/edit/product/integrate
+
+Integrate and embed one or more products into a predefined scene at precise user-defined coordinates. The product is automatically matched to the scene's lighting, perspective, and aesthetics. Products are automatically cut out from their background as part of the pipeline.
+
+**Request:**
+```json
+{
+  "scene": "https://scene-image-url",
+  "products": [
+    {
+      "image": "https://product-image-url",
+      "coordinates": {
+        "x": 100,
+        "y": 200,
+        "width": 300,
+        "height": 400
+      }
+    }
+  ],
+  "seed": 42
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `scene` | string | required | Scene image URL or base64. Accepted formats: jpeg, jpg, png, webp |
+| `products` | array | required | Array of product objects (1 to N products) |
+| `products[].image` | string | required | Product image URL or base64. If it has an alpha channel, no cutout is applied; otherwise automatic cutout is applied |
+| `products[].coordinates` | object | required | Placement and scaling of the product within the scene |
+| `products[].coordinates.x` | int | required | X-coordinate of the product's top-left corner (pixels) |
+| `products[].coordinates.y` | int | required | Y-coordinate of the product's top-left corner (pixels) |
+| `products[].coordinates.width` | int | required | Desired product width in pixels (must not exceed scene dimensions) |
+| `products[].coordinates.height` | int | required | Desired product height in pixels (must not exceed scene dimensions) |
+| `seed` | int | random | Seed for deterministic generation |
+
+**Response:**
+```json
+{
+  "request_id": "uuid",
+  "result": {
+    "image_url": "https://..."
+  }
+}
+```
+
+**Async Response (202):**
+```json
+{
+  "request_id": "uuid",
+  "status_url": "https://..."
+}
+```
+
 ---
 
 ## Text-Based Object Editing

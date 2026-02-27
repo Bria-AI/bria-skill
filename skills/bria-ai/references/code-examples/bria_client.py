@@ -454,6 +454,44 @@ class BriaClient:
             wait,
         )
 
+    def integrate_products(
+        self,
+        scene: str,
+        products: list,
+        seed: Optional[int] = None,
+        wait: bool = True,
+    ) -> Dict[str, Any]:
+        """
+        Integrate and embed one or more products into a scene at precise coordinates.
+
+        Products are automatically cut out from their background and matched to
+        the scene's lighting, perspective, and aesthetics.
+
+        Args:
+            scene: Scene image URL, base64 string, or local file path
+            products: List of dicts, each with 'image' (str) and 'coordinates' (dict with x, y, width, height)
+            seed: For deterministic generation
+            wait: Wait for completion
+
+        Returns:
+            Dict with integrated scene image_url
+        """
+        resolved_products = []
+        for p in products:
+            resolved_products.append({
+                "image": self._resolve_image(p["image"]),
+                "coordinates": p["coordinates"],
+            })
+
+        data: Dict[str, Any] = {
+            "scene": self._resolve_image(scene),
+            "products": resolved_products,
+        }
+        if seed is not None:
+            data["seed"] = seed
+
+        return self._request("/image/edit/product/integrate", data, wait)
+
     def blur_background(self, image_url: str, wait: bool = True) -> Dict[str, Any]:
         """
         Apply blur effect to image background.

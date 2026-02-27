@@ -397,6 +397,25 @@ bria_lifestyle_shot() {
   fi
 }
 
+bria_integrate_products() {
+  local scene
+  scene=$(bria_resolve_image "$1")
+  local products_json="$2"  # JSON array of {image, coordinates} objects
+  local seed="${3:-}"
+
+  local data
+  data=$(jq -n \
+    --arg scene "$scene" \
+    --argjson products "$products_json" \
+    '{scene: $scene, products: $products}')
+
+  if [[ -n "$seed" ]]; then
+    data=$(echo "$data" | jq --argjson seed "$seed" '. + {seed: $seed}')
+  fi
+
+  bria_request "/image/edit/product/integrate" "$data"
+}
+
 bria_blur_background() {
   local image_url
   image_url=$(bria_resolve_image "$1")
@@ -707,6 +726,20 @@ curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text
     "file": "BASE64_ENCODED_IMAGE",
     "prompt": "modern kitchen countertop, morning light",
     "placement_type": "automatic"
+  }'
+
+# --- Integrate Products into Scene ---
+curl -X POST "https://engine.prod.bria-api.com/image/edit/product/integrate" \
+  -H "api_token: $BRIA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scene": "https://example.com/scene.jpg",
+    "products": [
+      {
+        "image": "https://example.com/product.png",
+        "coordinates": {"x": 100, "y": 200, "width": 300, "height": 400}
+      }
+    ]
   }'
 
 # --- Edit Image (Natural Language) ---
