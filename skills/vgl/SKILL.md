@@ -266,6 +266,7 @@ Only change what the edit strictly requires.
 curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
+  -H "User-Agent: BriaSkills/1.2.3" \
   -d '{
     "structured_prompt": "{\"short_description\": \"...\", ...}",
     "prompt": "Generate this scene",

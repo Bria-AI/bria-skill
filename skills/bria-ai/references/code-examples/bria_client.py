@@ -108,7 +108,7 @@ class BriaClient:
         return {
             "api_token": self.api_key,
             "Content-Type": "application/json",
-            "User-Agent": "BriaSkills/1.2.2",
+            "User-Agent": "BriaSkills/1.2.3",
         }
 
     def _request(self, endpoint: str, data: Dict, wait: bool = True) -> Dict[str, Any]:
