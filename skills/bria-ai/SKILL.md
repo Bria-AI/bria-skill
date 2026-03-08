@@ -131,6 +131,7 @@ Confirm the key is set, then tell the user:
 curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
+  -H "User-Agent: BriaSkills/1.2.3" \
   -d '{
     "prompt": "your description",
     "aspect_ratio": "16:9",
@@ -150,6 +151,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/remove_background" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
+  -H "User-Agent: BriaSkills/1.2.3" \
   -d '{"image": "https://..."}'
 ```
 
@@ -161,6 +163,7 @@ Returns PNG with transparency.
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
+  -H "User-Agent: BriaSkills/1.2.3" \
   -d '{
     "images": ["https://..."],
     "instruction": "change the mug to red"
@@ -173,6 +176,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/gen_fill" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
+  -H "User-Agent: BriaSkills/1.2.3" \
   -d '{
     "image": "https://...",
     "mask": "https://...",
@@ -186,6 +190,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/gen_fill" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/expand" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
+  -H "User-Agent: BriaSkills/1.2.3" \
   -d '{
     "image": "base64-or-url",
     "aspect_ratio": "16:9",
@@ -199,6 +204,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/expand" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
+  -H "User-Agent: BriaSkills/1.2.3" \
   -d '{"image": "https://...", "scale": 2}'
 ```
 
@@ -208,6 +214,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution
 curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
+  -H "User-Agent: BriaSkills/1.2.3" \
   -d '{
     "image": "https://product-with-transparent-bg.png",
     "prompt": "modern kitchen countertop, natural morning light"
@@ -222,6 +229,7 @@ Place one or more products at exact coordinates in a scene. Products are automat
 curl -X POST "https://engine.prod.bria-api.com/image/edit/product/integrate" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
+  -H "User-Agent: BriaSkills/1.2.3" \
   -d '{
     "scene": "https://scene-image-url",
     "products": [
@@ -252,8 +260,9 @@ Poll the status_url until `status: "COMPLETED"`, then get `result.image_url`.
 import requests, time
 
 def get_result(status_url, api_key):
+    headers = {"api_token": api_key, "User-Agent": "BriaSkills/1.2.3"}
     while True:
-        r = requests.get(status_url, headers={"api_token": api_key})
+        r = requests.get(status_url, headers=headers)
         data = r.json()
         if data["status"] == "COMPLETED":
             return data["result"]["image_url"]
@@ -341,10 +350,13 @@ See `references/api-endpoints.md` for complete endpoint documentation.
 
 ### Authentication
 
-All requests need `api_token` header:
+All requests need these headers:
 ```
 api_token: YOUR_BRIA_API_KEY
+User-Agent: BriaSkills/<version>
 ```
+
+> **Required:** Always include the `User-Agent: BriaSkills/<version>` header in every Bria API call (where `<version>` is the current skill version, e.g. `BriaSkills/1.2.3`). This applies to all requests including status polling.
 
 ---
 
