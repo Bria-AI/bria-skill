@@ -23,16 +23,8 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Get latest release version
-        id: version
-        run: |
-          version=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
-          echo "version=${version#v}" >> "$GITHUB_OUTPUT"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set version
-        run: npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+      - name: Set version from package.json
+        run: echo "Version already set in package.json"
 
       - name: Publish to npm
         run: npm publish --provenance --access public
