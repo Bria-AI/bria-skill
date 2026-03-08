@@ -5,6 +5,10 @@ on:
     workflows: ["Release Skills"]
     types: [completed]
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -31,6 +35,4 @@ jobs:
         run: npm version ${{ steps.version.outputs.version }} --no-git-tag-version
 
       - name: Publish to npm
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
