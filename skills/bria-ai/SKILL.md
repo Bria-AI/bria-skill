@@ -4,7 +4,7 @@ description: Generate, edit, and transform images with commercially-safe AI mode
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.2.1"
+  version: "1.2.3"
   dependencies:
     - type: env
       name: BRIA_API_KEY
