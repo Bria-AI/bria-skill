@@ -101,7 +101,7 @@ class ImageUtils:
             PIL Image object
         """
         response = requests.get(
-            url, timeout=timeout, headers={"User-Agent": "BriaSkills/1.2.4"}
+            url, timeout=timeout, headers={"User-Agent": "BriaSkills/1.2.5"}
         )
         response.raise_for_status()
         return Image.open(io.BytesIO(response.content))
