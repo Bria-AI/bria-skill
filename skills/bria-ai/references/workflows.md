@@ -14,7 +14,7 @@ async def generate_image(session, api_key, prompt, aspect_ratio="1:1"):
     """Launch a single generation request."""
     async with session.post(
         "https://engine.prod.bria-api.com/v2/image/generate",
-        headers={"api_token": api_key, "Content-Type": "application/json", "User-Agent": "BriaSkills/1.2.3"},
+        headers={"api_token": api_key, "Content-Type": "application/json", "User-Agent": "BriaSkills/1.2.4"},
         json={"prompt": prompt, "aspect_ratio": aspect_ratio}
     ) as resp:
         return await resp.json()
@@ -22,7 +22,7 @@ async def generate_image(session, api_key, prompt, aspect_ratio="1:1"):
 async def poll_status(session, api_key, status_url, timeout=120):
     """Poll until complete or failed."""
     for _ in range(timeout // 2):
-        async with session.get(status_url, headers={"api_token": api_key, "User-Agent": "BriaSkills/1.2.3"}) as resp:
+        async with session.get(status_url, headers={"api_token": api_key, "User-Agent": "BriaSkills/1.2.4"}) as resp:
             data = await resp.json()
             if data["status"] == "COMPLETED":
                 return data["result"]["image_url"]
@@ -109,14 +109,14 @@ async function generateBatch(
       // Launch request
       const res = await fetch("https://engine.prod.bria-api.com/v2/image/generate", {
         method: "POST",
-        headers: { "api_token": apiKey, "Content-Type": "application/json", "User-Agent": "BriaSkills/1.2.3" },
+        headers: { "api_token": apiKey, "Content-Type": "application/json", "User-Agent": "BriaSkills/1.2.4" },
         body: JSON.stringify({ prompt, aspect_ratio: aspectRatio })
       });
       const { status_url } = (await res.json()) as BriaResponse;
 
       // Poll for result
       for (let i = 0; i < 60; i++) {
-        const statusRes = await fetch(status_url, { headers: { "api_token": apiKey, "User-Agent": "BriaSkills/1.2.3" } });
+        const statusRes = await fetch(status_url, { headers: { "api_token": apiKey, "User-Agent": "BriaSkills/1.2.4" } });
         const data = (await statusRes.json()) as BriaStatusResponse;
         if (data.status === "COMPLETED") return data.result!.image_url;
         if (data.status === "FAILED") throw new Error(data.error || "Generation failed");
@@ -174,7 +174,7 @@ async def product_pipeline(api_key, product_descriptions, scene_prompt):
             # Step 2: Remove background
             async with session.post(
                 "https://engine.prod.bria-api.com/v2/image/edit/remove_background",
-                headers={"api_token": api_key, "Content-Type": "application/json", "User-Agent": "BriaSkills/1.2.3"},
+                headers={"api_token": api_key, "Content-Type": "application/json", "User-Agent": "BriaSkills/1.2.4"},
                 json={"image": product_url}
             ) as resp:
                 rmbg_result = await resp.json()
@@ -183,7 +183,7 @@ async def product_pipeline(api_key, product_descriptions, scene_prompt):
             # Step 3: Place in lifestyle scene
             async with session.post(
                 "https://engine.prod.bria-api.com/v2/image/edit/lifestyle_shot_by_text",
-                headers={"api_token": api_key, "Content-Type": "application/json", "User-Agent": "BriaSkills/1.2.3"},
+                headers={"api_token": api_key, "Content-Type": "application/json", "User-Agent": "BriaSkills/1.2.4"},
                 json={"image": transparent_url, "prompt": scene_prompt}
             ) as resp:
                 lifestyle_result = await resp.json()
