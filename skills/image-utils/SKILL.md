@@ -244,7 +244,7 @@ with open("optimized.webp", "wb") as f:
 
 ## Integration with Bria AI
 
-Use alongside the **[bria-ai skill](../bria-ai/SKILL.md)** to post-process AI-generated images. Generate or edit images with Bria's API, then use image-utils for resizing, cropping, watermarking, and web optimization.
+Use alongside the **[bria-ai skill](https://clawhub.ai/galbria/bria-ai)** to post-process AI-generated images. Generate or edit images with Bria's API, then use image-utils for resizing, cropping, watermarking, and web optimization.
 
 ```python
 import requests
