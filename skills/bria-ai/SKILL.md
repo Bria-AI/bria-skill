@@ -1,27 +1,20 @@
 ---
 name: bria-ai
-description: Generate, edit, and transform images with commercially-safe AI models. Create images from text, edit by natural language instruction, remove backgrounds (transparent PNG), replace backgrounds, add/replace/remove objects, inpaint, outpaint, upscale (2x/4x), enhance quality, restyle (oil painting, anime, 3D), relight, reseason, restore old photos, colorize, sketch to photo, and product lifestyle shots. Use for websites, apps, presentations needing hero images, banners, product photos, product placement in scenes, icons, illustrations, or backgrounds. Also for e-commerce photography, batch generation, and pipelines. Triggers are image generation, generate/create image, edit photo, remove background, transparent PNG, replace background, product shot, lifestyle scenes, upscale, style transfer, photo restoration, colorize, sketch to image, outpaint, inpaint, cut out subject, integrate products into scene.
+description: Generate, edit, create product images with AI. Remove or replace backgrounds, lifestyle shots, transparent PNGs, visual assets, batch generation, illustrations. Controllable image editing with Bria.ai commercially-safe models — fine-grained control over what gets generated, edited, or removed. Edit by text instruction, mask specific regions, add/replace/remove individual objects, control lighting, season, and style. Use for e-commerce product photography, background removal, image upscaling, style transfer, hero images, icons, banners, and pipeline workflows. Triggers on AI image generation, controllable editing, background removal, or visual asset creation.
+homepage: https://bria.ai
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.2.3"
+  version: "1.2.6"
   dependencies:
     - type: env
       name: BRIA_API_KEY
       description: "Bria AI API key (get one at https://platform.bria.ai/console/account/api-keys)"
-    - type: runtime
-      name: python
-      version: ">=3.8"
-      optional: true
-    - type: runtime
-      name: node
-      version: ">=18"
-      optional: true
 ---
 
-# Bria — Controllable Image Generation & Editing
+# Bria — Generate, Edit & Remove Background from Images with AI
 
-Generate and precisely control visual assets using Bria's commercially-safe AI models (FIBO, RMBG-2.0, GenFill, and more). Unlike black-box generators, Bria gives you fine-grained control: edit by text instruction, mask specific regions, add/replace/remove individual objects, change lighting or season independently, and chain operations in pipelines.
+Generate, edit, and create visual assets using Bria's commercially-safe AI models (Fibo, Fibo-Edit,  RMBG-2.0, GenFill, and more). Remove or replace backgrounds, create product lifestyle shots, generate transparent PNGs, batch generate images, and build pipeline workflows. Unlike black-box generators, Bria gives you fine-grained control: edit by text instruction, mask specific regions, add/replace/remove individual objects, change lighting or season independently.
 
 ## Setup — API Key Check
 
@@ -43,7 +36,6 @@ Tell the user exactly this:
 > 1. Go to https://platform.bria.ai/console/account/api-keys
 > 2. Sign up or log in
 > 3. Click **Create API Key**
-> 4. Copy the key and **paste it here**
 
 Wait for the user to provide their API key. Do not proceed until they give you the key.
 
@@ -55,24 +47,24 @@ Wait for the user to provide their API key. Do not proceed until they give you t
 
 | Need | Capability | Use Case |
 |------|------------|----------|
-| Create new images | FIBO Generate | Hero images, product shots, illustrations |
-| Edit by text | FIBO-Edit | Change colors, modify objects, transform scenes |
-| Edit with mask | GenFill/Erase | Precise inpainting, add/replace specific regions |
+| Generate images from text | FIBO Generate | Hero images, product shots, illustrations, social media images, banners |
+| Edit images by text instruction | FIBO-Edit | Change colors, modify objects, transform scenes |
+| Edit image region with mask | GenFill/Erase | Precise inpainting, add/replace specific regions |
 | Add/Replace/Remove objects | Text-based editing | Add vase, replace apple with pear, remove table |
-| Transparent backgrounds | RMBG-2.0 | Extract subjects for overlays, logos, cutouts |
-| Background operations | Replace/Blur/Erase | Change, blur, or remove backgrounds |
-| Expand images | Outpainting | Extend boundaries, change aspect ratios |
-| Upscale images | Super Resolution | Increase resolution 2x or 4x |
-| Enhance quality | Enhancement | Improve lighting, colors, details |
-| Transform style | Restyle | Oil painting, anime, cartoon, 3D render |
+| Remove background (transparent PNG) | RMBG-2.0 | Extract subjects for overlays, logos, cutouts |
+| Replace/blur/erase background | Background ops | Change, blur, or remove backgrounds |
+| Expand/outpaint images | Outpainting | Extend boundaries, change aspect ratios |
+| Upscale image resolution | Super Resolution | Increase resolution 2x or 4x |
+| Enhance image quality | Enhancement | Improve lighting, colors, details |
+| Restyle images | Restyle | Oil painting, anime, cartoon, 3D render |
 | Change lighting | Relight | Golden hour, spotlight, dramatic lighting |
 | Change season | Reseason | Spring, summer, autumn, winter |
-| Blend/composite | Image Blending | Apply textures, logos, merge images |
-| Restore photos | Restoration | Fix old/damaged photos |
-| Colorize | Colorization | Add color to B&W, or convert to B&W |
+| Composite/blend images | Image Blending | Apply textures, logos, merge images |
+| Restore old photos | Restoration | Fix old/damaged photos |
+| Colorize images | Colorization | Add color to B&W, or convert to B&W |
 | Sketch to photo | Sketch2Image | Convert drawings to realistic photos |
-| Product photography | Lifestyle Shot | Place products in scenes |
-| Product integration | Product Integrate | Embed products into scenes at exact coordinates |
+| Create product lifestyle shots | Lifestyle Shot | Place products in scenes for e-commerce |
+| Integrate products into scenes | Product Integrate | Embed products at exact coordinates |
 
 ## Quick Reference
 
@@ -82,17 +74,20 @@ Wait for the user to provide their API key. Do not proceed until they give you t
 curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.3" \
+  -H "User-Agent: BriaSkills/1.2.6" \
   -d '{
     "prompt": "your description",
     "aspect_ratio": "16:9",
-    "resolution": "1MP"
+    "resolution": "1MP",
+    "sync": true
   }'
 ```
 
 **Aspect ratios**: `1:1` (square), `16:9` (hero/banner), `4:3` (presentation), `9:16` (mobile/story), `3:4` (portrait)
 
 **Resolution**: `1MP` (default) or `4MP` (improved details for photorealism, adds ~30s latency)
+
+**Sync mode**: Pass `"sync": true` in the request body for single image generation to get the result directly in the response. For batch/multiple image generation, omit `sync` (or set `false`) and use polling instead.
 
 > **Advanced**: For precise, deterministic control over generation, use **[VGL structured prompts](../vgl/SKILL.md)** instead of natural language. VGL defines every visual attribute (objects, lighting, composition) as explicit JSON.
 
@@ -102,7 +97,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/remove_background" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.3" \
+  -H "User-Agent: BriaSkills/1.2.6" \
   -d '{"image": "https://..."}'
 ```
 
@@ -114,7 +109,7 @@ Returns PNG with transparency.
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.3" \
+  -H "User-Agent: BriaSkills/1.2.6" \
   -d '{
     "images": ["https://..."],
     "instruction": "change the mug to red"
@@ -127,7 +122,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/gen_fill" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.3" \
+  -H "User-Agent: BriaSkills/1.2.6" \
   -d '{
     "image": "https://...",
     "mask": "https://...",
@@ -141,7 +136,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/gen_fill" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/expand" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.3" \
+  -H "User-Agent: BriaSkills/1.2.6" \
   -d '{
     "image": "base64-or-url",
     "aspect_ratio": "16:9",
@@ -155,17 +150,17 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/expand" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.3" \
+  -H "User-Agent: BriaSkills/1.2.6" \
   -d '{"image": "https://...", "scale": 2}'
 ```
 
-### Product Lifestyle Shot
+### Create Product Lifestyle Shot
 
 ```bash
 curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.3" \
+  -H "User-Agent: BriaSkills/1.2.6" \
   -d '{
     "image": "https://product-with-transparent-bg.png",
     "prompt": "modern kitchen countertop, natural morning light"
@@ -180,7 +175,7 @@ Place one or more products at exact coordinates in a scene. Products are automat
 curl -X POST "https://engine.prod.bria-api.com/image/edit/product/integrate" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.3" \
+  -H "User-Agent: BriaSkills/1.2.6" \
   -d '{
     "scene": "https://scene-image-url",
     "products": [
@@ -194,9 +189,15 @@ curl -X POST "https://engine.prod.bria-api.com/image/edit/product/integrate" \
 
 ---
 
-## Async Response Handling
+## Response Handling
 
-All endpoints return async responses:
+### Sync (single image generation)
+
+For single image requests, pass `"sync": true` in the request body. The response returns the result directly — no polling needed.
+
+### Async with polling (batch generation)
+
+For batch or multiple image generation, omit `sync` (or set `"sync": false`). The response returns a status URL to poll:
 
 ```json
 {
@@ -211,9 +212,8 @@ Poll the status_url until `status: "COMPLETED"`, then get `result.image_url`.
 import requests, time
 
 def get_result(status_url, api_key):
-    headers = {"api_token": api_key, "User-Agent": "BriaSkills/1.2.3"}
     while True:
-        r = requests.get(status_url, headers=headers)
+        r = requests.get(status_url, headers={"api_token": api_key, "User-Agent": "BriaSkills/1.2.6"})
         data = r.json()
         if data["status"] == "COMPLETED":
             return data["result"]["image_url"]
@@ -241,7 +241,7 @@ See `references/api-endpoints.md` for complete endpoint documentation.
 
 ### Key Endpoints
 
-**Generation**
+**Image Generation**
 | Endpoint | Purpose |
 |----------|---------|
 | `POST /v2/image/generate` | Generate images from text (FIBO) |
@@ -290,7 +290,7 @@ See `references/api-endpoints.md` for complete endpoint documentation.
 **Product Photography**
 | Endpoint | Purpose |
 |----------|---------|
-| `POST /v1/product/lifestyle_shot_by_text` | Place product in scene by text |
+| `POST /v1/product/lifestyle_shot_by_text` | Create product lifestyle shots by text |
 | `POST /image/edit/product/integrate` | Integrate products into scene at exact coordinates |
 
 **Utilities**
@@ -301,13 +301,12 @@ See `references/api-endpoints.md` for complete endpoint documentation.
 
 ### Authentication
 
-All requests need these headers:
+All requests need `api_token` header:
 ```
 api_token: YOUR_BRIA_API_KEY
 User-Agent: BriaSkills/<version>
 ```
-
-> **Required:** Always include the `User-Agent: BriaSkills/<version>` header in every Bria API call (where `<version>` is the current skill version, e.g. `BriaSkills/1.2.3`). This applies to all requests including status polling.
+> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.2.6`) in every API call, including status polling requests.
 
 ---
 

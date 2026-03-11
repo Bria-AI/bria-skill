@@ -108,7 +108,7 @@ class BriaClient:
         return {
             "api_token": self.api_key,
             "Content-Type": "application/json",
-            "User-Agent": "BriaSkills/1.2.3",
+            "User-Agent": "BriaSkills/1.2.6",
         }
 
     def _request(self, endpoint: str, data: Dict, wait: bool = True) -> Dict[str, Any]:
@@ -478,10 +478,12 @@ class BriaClient:
         """
         resolved_products = []
         for p in products:
-            resolved_products.append({
-                "image": self._resolve_image(p["image"]),
-                "coordinates": p["coordinates"],
-            })
+            resolved_products.append(
+                {
+                    "image": self._resolve_image(p["image"]),
+                    "coordinates": p["coordinates"],
+                }
+            )
 
         data: Dict[str, Any] = {
             "scene": self._resolve_image(scene),
