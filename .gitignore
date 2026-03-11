@@ -31,3 +31,7 @@ node_modules/
 dist/
 build/
 *.egg-info/
+tests/run_tests.sh
+tests/test_bria_client.py
+tests/test_bria_client.sh
+tests/test_bria_client.ts
