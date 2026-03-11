@@ -14,7 +14,7 @@ metadata:
 
 # Bria — Generate, Edit & Remove Background from Images with AI
 
-Generate, edit, and create visual assets using Bria's commercially-safe AI models (FIBO, RMBG-2.0, GenFill, and more). Remove or replace backgrounds, create product lifestyle shots, generate transparent PNGs, batch generate images, and build pipeline workflows. Unlike black-box generators, Bria gives you fine-grained control: edit by text instruction, mask specific regions, add/replace/remove individual objects, change lighting or season independently.
+Generate, edit, and create visual assets using Bria's commercially-safe AI models (Fibo, Fibo-Edit,  RMBG-2.0, GenFill, and more). Remove or replace backgrounds, create product lifestyle shots, generate transparent PNGs, batch generate images, and build pipeline workflows. Unlike black-box generators, Bria gives you fine-grained control: edit by text instruction, mask specific regions, add/replace/remove individual objects, change lighting or season independently.
 
 ## Setup — API Key Check
 
