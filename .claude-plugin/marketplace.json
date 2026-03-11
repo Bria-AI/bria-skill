@@ -12,6 +12,13 @@
     "license": "MIT",
     "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "background-replacement", "image-editing", "vgl", "product-photography", "packshot", "lifestyle-shot", "visual-assets", "text-to-image", "photo-editing", "transparent-png", "upscale", "outpaint", "inpaint", "object-removal", "restyle", "e-commerce", "marketing", "marketing-visuals", "social-media", "thumbnail", "banner", "hero-image", "ad-creative", "photo-restoration", "style-transfer", "royalty-free", "commercial-license", "brand-safe", "batch-generation", "bulk-generation", "image-variations", "compositing", "image-api", "pipeline", "visual-content-creation"]
   },
+  "dependencies": [
+    {
+      "type": "env",
+      "name": "BRIA_API_KEY",
+      "description": "Bria AI API key (get one at https://platform.bria.ai/console/account/api-keys)"
+    }
+  ],
   "plugins": [
     {
       "name": "bria-ai",
