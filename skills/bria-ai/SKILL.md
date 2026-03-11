@@ -37,64 +37,15 @@ If the output is **not empty**, skip to the next section.
 
 ### Step 2: If the key is missing, guide the user
 
-Open the Bria API keys page in the browser:
-
-```bash
-open "https://platform.bria.ai/console/account/api-keys?utm_source=skill&utm_campaign=bria_skills&utm_content=adjust_photoshop_for_agent"   # macOS
-# xdg-open "https://platform.bria.ai/console/account/api-keys?utm_source=skill&utm_campaign=bria_skills&utm_content=adjust_photoshop_for_agent"  # Linux
-```
-
-Then tell the user exactly this:
-> I opened the Bria website in your browser. To use image generation, you need a free API key.
+Tell the user exactly this:
+> To use image generation, you need a free Bria API key.
 >
-> 1. Sign up or log in on the page I just opened
-> 2. Click **Create API Key**
-> 3. Copy the key and **paste it here**
+> 1. Go to https://platform.bria.ai/console/account/api-keys
+> 2. Sign up or log in
+> 3. Click **Create API Key**
+> 4. Copy the key and **paste it here**
 
 Wait for the user to provide their API key. Do not proceed until they give you the key.
-
-### Step 3: Save the key permanently
-
-Once the user provides the key, save it so it persists across sessions.
-
-**On macOS/Linux**, detect the shell and append to the correct profile:
-
-```bash
-# Detect the shell profile
-if [ -n "$ZSH_VERSION" ] || [ "$SHELL" = */zsh ]; then
-  PROFILE_FILE="$HOME/.zshrc"
-elif [ -f "$HOME/.bashrc" ]; then
-  PROFILE_FILE="$HOME/.bashrc"
-else
-  PROFILE_FILE="$HOME/.profile"
-fi
-
-# Append the export (only if not already present)
-grep -q 'export BRIA_API_KEY=' "$PROFILE_FILE" 2>/dev/null && \
-  sed -i.bak '/export BRIA_API_KEY=/d' "$PROFILE_FILE"
-echo 'export BRIA_API_KEY="THE_KEY_THE_USER_GAVE_YOU"' >> "$PROFILE_FILE"
-
-# Make it available immediately in this session
-export BRIA_API_KEY="THE_KEY_THE_USER_GAVE_YOU"
-```
-
-**On Windows (PowerShell)**:
-
-```powershell
-[System.Environment]::SetEnvironmentVariable("BRIA_API_KEY", "THE_KEY_THE_USER_GAVE_YOU", "User")
-$env:BRIA_API_KEY = "THE_KEY_THE_USER_GAVE_YOU"
-```
-
-Replace `THE_KEY_THE_USER_GAVE_YOU` with the actual key the user provided.
-
-### Step 4: Verify
-
-```bash
-echo $BRIA_API_KEY
-```
-
-Confirm the key is set, then tell the user:
-> Your API key is saved and will persist across sessions. You're all set!
 
 **Do not proceed with any image generation or editing until the API key is confirmed set.**
 

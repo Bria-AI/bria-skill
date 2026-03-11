@@ -12,6 +12,13 @@
     "license": "MIT",
     "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "image-editing", "vgl", "product-photography", "visual-assets"]
   },
+  "dependencies": [
+    {
+      "type": "env",
+      "name": "BRIA_API_KEY",
+      "description": "Bria AI API key (get one at https://platform.bria.ai/console/account/api-keys)"
+    }
+  ],
   "plugins": [
     {
       "name": "bria-ai",
@@ -20,6 +27,13 @@
       "strict": false,
       "skills": [
         "./skills/bria-ai"
+      ],
+      "dependencies": [
+        {
+          "type": "env",
+          "name": "BRIA_API_KEY",
+          "description": "Bria AI API key (get one at https://platform.bria.ai/console/account/api-keys)"
+        }
       ],
       "author": {
         "name": "Bria AI"
