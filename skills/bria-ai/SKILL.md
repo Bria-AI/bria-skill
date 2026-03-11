@@ -30,40 +30,14 @@ If the output is **not empty**, skip to the next section.
 
 ### Step 2: If the key is missing, guide the user
 
-Open the Bria API keys page in the browser:
-
-```bash
-open "https://platform.bria.ai/console/account/api-keys?utm_source=skill&utm_campaign=bria_skills&utm_content=adjust_photoshop_for_agent"   # macOS
-# xdg-open "https://platform.bria.ai/console/account/api-keys?utm_source=skill&utm_campaign=bria_skills&utm_content=adjust_photoshop_for_agent"  # Linux
-```
-
-Then tell the user exactly this:
-> I opened the Bria website in your browser. To use image generation, you need a free API key.
+Tell the user exactly this:
+> To use image generation, you need a free Bria API key.
 >
-> 1. Sign up or log in on the page I just opened
-> 2. Click **Create API Key**
-> 3. Copy the key and **paste it here**
+> 1. Go to https://platform.bria.ai/console/account/api-keys
+> 2. Sign up or log in
+> 3. Click **Create API Key**
 
 Wait for the user to provide their API key. Do not proceed until they give you the key.
-
-### Step 3: Set the key for this session
-
-Once the user provides the key, set it in the current session:
-
-```bash
-export BRIA_API_KEY="THE_KEY_THE_USER_GAVE_YOU"
-```
-
-Replace `THE_KEY_THE_USER_GAVE_YOU` with the actual key the user provided.
-
-Then tell the user:
-> Your API key is set for this session. To make it persist across sessions, add the following line to your shell profile (e.g. `~/.zshrc` or `~/.bashrc`):
->
-> ```
-> export BRIA_API_KEY="your-key-here"
-> ```
-
-**Do not write to the user's shell profile files directly.** Let the user handle persistence themselves.
 
 **Do not proceed with any image generation or editing until the API key is confirmed set.**
 
