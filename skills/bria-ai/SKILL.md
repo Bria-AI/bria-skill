@@ -1,7 +1,6 @@
 ---
 name: bria-ai
 description: Generate, edit, create product images with AI. Remove or replace backgrounds, lifestyle shots, transparent PNGs, visual assets, batch generation, illustrations. Controllable image editing with Bria.ai commercially-safe models — fine-grained control over what gets generated, edited, or removed. Edit by text instruction, mask specific regions, add/replace/remove individual objects, control lighting, season, and style. Use for e-commerce product photography, background removal, image upscaling, style transfer, hero images, icons, banners, and pipeline workflows. Triggers on AI image generation, controllable editing, background removal, or visual asset creation.
-homepage: https://bria.ai
 license: MIT
 metadata:
   author: Bria AI
