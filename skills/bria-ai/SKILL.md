@@ -19,10 +19,14 @@ Generate, edit, and create visual assets using Bria's commercially-safe AI model
 
 Before making any Bria API call, check for the API key and help the user set it up if missing:
 
-### Step 1: Check if the key exists
+### Step 1: Check if the key exists (without printing the key)
 
 ```bash
-echo $BRIA_API_KEY
+if [ -z "$BRIA_API_KEY" ]; then
+  echo "BRIA_API_KEY is not set"
+else
+  echo "BRIA_API_KEY is set"
+fi
 ```
 
 If the output is **not empty**, skip to the next section.
