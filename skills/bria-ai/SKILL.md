@@ -4,7 +4,7 @@ description: Generate, edit, create product images with AI. Remove or replace ba
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.2.6"
+  version: "1.2.7"
   dependencies:
     - type: env
       name: BRIA_API_KEY
@@ -13,7 +13,7 @@ metadata:
 
 # Bria — Generate, Edit & Remove Background from Images with AI
 
-Generate, edit, and create visual assets using Bria's commercially-safe AI models (Fibo, Fibo-Edit,  RMBG-2.0, GenFill, and more). Remove or replace backgrounds, create product lifestyle shots, generate transparent PNGs, batch generate images, and build pipeline workflows. Unlike black-box generators, Bria gives you fine-grained control: edit by text instruction, mask specific regions, add/replace/remove individual objects, change lighting or season independently.
+Generate, edit, create product images with AI. Remove or replace backgrounds, lifestyle shots, transparent PNGs, visual assets, batch generation, illustrations. Controllable image editing with Bria.ai commercially-safe models — fine-grained control over what gets generated, edited, or removed. Edit by text instruction, mask specific regions, add/replace/remove individual objects, control lighting, season, and style. Use for e-commerce product photography, background removal, image upscaling, style transfer, hero images, icons, banners, and pipeline workflows. Triggers on AI image generation, controllable editing, background removal, or visual asset creation.
 
 ## Setup — API Key Check
 
@@ -77,7 +77,7 @@ Wait for the user to provide their API key. Do not proceed until they give you t
 curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.6" \
+  -H "User-Agent: BriaSkills/1.2.7" \
   -d '{
     "prompt": "your description",
     "aspect_ratio": "16:9",
@@ -100,7 +100,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/remove_background" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.6" \
+  -H "User-Agent: BriaSkills/1.2.7" \
   -d '{"image": "https://..."}'
 ```
 
@@ -112,7 +112,7 @@ Returns PNG with transparency.
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.6" \
+  -H "User-Agent: BriaSkills/1.2.7" \
   -d '{
     "images": ["https://..."],
     "instruction": "change the mug to red"
@@ -125,7 +125,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/gen_fill" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.6" \
+  -H "User-Agent: BriaSkills/1.2.7" \
   -d '{
     "image": "https://...",
     "mask": "https://...",
@@ -139,7 +139,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/gen_fill" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/expand" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.6" \
+  -H "User-Agent: BriaSkills/1.2.7" \
   -d '{
     "image": "base64-or-url",
     "aspect_ratio": "16:9",
@@ -153,7 +153,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/expand" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.6" \
+  -H "User-Agent: BriaSkills/1.2.7" \
   -d '{"image": "https://...", "scale": 2}'
 ```
 
@@ -163,7 +163,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution
 curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.6" \
+  -H "User-Agent: BriaSkills/1.2.7" \
   -d '{
     "image": "https://product-with-transparent-bg.png",
     "prompt": "modern kitchen countertop, natural morning light"
@@ -178,7 +178,7 @@ Place one or more products at exact coordinates in a scene. Products are automat
 curl -X POST "https://engine.prod.bria-api.com/image/edit/product/integrate" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.6" \
+  -H "User-Agent: BriaSkills/1.2.7" \
   -d '{
     "scene": "https://scene-image-url",
     "products": [
@@ -216,7 +216,7 @@ import requests, time
 
 def get_result(status_url, api_key):
     while True:
-        r = requests.get(status_url, headers={"api_token": api_key, "User-Agent": "BriaSkills/1.2.6"})
+        r = requests.get(status_url, headers={"api_token": api_key, "User-Agent": "BriaSkills/1.2.7"})
         data = r.json()
         if data["status"] == "COMPLETED":
             return data["result"]["image_url"]
@@ -309,7 +309,7 @@ All requests need `api_token` header:
 api_token: YOUR_BRIA_API_KEY
 User-Agent: BriaSkills/<version>
 ```
-> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.2.6`) in every API call, including status polling requests.
+> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.2.7`) in every API call, including status polling requests.
 
 ---
 
