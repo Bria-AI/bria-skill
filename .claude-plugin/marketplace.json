@@ -7,10 +7,10 @@
   },
   "metadata": {
     "description": "Official Bria AI skills — text-to-image generation, image editing, background removal and replacement, object removal, inpainting, outpainting, upscale, restyle, product photography and packshots, batch/bulk generation, VGL structured prompts, and image utilities. Commercially licensed, royalty-free, brand-safe AI image generation and editing API.",
-    "version": "1.2.6",
+    "version": "1.2.7",
     "repository": "https://github.com/bria-ai/bria-skill",
     "license": "MIT",
-    "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "background-replacement", "image-editing", "vgl", "product-photography", "packshot", "lifestyle-shot", "visual-assets", "text-to-image", "photo-editing", "transparent-png", "upscale", "outpaint", "inpaint", "object-removal", "restyle", "e-commerce", "marketing", "marketing-visuals", "social-media", "thumbnail", "banner", "hero-image", "ad-creative", "photo-restoration", "style-transfer", "royalty-free", "commercial-license", "brand-safe", "batch-generation", "bulk-generation", "image-variations", "compositing", "image-api", "pipeline", "visual-content-creation"]
+    "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "background-replacement", "image-editing", "vgl", "product-photography", "packshot", "lifestyle-shot", "visual-assets", "text-to-image", "photo-editing", "transparent-png", "upscale", "outpaint", "inpaint", "object-removal", "restyle", "e-commerce", "marketing", "marketing-visuals", "social-media", "thumbnail", "banner", "hero-image", "ad-creative", "photo-restoration", "style-transfer", "royalty-free", "commercial-license", "brand-safe", "batch-generation", "bulk-generation", "image-variations", "compositing", "image-api", "pipeline", "visual-content-creation", "generate-image", "create-image", "ai-art", "photo-retouching", "image-enhancement", "relight", "reseason", "sketch-to-photo", "colorize", "web-design", "content-creation", "cutout", "product-placement", "scene-generation"]
   },
   "dependencies": [
     {
@@ -22,7 +22,7 @@
   "plugins": [
     {
       "name": "bria-ai",
-      "description": "Controllable image generation and editing with Bria.ai commercially-safe, royalty-free AI models. Text-to-image generation from prompts. Remove, replace, or swap image backgrounds for transparent PNGs. Inpaint regions, erase/remove objects, outpaint/extend images. Upscale resolution, enhance quality, restyle, relight. Generate product photography — packshots, lifestyle shots, place products in scenes. Create hero images, banners, social media visuals, marketing creatives, icons, illustrations. Batch/bulk generation, automated pipelines, image variations. Commercially licensed, brand-safe, no copyright issues. Professional image generation and editing API for websites, apps, e-commerce, presentations, and documents.",
+      "description": "AI image generation and editing API via Bria.ai — generate images from text prompts, edit photos with natural language instructions, remove or replace backgrounds for transparent PNGs, create product photography and lifestyle shots, upscale resolution, restyle, and batch-generate visual assets. Commercially safe, royalty-free, brand-safe. 20+ endpoints for e-commerce product photos, hero images, banners, social media visuals, illustrations, icons, ad creatives, and automated image pipelines. Powered by FIBO (text-to-image), FIBO-Edit (instruction-based editing), and RMBG-2.0 (background removal).",
       "source": "./skills/bria-ai",
       "strict": false,
       "skills": [
