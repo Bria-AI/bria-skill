@@ -55,7 +55,7 @@ else
 fi
 ```
 
-If the output is **not empty**, skip to the next section.
+If the output says **BRIA_API_KEY is set**, skip to the next section.
 
 ### Step 2: If the key is missing, guide the user
 
