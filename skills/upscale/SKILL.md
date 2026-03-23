@@ -21,14 +21,18 @@ Before making any API call, you need a valid Bria access token.
 ```bash
 if [ -f ~/.bria/credentials ]; then
   BRIA_ACCESS_TOKEN=$(grep '^access_token=' "$HOME/.bria/credentials" | cut -d= -f2-)
+  BRIA_API_KEY=$(grep '^api_token=' "$HOME/.bria/credentials" | cut -d= -f2-)
 fi
 if [ -z "$BRIA_ACCESS_TOKEN" ]; then
   echo "NO_CREDENTIALS"
+elif [ -n "$BRIA_API_KEY" ]; then
+  echo "READY"
 else
   echo "CREDENTIALS_FOUND"
 fi
 ```
 
+If the output is `READY`, skip straight to making API calls — no introspection needed.
 If the output is `CREDENTIALS_FOUND`, skip to Step 3.
 If the output is `NO_CREDENTIALS`, proceed to Step 2.
 
@@ -39,7 +43,7 @@ Start the device authorization flow:
 **2a. Request a device code:**
 
 ```bash
-DEVICE_RESPONSE=$(curl -s -X POST "https://engine.int.bria-api.com/v2/auth/device/authorize" \
+DEVICE_RESPONSE=$(curl -s -X POST "https://engine.prod.bria-api.com/v2/auth/device/authorize" \
   -H "Content-Type: application/json")
 echo "$DEVICE_RESPONSE"
 ```
@@ -51,7 +55,7 @@ Parse the response fields:
 
 **2b. Show the user a single sign-in link.** Tell them exactly this — nothing more:
 
-> **Connect your Bria account:** [Click here to sign in](https://int.platform.bria.ai/device/verify?user_code={user_code})
+> **Connect your Bria account:** [Click here to sign in](https://platform.bria.ai/device/verify?user_code={user_code})
 > Your code is **{user_code}** — it's already filled in.
 
 Do NOT show two links. Do NOT show the raw URL separately. Do NOT use `verification_uri` from the API response. Keep it to one clickable link.
@@ -60,7 +64,7 @@ Do NOT show two links. Do NOT show the raw URL separately. Do NOT use `verificat
 
 ```bash
 for i in $(seq 1 60); do
-  TOKEN_RESPONSE=$(curl -s -X POST "https://engine.int.bria-api.com/v2/auth/token" \
+  TOKEN_RESPONSE=$(curl -s -X POST "https://engine.prod.bria-api.com/v2/auth/token" \
     -d "grant_type=urn:ietf:params:oauth:grant-type:device_code" \
     -d "device_code=$DEVICE_CODE")
   ACCESS_TOKEN=$(printf '%s' "$TOKEN_RESPONSE" | sed -n 's/.*"access_token" *: *"\([^"]*\)".*/\1/p')
@@ -85,7 +89,7 @@ If the output contains `AUTHENTICATED`, proceed to Step 3. Otherwise the code ex
 Introspect the bearer token to check billing status and obtain the real API key for Bria API calls:
 
 ```bash
-INTROSPECT=$(curl -s -X POST "https://engine.int.bria-api.com/v2/auth/token/introspect" \
+INTROSPECT=$(curl -s -X POST "https://engine.prod.bria-api.com/v2/auth/token/introspect" \
   -d "token=$BRIA_ACCESS_TOKEN")
 BILLING_STATUS=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"billing_status" *: *"\([^"]*\)".*/\1/p')
 if [ "$BILLING_STATUS" = "blocked" ]; then
@@ -98,12 +102,17 @@ if [ "$ACTIVE" = "false" ]; then
   echo "TOKEN_EXPIRED"
 fi
 BRIA_API_KEY=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"api_token" *: *"\([^"]*\)".*/\1/p')
+if [ -n "$BRIA_API_KEY" ]; then
+  grep -v '^api_token=' "$HOME/.bria/credentials" > "$HOME/.bria/credentials.tmp" 2>/dev/null || true
+  printf 'api_token=%s\n' "$BRIA_API_KEY" >> "$HOME/.bria/credentials.tmp"
+  mv "$HOME/.bria/credentials.tmp" "$HOME/.bria/credentials"
+fi
 ```
 
 Interpret the output:
 - If it prints `BILLING_ERROR: ...` — relay the message to the user exactly as shown and **stop**. Do not make any API calls.
 - If it prints `TOKEN_EXPIRED` — the session is no longer valid. Tell the user their session expired and restart from Step 2.
-- Otherwise, `BRIA_API_KEY` now contains the real API key. Proceed to the tool section below.
+- Otherwise, `BRIA_API_KEY` now contains the real API key and is cached for future calls. Proceed to the tool section below.
 
 ## Image Input
 
@@ -150,7 +159,7 @@ Interpret the response based on `HTTP_STATUS`:
 
 - **HTTP 200** — Success — parse result from JSON.
 - **HTTP 401** — API key invalid or revoked. Delete ~/.bria/credentials and tell user to re-authenticate.
-- **HTTP 403** — Billing or quota issue. Show the `detail` field from the JSON and include upgrade link: https://int.platform.bria.ai/pricing
+- **HTTP 403** — Billing or quota issue. Show the `detail` field from the JSON and include upgrade link: https://platform.bria.ai/pricing
 - **HTTP 5xx** — Temporary server error. Tell user to try again in a few minutes.
 
 **Response:** Returns JSON with `result_url` pointing to the upscaled image.
