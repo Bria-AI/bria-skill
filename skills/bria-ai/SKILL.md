@@ -164,6 +164,22 @@ Interpret the output:
 | Create product lifestyle shots | Lifestyle Shot | Place products in scenes for e-commerce |
 | Integrate products into scenes | Product Integrate | Embed products at exact coordinates |
 
+## Image Input
+
+For any endpoint that accepts an image, determine the source before making the API call:
+
+1. **User provided a URL** (starts with http/https) — pass it directly in the JSON body.
+2. **User provided a file path** (e.g. `~/Downloads/photo.png`) — base64-encode the file and pass inline (see per-tool skills for the shell pattern).
+3. **User pasted/attached an image in the chat** — the IDE saves it to a local path visible in the conversation context (look for `<image_files>` or `<attached_files>` in the system prompt). Use that path.
+4. **Image from a previous Bria API result** — use the `result_url` or `image_url` from the prior response directly. It is already a URL.
+
+**Rules:**
+- NEVER search the filesystem (`ls`, `find`, glob patterns) to locate images. The source is always in the conversation — check the user's message for a URL or path, check `<image_files>` / `<attached_files>` tags for pasted/attached images, or use the `result_url` from a prior Bria API response.
+- NEVER visually inspect multiple files to find the right one.
+- NEVER upload images to third-party hosting services.
+
+---
+
 ## Quick Reference
 
 ### Generate an Image (FIBO)

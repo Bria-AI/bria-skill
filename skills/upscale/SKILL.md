@@ -116,13 +116,18 @@ Interpret the output:
 
 ## Image Input
 
-This API accepts images as either a **public URL** or a **local file path**. The shell block in the tool section handles both automatically:
-- **URLs** are passed directly to the API
-- **Local files** are base64-encoded before sending
+Determine the image source before making the API call:
 
-Replace `"IMAGE_URL_OR_PATH"` with the actual URL or file path the user provided.
+1. **User provided a URL** (starts with http/https) — use it directly as `IMAGE_INPUT`.
+2. **User provided a file path** (e.g. `~/Downloads/photo.png`) — use that exact path as `IMAGE_INPUT`.
+3. **User pasted/attached an image in the chat** — the IDE saves it to a local path visible in the conversation context (look for `<image_files>` or `<attached_files>` in the system prompt). Use that path as `IMAGE_INPUT`.
+4. **Image from a previous Bria API result** — use the `result_url` or `image_url` from the prior response directly. It is already a URL.
+
+The shell block below handles both URLs and local files automatically (URLs pass through; local files are base64-encoded).
 
 **Rules:**
+- NEVER search the filesystem (`ls`, `find`, glob patterns) to locate images. The source is always in the conversation — check the user's message for a URL or path, check `<image_files>` / `<attached_files>` tags for pasted/attached images, or use the `result_url` from a prior Bria API response.
+- NEVER visually inspect multiple files to find the right one.
 - NEVER upload images to third-party hosting services.
 - NEVER pass base64 data inline in a curl `-d` argument — always use the shell payload builder shown in the tool section.
 
