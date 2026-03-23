@@ -70,7 +70,7 @@ Copy-paste any of these into your agent to see Bria in action:
 > Generate a photo of a modern office reception area. Then make these edits one by one, showing me the result after each: add a small bonsai tree on the reception desk, replace the wall art with a minimalist logo, change the lighting to warm evening, and remove the chair in the corner. Save each step and create a simple HTML page showing the image after each edit.
 
 ### Post-Production Pipeline
-> Take this image `https://labs-assets.bria.ai/sandbox-example-inputs/pexels-the-glorious-studio-3584518-5370644.jpg` and run a full post-production pipeline: first enhance the quality, then upscale to 4x resolution, then expand to 16:9. Save each step and create a simple HTML page showing before and after for each stage.
+> Take this image `https://labs-assets.bria.ai/sandbox-example-inputs/pexels-the-glorious-studio-3584518-5370644.jpg` and run a full post-production pipeline: first enhance the quality, then expand to 16:9, then upscale to total 8mp resolution. Save each step and create a simple HTML page showing before and after for each stage.
 
 ### Build a Product Pipeline in Code
 > Write a Python script that takes a list of product image URLs and processes each one through a pipeline: remove the background, place it in a lifestyle scene based on a prompt I provide, and upscale to 4x. For each step, poll the status URL until complete before moving to the next. Save all outputs to a local folder organized by product.
