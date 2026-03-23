@@ -5,10 +5,6 @@ license: MIT
 metadata:
   author: Bria AI
   version: "1.2.7"
-  dependencies:
-    - type: env
-      name: BRIA_API_KEY
-      description: "Bria AI API key (get one at https://platform.bria.ai/console/account/api-keys)"
 ---
 
 # Bria — AI Image Generation, Editing & Background Removal
@@ -41,34 +37,98 @@ This skill handles the full spectrum of AI image operations. If the user mention
 
 ---
 
-## Setup — API Key Check
+## Setup — Authentication
 
-Before making any Bria API call, check for the API key and help the user set it up if missing:
+Before making any API call, you need a valid Bria access token.
 
-### Step 1: Check if the key exists (without printing the key)
+### Step 1: Check for existing credentials
 
 ```bash
-if [ -z "$BRIA_API_KEY" ]; then
-  echo "BRIA_API_KEY is not set"
+if [ -f ~/.bria/credentials ]; then
+  BRIA_ACCESS_TOKEN=$(grep '^access_token=' "$HOME/.bria/credentials" | cut -d= -f2-)
+fi
+if [ -z "$BRIA_ACCESS_TOKEN" ]; then
+  echo "NO_CREDENTIALS"
 else
-  echo "BRIA_API_KEY is set"
+  echo "CREDENTIALS_FOUND"
 fi
 ```
 
-If the output says **BRIA_API_KEY is set**, skip to the next section.
+If the output is `CREDENTIALS_FOUND`, skip to Step 3.
+If the output is `NO_CREDENTIALS`, proceed to Step 2.
 
-### Step 2: If the key is missing, guide the user
+### Step 2: Authenticate via device authorization
 
-Tell the user exactly this:
-> To use image generation, you need a free Bria API key.
->
-> 1. Go to https://platform.bria.ai/console/account/api-keys
-> 2. Sign up or log in
-> 3. Click **Create API Key**
+Start the device authorization flow:
 
-Wait for the user to provide their API key. Do not proceed until they give you the key.
+**2a. Request a device code:**
 
-**Do not proceed with any image generation or editing until the API key is confirmed set.**
+```bash
+DEVICE_RESPONSE=$(curl -s -X POST "https://engine.int.bria-api.com/v2/auth/device/authorize" \
+  -H "Content-Type: application/json")
+echo "$DEVICE_RESPONSE"
+```
+
+Parse the response fields:
+- `device_code` — used to poll for the token (keep this, don't show to user)
+- `user_code` — the code the user must enter (e.g. `BRIA-XXXX`)
+- `interval` — seconds between poll attempts
+
+**2b. Show the user a single sign-in link.** Tell them exactly this — nothing more:
+
+> **Connect your Bria account:** [Click here to sign in](https://int.platform.bria.ai/device/verify?user_code={user_code})
+> Your code is **{user_code}** — it's already filled in.
+
+Do NOT show two links. Do NOT show the raw URL separately. Do NOT use `verification_uri` from the API response. Keep it to one clickable link.
+
+**2c. Poll for the token.** After showing the user the code, immediately start polling. Try up to 60 times with the given interval (default 5 seconds):
+
+```bash
+for i in $(seq 1 60); do
+  TOKEN_RESPONSE=$(curl -s -X POST "https://engine.int.bria-api.com/v2/auth/token" \
+    -d "grant_type=urn:ietf:params:oauth:grant-type:device_code" \
+    -d "device_code=$DEVICE_CODE")
+  ACCESS_TOKEN=$(printf '%s' "$TOKEN_RESPONSE" | sed -n 's/.*"access_token" *: *"\([^"]*\)".*/\1/p')
+  if [ -n "$ACCESS_TOKEN" ]; then
+    BRIA_ACCESS_TOKEN="$ACCESS_TOKEN"
+    REFRESH_TOKEN=$(printf '%s' "$TOKEN_RESPONSE" | sed -n 's/.*"refresh_token" *: *"\([^"]*\)".*/\1/p')
+    mkdir -p ~/.bria
+    printf 'access_token=%s\nrefresh_token=%s\n' "$BRIA_ACCESS_TOKEN" "$REFRESH_TOKEN" > "$HOME/.bria/credentials"
+    echo "AUTHENTICATED"
+    break
+  fi
+  sleep 5
+done
+```
+
+If the output contains `AUTHENTICATED`, proceed to Step 3. Otherwise the code expired — start over from Step 2a.
+
+**Do not proceed with any API call until authentication is confirmed.**
+
+### Step 3: Verify billing status and resolve API key
+
+Introspect the bearer token to check billing status and obtain the real API key for Bria API calls:
+
+```bash
+INTROSPECT=$(curl -s -X POST "https://engine.int.bria-api.com/v2/auth/token/introspect" \
+  -d "token=$BRIA_ACCESS_TOKEN")
+BILLING_STATUS=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"billing_status" *: *"\([^"]*\)".*/\1/p')
+if [ "$BILLING_STATUS" = "blocked" ]; then
+  BILLING_MSG=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"billing_message" *: *"\([^"]*\)".*/\1/p')
+  echo "BILLING_ERROR: $BILLING_MSG"
+fi
+ACTIVE=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"active" *: *\([^,}]*\).*/\1/p' | tr -d ' ')
+if [ "$ACTIVE" = "false" ]; then
+  rm -f ~/.bria/credentials
+  echo "TOKEN_EXPIRED"
+fi
+BRIA_API_KEY=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"api_token" *: *"\([^"]*\)".*/\1/p')
+```
+
+Interpret the output:
+- If it prints `BILLING_ERROR: ...` — relay the message to the user exactly as shown and **stop**. Do not make any API calls.
+- If it prints `TOKEN_EXPIRED` — the session is no longer valid. Tell the user their session expired and restart from Step 2.
+- Otherwise, `BRIA_API_KEY` now contains the real API key. Proceed to the next section.
 
 ---
 
@@ -235,21 +295,37 @@ For batch or multiple image generation, omit `sync` (or set `"sync": false`). Th
 }
 ```
 
-Poll the status_url until `status: "COMPLETED"`, then get `result.image_url`.
+Poll the status_url until `status: "COMPLETED"`, then get `result.image_url`:
 
-```python
-import requests, time
-
-def get_result(status_url, api_key):
-    while True:
-        r = requests.get(status_url, headers={"api_token": api_key, "User-Agent": "BriaSkills/1.2.7"})
-        data = r.json()
-        if data["status"] == "COMPLETED":
-            return data["result"]["image_url"]
-        if data["status"] == "FAILED":
-            raise Exception(data.get("error"))
-        time.sleep(2)
+```bash
+if [ -n "$STATUS_URL" ]; then
+  for i in $(seq 1 30); do
+    POLL=$(curl -s "$STATUS_URL" \
+      -H "api_token: $BRIA_API_KEY" \
+      -H "User-Agent: BriaSkills/1.2.7")
+    STATUS=$(printf '%s' "$POLL" | sed -n 's/.*"status" *: *"\([^"]*\)".*/\1/p')
+    if [ "$STATUS" = "COMPLETED" ]; then
+      IMAGE_URL=$(printf '%s' "$POLL" | sed -n 's/.*"image_url" *: *"\([^"]*\)".*/\1/p')
+      echo "DONE: $IMAGE_URL"
+      break
+    fi
+    if [ "$STATUS" = "FAILED" ]; then
+      ERROR=$(printf '%s' "$POLL" | sed -n 's/.*"error" *: *"\([^"]*\)".*/\1/p')
+      echo "FAILED: $ERROR"
+      break
+    fi
+    sleep 2
+  done
+fi
 ```
+
+### Local Files
+
+All image endpoints accept local file paths — not just URLs. Local files are base64-encoded before sending. See [image input handling](../../preambles/image-input-handling.md) for the shell pattern used in per-tool skills.
+
+**Rules:**
+- NEVER upload images to third-party hosting services.
+- NEVER pass base64 data inline in a curl `-d` argument — use a temp file payload instead.
 
 ---
 
@@ -270,9 +346,9 @@ See `references/api-endpoints.md` for complete endpoint documentation with reque
 
 ### Authentication
 
-All requests need these headers:
+All requests need these headers (the `api_token` value comes from the device auth flow in Setup above):
 ```
-api_token: YOUR_BRIA_API_KEY
+api_token: $BRIA_API_KEY
 Content-Type: application/json
 User-Agent: BriaSkills/1.2.7
 ```
@@ -288,6 +364,19 @@ User-Agent: BriaSkills/1.2.7
 - **[Bash/curl Reference](references/code-examples/bria_client.sh)** — Shell functions for all endpoints
 
 ## Related Skills
+
+### Per-Tool Skills
+
+Focused, single-purpose skills for common operations:
+
+- **[remove-bg](../remove-bg/SKILL.md)** — Remove image background to transparent PNG
+- **[generate-image](../generate-image/SKILL.md)** — Generate images from text descriptions
+- **[edit-image](../edit-image/SKILL.md)** — Edit images using natural language instructions
+- **[replace-bg](../replace-bg/SKILL.md)** — Replace image background with AI-generated scene
+- **[upscale](../upscale/SKILL.md)** — Upscale image resolution 2x or 4x
+- **[lifestyle-shot](../lifestyle-shot/SKILL.md)** — Create product lifestyle photography
+
+### Companion Skills
 
 - **[vgl](../vgl/SKILL.md)** — Write structured VGL JSON prompts for precise, deterministic control over FIBO image generation
 - **[image-utils](../image-utils/SKILL.md)** — Classic image manipulation (resize, crop, composite, watermarks) for post-processing
