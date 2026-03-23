@@ -52,7 +52,7 @@ Copy-paste any of these to see Bria in action:
 > I have a product image at `https://labs-assets.bria.ai/sandbox-example-inputs/pexels-the-glorious-studio-3584518-5370644.jpg`. Remove the background, place it in a modern kitchen as a lifestyle shot, and upscale to 4x resolution. Then expand it to 1:1 for Instagram, 9:16 for Stories, and 16:9 for a website hero banner. Save each step and create a simple HTML page showing the progression.
 
 ### Sketch to Business Asset
-> I have a rough sketch of a brand mascot at `https://i.ibb.co/sJ2Rs0Vr/generated-image.png`. Convert it to a polished colored illustration, enhance the quality, then create versions restyled as a 3D render and as vector art. Save each version and create a simple HTML page showing each result with a label.
+> I have a rough sketch of a brand mascot at `https://bria-datasets.s3.us-east-1.amazonaws.com/gb_assets/generated-image.png`. Convert it to a polished colored illustration, enhance the quality, then create versions restyled as a 3D render and as vector art. Save each version and create a simple HTML page showing each result with a label.
 
 ### Precision Edit Chain
 > Generate a photo of a modern office reception area. Then make these edits one by one, showing me the result after each: add a flower arrangement on the reception desk, replace the wall art with a minimalist logo, change the lighting to warm evening, and remove the chair in the corner. Save each step and create a simple HTML page showing the image after each edit.
