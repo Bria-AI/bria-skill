@@ -53,15 +53,27 @@ Ask your agent to generate images, remove backgrounds, edit photos, and more. Th
 | **Upscale resolution** | 2x or 4x — preserves details | Super resolution enhancement |
 | **Pipeline chaining** | Multi-step — compose operations in sequence | Generate -> remove BG -> lifestyle shot |
 
-## Example Use Cases
+## Getting Started — Try These Prompts
 
-**Building a website?** Ask: "Generate a hero image for a SaaS landing page, 16:9, modern and clean"
+Copy-paste any of these into your agent to see Bria in action:
 
-**E-commerce catalog?** Ask: "Remove the background from this product photo and place it in a kitchen scene"
+### See What Bria Can Do
+> Generate a 4MP photo of a red sneaker on a wooden floor in a gym. Then show me what you can do with it — one step at a time: remove the background, replace the background with a city street scene, restyle as a retro comic book illustration, change the season to winter, and relight with golden hour. Save each result and create a simple HTML page showing every step with a label.
 
-**Batch assets?** Ask: "Generate product photos for these 5 items and create transparent PNGs for each"
+### Product Shot Pipeline
+> I have a product image at `https://labs-assets.bria.ai/sandbox-example-inputs/pexels-the-glorious-studio-3584518-5370644.jpg`. Remove the background, place it in a modern kitchen as a lifestyle shot, and upscale to 4x resolution. Then expand it to 1:1 for Instagram, 9:16 for Stories, and 16:9 for a website hero banner. Save each step and create a simple HTML page showing the progression.
 
-**Presentations?** Ask: "Create a slide visual showing data analytics, blue gradient, corporate style"
+### Sketch to Business Asset
+> I have a rough sketch of a brand mascot at `https://bria-datasets.s3.us-east-1.amazonaws.com/gb_assets/generated-image.png`. Convert it to a polished colored illustration, enhance the quality, then create versions restyled as a 3D render and as vector art. Save each version and create a simple HTML page showing each result with a label.
+
+### Precision Edit Chain
+> Generate a photo of a modern office reception area. Then make these edits one by one, showing me the result after each: add a small bonsai tree on the reception desk, replace the wall art with a minimalist logo, change the lighting to warm evening, and remove the chair in the corner. Save each step and create a simple HTML page showing the image after each edit.
+
+### Post-Production Pipeline
+> Take this image `https://labs-assets.bria.ai/sandbox-example-inputs/pexels-the-glorious-studio-3584518-5370644.jpg` and run a full post-production pipeline: first enhance the quality, then expand to 16:9, then upscale to total 8mp resolution. Save each step and create a simple HTML page showing before and after for each stage.
+
+### Build a Product Pipeline in Code
+> Write a Python script that takes a list of product image URLs and processes each one through a pipeline: remove the background, place it in a lifestyle scene based on a prompt I provide, and upscale to 4x. For each step, poll the status URL until complete before moving to the next. Save all outputs to a local folder organized by product.
 
 ## Alternative Installation
 
