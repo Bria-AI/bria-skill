@@ -46,7 +46,7 @@ This skill handles the full spectrum of AI image operations. If the user mention
 Copy-paste any of these to see Bria in action:
 
 ### See What Bria Can Do
-> Generate a photo of a cozy mountain cabin by a lake. Then show me what you can do with it — one step at a time: remove the background, replace it with a tropical beach, restyle as an oil painting, change the season to winter, and relight with golden hour. Save each result and create a simple HTML page showing every step with a label.
+> Generate a photo of a red sneaker on a white background. Then show me what you can do with it — one step at a time: remove the background, replace the background with a city street scene, restyle as an oil painting, change the season to winter, and relight with golden hour. Save each result and create a simple HTML page showing every step with a label.
 
 ### Product Shot Pipeline
 > I have a product image at `https://labs-assets.bria.ai/sandbox-example-inputs/pexels-the-glorious-studio-3584518-5370644.jpg`. Remove the background, place it in a modern kitchen as a lifestyle shot, and upscale to 4x resolution. Then expand it to 1:1 for Instagram, 9:16 for Stories, and 16:9 for a website hero banner. Save each step and create a simple HTML page showing the progression.
