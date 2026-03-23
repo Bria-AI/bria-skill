@@ -58,7 +58,7 @@ Ask your agent to generate images, remove backgrounds, edit photos, and more. Th
 Copy-paste any of these into your agent to see Bria in action:
 
 ### See What Bria Can Do
-> Generate a photo of a red sneaker on a wooden floor in a gym. Then show me what you can do with it — one step at a time: remove the background, replace the background with a city street scene, restyle as a retro comic book illustration, change the season to winter, and relight with golden hour. Save each result and create a simple HTML page showing every step with a label.
+> Generate a 4MP photo of a red sneaker on a wooden floor in a gym. Then show me what you can do with it — one step at a time: remove the background, replace the background with a city street scene, restyle as a retro comic book illustration, change the season to winter, and relight with golden hour. Save each result and create a simple HTML page showing every step with a label.
 
 ### Product Shot Pipeline
 > I have a product image at `https://labs-assets.bria.ai/sandbox-example-inputs/pexels-the-glorious-studio-3584518-5370644.jpg`. Remove the background, place it in a modern kitchen as a lifestyle shot, and upscale to 4x resolution. Then expand it to 1:1 for Instagram, 9:16 for Stories, and 16:9 for a website hero banner. Save each step and create a simple HTML page showing the progression.
