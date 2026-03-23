@@ -286,11 +286,6 @@ Place a product in a lifestyle scene using text description. The product image m
 | `image_url` | string | one of `image_url` / `file` | Product image URL. If both `image_url` and `file` are provided, `image_url` is used. Accepted formats: jpeg, jpg, png, webp. Max 12MB |
 | `file` | string | one of `image_url` / `file` | Product image as base64. Use `image_url` instead when you have a URL |
 | `scene_description` | string | yes | Text description of the scene/background. English only, no special characters |
-| `placement_type` | string | no | `"automatic"` (default) or `"manual_placement"` |
-| `optimize_description` | bool | no | When true, optimizes the scene_description for better results |
-| `num_results` | int | no | Number of results to generate |
-| `negative_prompt` | string | no | Elements to exclude from the scene (only when `fast=false`) |
-| `sync` | bool | no | `true` for synchronous response. Use `false` when generating more than 1 result |
 
 ### POST /image/edit/product/integrate
 
