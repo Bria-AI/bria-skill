@@ -61,16 +61,16 @@ Copy-paste any of these into your agent to see Bria in action:
 > Generate a photo of a cozy mountain cabin by a lake. Then show me what you can do with it — one step at a time: remove the background, replace it with a tropical beach, restyle as an oil painting, change the season to winter, and relight with golden hour. Save each result and create a simple HTML page showing every step with a label.
 
 ### Product Shot Pipeline
-> I have a product image at `https://example.com/product.png`. Remove the background, place it in a modern kitchen as a lifestyle shot, and upscale to 4x resolution. Then expand it to 1:1 for Instagram, 9:16 for Stories, and 16:9 for a website hero banner. Save each step and create a simple HTML page showing the progression.
+> I have a product image at `https://labs-assets.bria.ai/sandbox-example-inputs/pexels-the-glorious-studio-3584518-5370644.jpg`. Remove the background, place it in a modern kitchen as a lifestyle shot, and upscale to 4x resolution. Then expand it to 1:1 for Instagram, 9:16 for Stories, and 16:9 for a website hero banner. Save each step and create a simple HTML page showing the progression.
 
 ### Sketch to Business Asset
-> I have a rough sketch of a brand mascot at `https://example.com/sketch.png`. Convert it to a polished colored illustration, enhance the quality, then create versions restyled as a 3D render and as vector art. Save each version and create a simple HTML page showing each result with a label.
+> I have a rough sketch of a brand mascot at `https://ibb.co/n8bmQHLS`. Convert it to a polished colored illustration, enhance the quality, then create versions restyled as a 3D render and as vector art. Save each version and create a simple HTML page showing each result with a label.
 
 ### Precision Edit Chain
 > Generate a photo of a modern office reception area. Then make these edits one by one, showing me the result after each: add a flower arrangement on the reception desk, replace the wall art with a minimalist logo, change the lighting to warm evening, and remove the chair in the corner. Save each step and create a simple HTML page showing the image after each edit.
 
 ### Post-Production Pipeline
-> Take this image `https://example.com/photo.jpg` and run a full post-production pipeline: first enhance the quality, then upscale to 4x resolution, then expand from 1:1 to 16:9 by extending the sides. Save each step and create a simple HTML page showing before and after for each stage.
+> Take this image `https://labs-assets.bria.ai/sandbox-example-inputs/pexels-the-glorious-studio-3584518-5370644.jpg` and run a full post-production pipeline: first enhance the quality, then upscale to 4x resolution, then expand from 1:1 to 16:9 by extending the sides. Save each step and create a simple HTML page showing before and after for each stage.
 
 ### Build a Product Pipeline in Code
 > Write a Python script that takes a list of product image URLs and processes each one through a pipeline: remove the background, place it in a lifestyle scene based on a prompt I provide, and upscale to 4x. For each step, poll the status URL until complete before moving to the next. Save all outputs to a local folder organized by product.
