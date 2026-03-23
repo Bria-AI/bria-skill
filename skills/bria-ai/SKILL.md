@@ -55,7 +55,7 @@ Copy-paste any of these to see Bria in action:
 > I have a rough sketch of a brand mascot at `https://bria-datasets.s3.us-east-1.amazonaws.com/gb_assets/generated-image.png`. Convert it to a polished colored illustration, enhance the quality, then create versions restyled as a 3D render and as vector art. Save each version and create a simple HTML page showing each result with a label.
 
 ### Precision Edit Chain
-> Generate a photo of a modern office reception area. Then make these edits one by one, showing me the result after each: add a flower arrangement on the reception desk, replace the wall art with a minimalist logo, change the lighting to warm evening, and remove the chair in the corner. Save each step and create a simple HTML page showing the image after each edit.
+> Generate a photo of a modern office reception area. Then make these edits one by one, showing me the result after each: add a small bonsai tree on the reception desk, replace the wall art with a minimalist logo, change the lighting to warm evening, and remove the chair in the corner. Save each step and create a simple HTML page showing the image after each edit.
 
 ### Post-Production Pipeline
 > Take this image `https://labs-assets.bria.ai/sandbox-example-inputs/pexels-the-glorious-studio-3584518-5370644.jpg` and run a full post-production pipeline: first enhance the quality, then upscale to 4x resolution, then expand from 1:1 to 16:9 by extending the sides. Save each step and create a simple HTML page showing before and after for each stage.
