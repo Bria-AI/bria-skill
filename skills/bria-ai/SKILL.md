@@ -215,10 +215,12 @@ curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text
   -H "Content-Type: application/json" \
   -H "User-Agent: BriaSkills/1.2.7" \
   -d '{
-    "image": "https://product-with-transparent-bg.png",
-    "prompt": "modern kitchen countertop, natural morning light"
+    "image_url": "https://product-with-transparent-bg.png",
+    "scene_description": "modern kitchen countertop, natural morning light"
   }'
 ```
+
+Use `image_url` when you have a URL (preferred). Use `file` with base64 only when no URL is available. The product image must have a transparent background — use background removal first if needed.
 
 ### Integrate Products into Scene
 

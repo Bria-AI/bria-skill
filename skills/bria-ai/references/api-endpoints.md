@@ -268,16 +268,29 @@ Upscale image resolution.
 
 ### POST /v1/product/lifestyle_shot_by_text
 
-Place a product in a lifestyle scene using text description.
+Place a product in a lifestyle scene using text description. The product image must have a transparent background (use background removal or product cutout first if needed).
 
 **Request:**
 ```json
 {
-  "file": "BASE64_ENCODED_IMAGE",
-  "prompt": "modern kitchen countertop, natural lighting",
+  "image_url": "https://product-with-transparent-bg.png",
+  "scene_description": "modern kitchen countertop, natural lighting",
   "placement_type": "automatic"
 }
 ```
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `image_url` | string | one of `image_url` / `file` | Product image URL. If both `image_url` and `file` are provided, `image_url` is used. Accepted formats: jpeg, jpg, png, webp. Max 12MB |
+| `file` | string | one of `image_url` / `file` | Product image as base64. Use `image_url` instead when you have a URL |
+| `scene_description` | string | yes | Text description of the scene/background. English only, no special characters |
+| `placement_type` | string | no | `"automatic"` (default) or `"manual_placement"` |
+| `optimize_description` | bool | no | When true, optimizes the scene_description for better results |
+| `num_results` | int | no | Number of results to generate |
+| `negative_prompt` | string | no | Elements to exclude from the scene (only when `fast=false`) |
+| `sync` | bool | no | `true` for synchronous response. Use `false` when generating more than 1 result |
 
 ### POST /image/edit/product/integrate
 
