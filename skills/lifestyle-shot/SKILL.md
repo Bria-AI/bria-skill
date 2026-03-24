@@ -12,6 +12,8 @@ metadata:
 
 Create professional product lifestyle shots. Place products in realistic AI-generated scenes.
 
+---
+
 ## Setup — Authentication
 
 Before making any API call, you need a valid Bria access token.
@@ -114,85 +116,29 @@ Interpret the output:
 - If it prints `TOKEN_EXPIRED` — the session is no longer valid. Tell the user their session expired and restart from Step 2.
 - Otherwise, `BRIA_API_KEY` now contains the real API key and is cached for future calls. Proceed to the tool section below.
 
-## Image Input
-
-Determine the image source before making the API call:
-
-1. **User provided a URL** (starts with http/https) — use it directly as `IMAGE_INPUT`.
-2. **User provided a file path** (e.g. `~/Downloads/photo.png`) — use that exact path as `IMAGE_INPUT`.
-3. **User pasted/attached an image in the chat** — the IDE saves it to a local path visible in the conversation context (look for `<image_files>` or `<attached_files>` in the system prompt). Use that path as `IMAGE_INPUT`.
-4. **Image from a previous Bria API result** — use the `result_url` or `image_url` from the prior response directly. It is already a URL.
-
-The shell block below handles both URLs and local files automatically (URLs pass through; local files are base64-encoded).
-
-**Rules:**
-- NEVER search the filesystem (`ls`, `find`, glob patterns) to locate images. The source is always in the conversation — check the user's message for a URL or path, check `<image_files>` / `<attached_files>` tags for pasted/attached images, or use the `result_url` from a prior Bria API response.
-- NEVER visually inspect multiple files to find the right one.
-- NEVER upload images to third-party hosting services.
-- NEVER pass base64 data inline in a curl `-d` argument — always use the shell payload builder shown in the tool section.
-
 ---
 
 ## Lifestyle Shot
 
-```bash
-IMAGE_INPUT="IMAGE_URL_OR_PATH"
-if printf '%s' "$IMAGE_INPUT" | grep -qE '^https?://'; then
-  printf '{"image": "%s", "prompt": "modern kitchen countertop, natural morning light"}' "$IMAGE_INPUT" > /tmp/bria_payload.json
-else
-  printf '{"image": "' > /tmp/bria_payload.json
-  base64 < "$IMAGE_INPUT" | tr -d '\n' >> /tmp/bria_payload.json
-  printf '", "prompt": "modern kitchen countertop, natural morning light"}' >> /tmp/bria_payload.json
-fi
+Replace `IMAGE_PATH_OR_URL` with the product image URL or local file path. Replace `SCENE_DESCRIPTION` with the desired scene.
 
-HTTP_CODE=$(curl -s -o /tmp/bria_result.json -w "%{http_code}" -X POST \
-  "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.0.0" \
-  -d @/tmp/bria_payload.json)
-RESULT=$(cat /tmp/bria_result.json)
-echo "HTTP_STATUS: $HTTP_CODE"
-echo "$RESULT"
+```bash
+source ~/.agents/skills/bria-ai/references/code-examples/bria_api.sh
+RESULT_URL=$(bria_call /v1/product/lifestyle_shot_by_text "IMAGE_PATH_OR_URL" '"prompt": "SCENE_DESCRIPTION"')
+echo "$RESULT_URL"
 ```
 
 **Parameters:**
 - `image` (required) — URL or local file path of the product image (transparent background recommended)
-- `prompt` (required) — Text description of the lifestyle scene
+- `prompt` (required) — Text description of the lifestyle scene (e.g. "modern kitchen countertop, natural morning light")
 
-Interpret the response based on `HTTP_STATUS`:
-
-- **HTTP 200** — Success — parse result from JSON.
-- **HTTP 401** — API key invalid or revoked. Delete ~/.bria/credentials and tell user to re-authenticate.
-- **HTTP 403** — Billing or quota issue. Show the `detail` field from the JSON and include upgrade link: https://platform.bria.ai/pricing
-- **HTTP 5xx** — Temporary server error. Tell user to try again in a few minutes.
-
-If the response contains `result_url`, show it to the user directly.
-
-If the response contains a `status_url` instead, the job is processing asynchronously. Poll it:
-
-```bash
-STATUS_URL=$(printf '%s' "$RESULT" | sed -n 's/.*"status_url" *: *"\([^"]*\)".*/\1/p')
-if [ -n "$STATUS_URL" ]; then
-  for i in $(seq 1 30); do
-    POLL=$(curl -s "$STATUS_URL" -H "api_token: $BRIA_API_KEY")
-    IMAGE_URL_RESULT=$(printf '%s' "$POLL" | sed -n 's/.*"image_url" *: *"\([^"]*\)".*/\1/p')
-    [ -z "$IMAGE_URL_RESULT" ] && IMAGE_URL_RESULT=$(printf '%s' "$POLL" | sed -n 's/.*"result_url" *: *"\([^"]*\)".*/\1/p')
-    if [ -n "$IMAGE_URL_RESULT" ]; then
-      echo "DONE: $IMAGE_URL_RESULT"
-      break
-    fi
-    sleep 3
-  done
-fi
-```
-
-**Response:** Returns JSON with the product composited into the described scene.
+If `bria_call` succeeds, `RESULT_URL` contains the lifestyle shot URL — show it to the user.
+If it fails, the error is printed to stderr with details (401 = re-auth needed, 403 = billing, 5xx = retry).
 
 ---
 
 ## See Also
 
-- remove-bg — Remove background to transparent PNG (use first)
-- replace-bg — Replace background with AI-generated scene
+- remove-background — Remove background to transparent PNG (use first)
+- replace-background — Replace background with AI-generated scene
 - [bria-ai](../bria-ai/SKILL.md) — Full Bria AI skill (all 20+ tools)

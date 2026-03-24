@@ -150,6 +150,6 @@ Interpret the response based on `HTTP_STATUS`:
 ## See Also
 
 - edit-image — Edit images with natural language instructions
-- remove-bg — Remove background to transparent PNG
-- replace-bg — Replace background with AI-generated scene
+- remove-background — Remove background to transparent PNG
+- replace-background — Replace background with AI-generated scene
 - [bria-ai](../bria-ai/SKILL.md) — Full Bria AI skill (all 20+ tools)

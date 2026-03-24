@@ -164,22 +164,6 @@ Interpret the output:
 | Create product lifestyle shots | Lifestyle Shot | Place products in scenes for e-commerce |
 | Integrate products into scenes | Product Integrate | Embed products at exact coordinates |
 
-## Image Input
-
-For any endpoint that accepts an image, determine the source before making the API call:
-
-1. **User provided a URL** (starts with http/https) — pass it directly in the JSON body.
-2. **User provided a file path** (e.g. `~/Downloads/photo.png`) — base64-encode the file and pass inline (see per-tool skills for the shell pattern).
-3. **User pasted/attached an image in the chat** — the IDE saves it to a local path visible in the conversation context (look for `<image_files>` or `<attached_files>` in the system prompt). Use that path.
-4. **Image from a previous Bria API result** — use the `result_url` or `image_url` from the prior response directly. It is already a URL.
-
-**Rules:**
-- NEVER search the filesystem (`ls`, `find`, glob patterns) to locate images. The source is always in the conversation — check the user's message for a URL or path, check `<image_files>` / `<attached_files>` tags for pasted/attached images, or use the `result_url` from a prior Bria API response.
-- NEVER visually inspect multiple files to find the right one.
-- NEVER upload images to third-party hosting services.
-
----
-
 ## Quick Reference
 
 ### Generate an Image (FIBO)
@@ -344,13 +328,21 @@ if [ -n "$STATUS_URL" ]; then
 fi
 ```
 
-### Local Files
+### Using `bria_call` (Recommended)
 
-All image endpoints accept local file paths — not just URLs. Local files are base64-encoded before sending. See [image input handling](../../preambles/image-input-handling.md) for the shell pattern used in per-tool skills.
+Use the `bria_api.sh` helper for any endpoint that accepts an image. It handles URL passthrough, local file base64 encoding, JSON construction, API call, and async polling. Pass a URL or local file path.
 
-**Rules:**
-- NEVER upload images to third-party hosting services.
-- NEVER pass base64 data inline in a curl `-d` argument — use a temp file payload instead.
+```bash
+source ~/.agents/skills/bria-ai/references/code-examples/bria_api.sh
+
+RESULT=$(bria_call /v2/image/edit/remove_background "/path/to/local/image.png")
+
+RESULT=$(bria_call /v2/image/edit/replace_background "https://example.com/img.jpg" '"prompt": "sunset beach"')
+
+RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instruction": "make it look warmer"')
+
+RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"scale": 4')
+```
 
 ---
 
@@ -386,6 +378,7 @@ User-Agent: BriaSkills/1.2.7
 - **[Workflows & Pipelines](references/workflows.md)** — Batch generation, parallel pipelines, integration examples
 - **[Python Client](references/code-examples/bria_client.py)** — Full-featured async Python client
 - **[TypeScript Client](references/code-examples/bria_client.ts)** — Typed Node.js client
+- **[API Helper (bria_api.sh)](references/code-examples/bria_api.sh)** — Minimal helper: one function call for any endpoint (recommended)
 - **[Bash/curl Reference](references/code-examples/bria_client.sh)** — Shell functions for all endpoints
 
 ## Related Skills
@@ -394,10 +387,10 @@ User-Agent: BriaSkills/1.2.7
 
 Focused, single-purpose skills for common operations:
 
-- **[remove-bg](../remove-bg/SKILL.md)** — Remove image background to transparent PNG
+- **[remove-background](../remove-background/SKILL.md)** — Remove image background to transparent PNG
 - **[generate-image](../generate-image/SKILL.md)** — Generate images from text descriptions
 - **[edit-image](../edit-image/SKILL.md)** — Edit images using natural language instructions
-- **[replace-bg](../replace-bg/SKILL.md)** — Replace image background with AI-generated scene
+- **[replace-background](../replace-background/SKILL.md)** — Replace image background with AI-generated scene
 - **[upscale](../upscale/SKILL.md)** — Upscale image resolution 2x or 4x
 - **[lifestyle-shot](../lifestyle-shot/SKILL.md)** — Create product lifestyle photography
 

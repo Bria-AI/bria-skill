@@ -1,64 +1,30 @@
 # Image Input Handling
 
-This is the shared image input preamble for Bria skills that accept image parameters. It handles URLs, local file paths, and chat-attached images transparently.
+Shared pattern for Bria skills that accept image parameters.
 
-When generating a new skill that accepts image input, include the resolution rules and shell pattern in the tool's section.
+## Tool Section Pattern
 
----
-
-## Image Input
-
-Determine the image source before making any API call:
-
-1. **User provided a URL** (starts with http/https) — use it directly as `IMAGE_INPUT`.
-2. **User provided a file path** (e.g. `~/Downloads/photo.png`) — use that exact path as `IMAGE_INPUT`.
-3. **User pasted/attached an image in the chat** — the IDE saves it to a local path visible in the conversation context (look for `<image_files>` or `<attached_files>` in the system prompt). Use that path as `IMAGE_INPUT`.
-4. **Image from a previous Bria API result** — use the `result_url` or `image_url` from the prior response directly. It is already a URL.
-
-The shell block in the tool section handles both URLs and local files automatically:
-- **URLs** are passed directly to the API
-- **Local files** are base64-encoded before sending
-
-**Rules:**
-- NEVER search the filesystem (`ls`, `find`, glob patterns) to locate images. The source is always in the conversation — check the user's message for a URL or path, check `<image_files>` / `<attached_files>` tags for pasted/attached images, or use the `result_url` from a prior Bria API response.
-- NEVER visually inspect multiple files to find the right one.
-- NEVER upload images to third-party hosting services.
-- NEVER pass base64 data inline in a curl `-d` argument — always use the shell payload builder shown below.
-
-## Shell Pattern
-
-For a single `image` parameter:
+Replace `IMAGE_PATH_OR_URL` with the image URL or local file path.
 
 ```bash
-IMAGE_INPUT="IMAGE_URL_OR_PATH"
-if printf '%s' "$IMAGE_INPUT" | grep -qE '^https?://'; then
-  printf '{"image": "%s"}' "$IMAGE_INPUT" > /tmp/bria_payload.json
-else
-  printf '{"image": "' > /tmp/bria_payload.json
-  base64 < "$IMAGE_INPUT" | tr -d '\n' >> /tmp/bria_payload.json
-  printf '"}' >> /tmp/bria_payload.json
-fi
+source ~/.agents/skills/bria-ai/references/code-examples/bria_api.sh
+RESULT_URL=$(bria_call <ENDPOINT> "IMAGE_PATH_OR_URL" [extra JSON fields...])
+echo "$RESULT_URL"
 ```
 
-For an `images` array parameter (e.g. edit-image):
+The helper auto-loads the API key from `~/.bria/credentials` and handles URL passthrough, local file base64 encoding, JSON construction, API call, and async polling.
+
+## Examples
 
 ```bash
-IMAGE_INPUT="IMAGE_URL_OR_PATH"
-if printf '%s' "$IMAGE_INPUT" | grep -qE '^https?://'; then
-  printf '{"images": ["%s"], "instruction": "your instruction"}' "$IMAGE_INPUT" > /tmp/bria_payload.json
-else
-  printf '{"images": ["' > /tmp/bria_payload.json
-  base64 < "$IMAGE_INPUT" | tr -d '\n' >> /tmp/bria_payload.json
-  printf '"], "instruction": "your instruction"}' >> /tmp/bria_payload.json
-fi
-```
+source ~/.agents/skills/bria-ai/references/code-examples/bria_api.sh
 
-Then pass the payload to curl:
+# Remove background
+RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/image.png")
 
-```bash
-curl -s -X POST "https://engine.prod.bria-api.com/v2/..." \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d @/tmp/bria_payload.json
+# Replace background
+RESULT_URL=$(bria_call /v2/image/edit/replace_background "https://example.com/img.jpg" '"prompt": "sunset beach"')
+
+# Edit image (uses images array)
+RESULT_URL=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instruction": "make it warmer"')
 ```
