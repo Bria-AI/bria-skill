@@ -31,3 +31,5 @@ node_modules/
 dist/
 build/
 *.egg-info/
+tests
+bria-ai-workspace

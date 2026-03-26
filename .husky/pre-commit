@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+echo "Validating skills..."
+
+failed=0
+for dir in skills/*/; do
+  [ -f "${dir}SKILL.md" ] || continue
+  skill_name=$(basename "$dir")
+  # Skip untracked skill directories
+  if ! git ls-files --error-unmatch "$dir" &>/dev/null && [ -z "$(git ls-files "$dir")" ]; then
+    continue
+  fi
+  if ! uvx --from 'git+https://github.com/agentskills/agentskills#subdirectory=skills-ref' skills-ref validate "$dir"; then
+    echo "FAIL: $skill_name"
+    failed=1
+  else
+    echo "OK:   $skill_name"
+  fi
+done
+
+if [ "$failed" -eq 1 ]; then
+  echo ""
+  echo "Commit aborted: skill validation failed."
+  exit 1
+fi

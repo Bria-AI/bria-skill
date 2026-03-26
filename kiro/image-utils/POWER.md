@@ -1,17 +1,16 @@
 ---
-name: image-utils
-description: Classic image manipulation with Python Pillow - resize, crop, composite, format conversion, watermarks, brightness/contrast adjustments, and web optimization. Use this skill when post-processing AI-generated images, preparing images for web delivery, batch processing image directories, creating responsive image variants, or performing any deterministic pixel-level image operation. Works standalone or alongside bria-ai for post-processing generated images.
-license: MIT
-metadata:
-  author: Bria AI
-  version: "1.2.7"
+name: "image-utils"
+displayName: "Image Utilities"
+description: "Classic image manipulation with Python Pillow — resize, crop, composite, format conversion, watermarks, brightness/contrast adjustments, and web optimization. Works standalone or alongside bria-ai for post-processing."
+keywords: ["image-utils", "pillow", "resize", "crop", "watermark", "image-processing", "web-optimization"]
+author: "Bria AI"
 ---
 
 # Image Utilities
 
 Pillow-based utilities for deterministic pixel-level image operations. Use for resize, crop, composite, format conversion, watermarks, and other standard image processing tasks.
 
-## When to Use This Skill
+## When to Use This Power
 
 - **Post-processing AI-generated images**: Resize, crop, optimize for web after generation
 - **Format conversion**: PNG ↔ JPEG ↔ WEBP with quality control
@@ -19,24 +18,6 @@ Pillow-based utilities for deterministic pixel-level image operations. Use for r
 - **Batch processing**: Resize to multiple sizes, add watermarks
 - **Web optimization**: Compress and resize for fast delivery
 - **Social media preparation**: Crop to platform-specific aspect ratios
-
-## When NOT to Use This Skill — Use `bria-ai` Instead
-
-This skill handles **deterministic pixel-level operations** only. For any **generative or AI-powered** image work, use the `bria-ai` skill instead:
-
-- **Generating images from text prompts** → use `bria-ai`
-- **AI background removal or replacement** → use `bria-ai`
-- **AI image editing (inpainting, object removal/addition)** → use `bria-ai`
-- **Style transfer or AI-driven visual effects** → use `bria-ai`
-- **Creating product lifestyle shots with AI** → use `bria-ai`
-- **Image upscaling with AI super-resolution** → use `bria-ai`
-
-**Rule of thumb**: If the task requires *creating new visual content* or *understanding image semantics*, use `bria-ai`. If the task requires *transforming existing pixels* (resize, crop, format convert, watermark), use this skill.
-
-If `bria-ai` is not available, install it with:
-```bash
-npx skills add bria-ai/bria-skill
-```
 
 ## Quick Reference
 
@@ -148,11 +129,9 @@ result = ImageUtils.composite(background, foreground)
 
 # Fit image onto canvas with letterboxing
 canvas = ImageUtils.fit_to_canvas(
-    image,
-    width=1200,
-    height=800,
-    background_color=(255, 255, 255, 255),  # White
-    position="center"  # or "top", "bottom"
+    image, width=1200, height=800,
+    background_color=(255, 255, 255, 255),
+    position="center"
 )
 ```
 
@@ -167,7 +146,6 @@ webp_bytes = ImageUtils.to_bytes(image, "WEBP", quality=90)
 # Get base64 for data URLs
 base64_str = ImageUtils.to_base64(image, "PNG")
 data_url = ImageUtils.to_base64(image, "PNG", include_data_url=True)
-# Returns: "data:image/png;base64,..."
 
 # Save with format auto-detected from extension
 ImageUtils.save(image, "output.png")
@@ -180,55 +158,36 @@ ImageUtils.save(image, "output.webp", quality=90)
 ```python
 # Text watermark
 watermarked = ImageUtils.add_text_watermark(
-    image,
-    text="© 2024 My Company",
-    position="bottom-right",  # bottom-left, top-right, top-left, center
-    font_size=24,
-    color=(255, 255, 255, 128),  # Semi-transparent white
-    margin=20
+    image, text="© 2024 My Company",
+    position="bottom-right", font_size=24,
+    color=(255, 255, 255, 128), margin=20
 )
 
 # Logo/image watermark
 logo = ImageUtils.load("logo.png")
 watermarked = ImageUtils.add_image_watermark(
-    image,
-    watermark=logo,
-    position="bottom-right",
-    opacity=0.5,
-    scale=0.15,  # 15% of image width
-    margin=20
+    image, watermark=logo,
+    position="bottom-right", opacity=0.5, scale=0.15, margin=20
 )
 ```
 
 ## Adjustments
 
 ```python
-# Brightness (1.0 = original, <1 darker, >1 lighter)
 bright = ImageUtils.adjust_brightness(image, 1.3)
 dark = ImageUtils.adjust_brightness(image, 0.7)
-
-# Contrast (1.0 = original)
 high_contrast = ImageUtils.adjust_contrast(image, 1.5)
-
-# Saturation (0 = grayscale, 1.0 = original, >1 more vivid)
 vivid = ImageUtils.adjust_saturation(image, 1.3)
 grayscale = ImageUtils.adjust_saturation(image, 0)
-
-# Sharpness
 sharp = ImageUtils.adjust_sharpness(image, 2.0)
-
-# Blur
 blurred = ImageUtils.blur(image, radius=5)
 ```
 
 ## Transforms
 
 ```python
-# Rotate (counter-clockwise, degrees)
 rotated = ImageUtils.rotate(image, 45)
-rotated = ImageUtils.rotate(image, 90, expand=False)  # Don't expand canvas
-
-# Flip
+rotated = ImageUtils.rotate(image, 90, expand=False)
 mirrored = ImageUtils.flip_horizontal(image)
 flipped = ImageUtils.flip_vertical(image)
 ```
@@ -236,91 +195,57 @@ flipped = ImageUtils.flip_vertical(image)
 ## Borders & Padding
 
 ```python
-# Add solid border
 bordered = ImageUtils.add_border(image, width=5, color=(0, 0, 0))
-
-# Add padding (whitespace)
-padded = ImageUtils.add_padding(image, padding=20)  # Uniform
-padded = ImageUtils.add_padding(image, padding=(10, 20, 10, 20))  # left, top, right, bottom
+padded = ImageUtils.add_padding(image, padding=20)
+padded = ImageUtils.add_padding(image, padding=(10, 20, 10, 20))
 ```
 
 ## Web Optimization
 
 ```python
-# Optimize for web delivery
 optimized_bytes = ImageUtils.optimize_for_web(
-    image,
-    max_dimension=1920,  # Resize if larger
-    format="WEBP",       # Best compression
-    quality=85
+    image, max_dimension=1920, format="WEBP", quality=85
 )
-
-# Save optimized
 with open("optimized.webp", "wb") as f:
     f.write(optimized_bytes)
 ```
 
-## Integration with Bria AI
-
-Use alongside the **[bria-ai skill](https://clawhub.ai/galbria/bria-ai)** to post-process AI-generated images. Generate or edit images with Bria's API, then use image-utils for resizing, cropping, watermarking, and web optimization.
+## Integration with AI Image Generation
 
 ```python
-import requests
+from bria_client import BriaClient
 from image_utils import ImageUtils
 
-# Generate with Bria AI (see bria-ai skill for full API reference)
-response = requests.post(
-    "https://engine.prod.bria-api.com/v2/image/generate",
-    headers={"api_token": BRIA_API_KEY, "Content-Type": "application/json"},
-    json={"prompt": "product photo of headphones", "aspect_ratio": "1:1", "sync": True}
-)
-image_url = response.json()["result"]["image_url"]
+client = BriaClient()
+result = client.generate("product photo of headphones", aspect_ratio="1:1")
+image = ImageUtils.load_from_url(result['result']['image_url'])
 
-# Download and post-process
-image = ImageUtils.load_from_url(image_url)
-
-# Create multiple sizes for responsive images
 sizes = {
     "large": ImageUtils.resize(image, width=1200),
     "medium": ImageUtils.resize(image, width=600),
     "thumb": ImageUtils.thumbnail(image, (150, 150))
 }
-
-# Save all as optimized WebP
 for name, img in sizes.items():
     ImageUtils.save(img, f"product_{name}.webp", quality=85)
 ```
 
-## Batch Processing Example
+## Available Steering Files
 
-```python
-from pathlib import Path
-from image_utils import ImageUtils
+- **image-utils-python** — Complete Python implementation with all methods and docstrings
 
-def process_catalog(input_dir, output_dir):
-    """Process all images in a directory."""
-    output_path = Path(output_dir)
-    output_path.mkdir(exist_ok=True)
+## Related Powers
 
-    for image_file in Path(input_dir).glob("*.{jpg,png,webp}"):
-        image = ImageUtils.load(image_file)
+- **bria-ai** — AI image generation and editing API
+- **vgl** — Structured VGL JSON prompts for precise image generation control
 
-        # Crop to square
-        square = ImageUtils.crop_to_aspect(image, "1:1")
+## License & Attribution
 
-        # Resize to standard size
-        resized = ImageUtils.resize(square, width=800, height=800)
+**License:** MIT
 
-        # Add watermark
-        final = ImageUtils.add_text_watermark(resized, "© My Brand")
+**Power Author:** Bria AI
 
-        # Save optimized
-        output_file = output_path / f"{image_file.stem}.webp"
-        ImageUtils.save(final, output_file, quality=85)
+**Original Work:** This power is converted from the [bria-skill](https://github.com/bria-ai/bria-skill) Claude Code skill by Bria AI.
 
-process_catalog("./raw_images", "./processed")
-```
+**Source Version:** Based on version 1.2.7.
 
-## API Reference
-
-See [image_utils.py](./references/code-examples/image_utils.py) for complete implementation with docstrings.
+**Update Frequency:** This power will be updated periodically.

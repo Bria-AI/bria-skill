@@ -1,6 +1,6 @@
 {
   "name": "bria-skills",
-  "version": "1.2.3",
+  "version": "1.2.7",
   "description": "Official Bria AI skills for Claude Code - image generation, editing, background removal, VGL structured prompts, and image utilities",
   "bin": {
     "bria-skills": "bin/cli.js"
@@ -17,16 +17,58 @@
     "bria",
     "ai-images",
     "image-generation",
+    "generate-image",
+    "create-image",
     "image-editing",
     "background-removal",
+    "background-replacement",
     "text-to-image",
     "product-photography",
+    "packshot",
+    "lifestyle-shot",
     "visual-assets",
     "fibo",
     "rmbg",
     "vgl",
     "upscale",
-    "restyle"
+    "restyle",
+    "relight",
+    "reseason",
+    "outpaint",
+    "inpaint",
+    "object-removal",
+    "photo-editing",
+    "photo-retouching",
+    "transparent-png",
+    "cutout",
+    "e-commerce",
+    "marketing",
+    "marketing-visuals",
+    "social-media",
+    "thumbnail",
+    "banner",
+    "hero-image",
+    "ad-creative",
+    "photo-restoration",
+    "style-transfer",
+    "image-enhancement",
+    "sketch-to-photo",
+    "colorize",
+    "ai-art",
+    "royalty-free",
+    "commercial-license",
+    "brand-safe",
+    "batch-generation",
+    "bulk-generation",
+    "image-variations",
+    "compositing",
+    "image-api",
+    "pipeline",
+    "visual-content-creation",
+    "web-design",
+    "content-creation",
+    "product-placement",
+    "scene-generation"
   ],
   "author": {
     "name": "Bria AI",
@@ -38,6 +80,12 @@
     "url": "git+https://github.com/bria-ai/bria-skill.git"
   },
   "homepage": "https://github.com/bria-ai/bria-skill#readme",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.0.0"
+  },
   "engines": {
     "node": ">=16.0.0"
   }
