@@ -166,185 +166,45 @@ Interpret the output:
 | Create product lifestyle shots | Lifestyle Shot | Place products in scenes for e-commerce |
 | Integrate products into scenes | Product Integrate | Embed products at exact coordinates |
 
-## Quick Reference
+## How to Call Any Endpoint
 
-### Generate an Image (FIBO)
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{
-    "prompt": "your description",
-    "aspect_ratio": "16:9",
-    "resolution": "1MP",
-    "sync": true
-  }'
-```
-
-**Aspect ratios**: `1:1` (square), `16:9` (hero/banner), `4:3` (presentation), `9:16` (mobile/story), `3:4` (portrait)
-
-**Resolution**: `1MP` (default) or `4MP` (improved details for photorealism, adds ~30s latency)
-
-**Sync mode**: Pass `"sync": true` in the request body for single image generation to get the result directly in the response. For batch/multiple image generation, omit `sync` (or set `false`) and use polling instead.
-
-> **Advanced**: For precise, deterministic control over generation, use **[VGL structured prompts](../vgl/SKILL.md)** instead of natural language. VGL defines every visual attribute (objects, lighting, composition) as explicit JSON.
-
-### Remove Background (RMBG-2.0)
+Use `bria_call` for all API calls. It handles URL passthrough, local file base64 encoding, JSON construction, API call, and async polling in a single function call. The API key is auto-loaded from `~/.bria/credentials`.
 
 ```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/remove_background" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{"image": "https://..."}'
-```
+source ~/.agents/skills/bria-ai/references/code-examples/bria_client.sh
 
-Returns PNG with transparency.
+# Generate (no image input — pass empty string)
+RESULT=$(bria_call /v2/image/generate "" '"prompt": "your description", "aspect_ratio": "16:9", "sync": true')
 
-### Edit Image (FIBO-Edit) - No Mask Required
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{
-    "images": ["https://..."],
-    "instruction": "change the mug to red"
-  }'
-```
-
-### Edit Image Region with Mask (GenFill)
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/gen_fill" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{
-    "image": "https://...",
-    "mask": "https://...",
-    "prompt": "what to generate in masked area"
-  }'
-```
-
-### Expand Image (Outpainting)
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/expand" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{
-    "image": "base64-or-url",
-    "aspect_ratio": "16:9",
-    "prompt": "coffee shop background, wooden table"
-  }'
-```
-
-### Upscale Image
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{"image": "https://...", "scale": 2}'
-```
-
-### Create Product Lifestyle Shot
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{
-    "image": "https://product-with-transparent-bg.png",
-    "prompt": "modern kitchen countertop, natural morning light"
-  }'
-```
-
-### Integrate Products into Scene
-
-Place one or more products at exact coordinates in a scene. Products are automatically cut out and matched to the scene's lighting and perspective.
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/image/edit/product/integrate" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{
-    "scene": "https://scene-image-url",
-    "products": [
-      {
-        "image": "https://product-image-url",
-        "coordinates": {"x": 100, "y": 200, "width": 300, "height": 400}
-      }
-    ]
-  }'
-```
-
----
-
-## Response Handling
-
-### Sync (single image generation)
-
-For single image requests, pass `"sync": true` in the request body. The response returns the result directly — no polling needed.
-
-### Async with polling (batch generation)
-
-For batch or multiple image generation, omit `sync` (or set `"sync": false`). The response returns a status URL to poll:
-
-```json
-{
-  "request_id": "uuid",
-  "status_url": "https://engine.prod.bria-api.com/v2/status/uuid"
-}
-```
-
-Poll the status_url until `status: "COMPLETED"`, then get `result.image_url`:
-
-```bash
-if [ -n "$STATUS_URL" ]; then
-  for i in $(seq 1 30); do
-    POLL=$(curl -s "$STATUS_URL" \
-      -H "api_token: $BRIA_API_KEY" \
-      -H "User-Agent: BriaSkills/1.2.7")
-    STATUS=$(printf '%s' "$POLL" | sed -n 's/.*"status" *: *"\([^"]*\)".*/\1/p')
-    if [ "$STATUS" = "COMPLETED" ]; then
-      IMAGE_URL=$(printf '%s' "$POLL" | sed -n 's/.*"image_url" *: *"\([^"]*\)".*/\1/p')
-      echo "DONE: $IMAGE_URL"
-      break
-    fi
-    if [ "$STATUS" = "FAILED" ]; then
-      ERROR=$(printf '%s' "$POLL" | sed -n 's/.*"error" *: *"\([^"]*\)".*/\1/p')
-      echo "FAILED: $ERROR"
-      break
-    fi
-    sleep 2
-  done
-fi
-```
-
-### Using `bria_call` (Recommended)
-
-Use the `bria_api.sh` helper for any endpoint that accepts an image. It handles URL passthrough, local file base64 encoding, JSON construction, API call, and async polling. Pass a URL or local file path.
-
-```bash
-source ~/.agents/skills/bria-ai/references/code-examples/bria_api.sh
-
+# Remove background
 RESULT=$(bria_call /v2/image/edit/remove_background "/path/to/local/image.png")
 
+# Replace background
 RESULT=$(bria_call /v2/image/edit/replace_background "https://example.com/img.jpg" '"prompt": "sunset beach"')
 
+# Edit image (uses images array — pass --key images)
 RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instruction": "make it look warmer"')
 
+# Upscale
 RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"scale": 4')
+
+# Lifestyle shot
+RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"prompt": "modern kitchen countertop"')
+
+echo "$RESULT"
 ```
+
+**Calling convention:** `bria_call <endpoint> <image_or_empty> [--key <json_key>] [extra JSON fields...]`
+- Pass a URL, local file path, or `""` (empty) for endpoints without image input
+- Use `--key images` when the endpoint expects an `images` array instead of `image`
+- Extra JSON fields are appended as key-value pairs: `'"key": "value"'`
+- Returns the result image URL on success, or prints an error to stderr
+
+**Generation options:** Aspect ratios `1:1`, `16:9`, `4:3`, `9:16`, `3:4`. Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for single images.
+
+> **Advanced**: For precise control over generation, use **[VGL structured prompts](../vgl/SKILL.md)** instead of natural language.
+
+See **[API Endpoints Reference](references/api-endpoints.md)** for full parameter documentation on all 20+ endpoints.
 
 ---
 
@@ -357,49 +217,27 @@ RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.j
 - **Quality keywords**: "high quality", "professional", "commercial grade", "4K", "sharp focus"
 - **Negative prompts**: "blurry, low quality, pixelated", "text, watermark, logo"
 
----
+### Recipes by Use Case
 
-## API Reference
+**Hero banner (16:9):** `"Modern tech startup workspace with developers collaborating, bright natural lighting, clean minimal aesthetic"` — include "clean background" or "minimal" for text overlay space
 
-For the **complete** Bria API (all endpoints, fields, and behaviors), use **[docs.bria.ai/llms.txt](https://docs.bria.ai/llms.txt)** — agent-ready docs meant for assistants implementing the API. Reach for it whenever this skill’s summary is not enough.
+**Product photo (1:1):** `"Professional product photo of [item] on white studio background, soft shadows, commercial photography lighting"` — then remove background for transparent PNG
 
-See `references/api-endpoints.md` for complete endpoint documentation with request/response formats for all 20+ endpoints (in-repo companion to the quick reference above).
+**Presentation visual (16:9):** `"Abstract visualization of data analytics, blue and purple gradient, modern corporate style, clean composition with space for text"` — common themes: "abstract technology", "business collaboration", "minimalist geometric patterns"
 
-### Authentication
+**Instagram post (1:1):** `"Lifestyle photo of coffee and laptop on wooden desk, morning light, cozy atmosphere"`
 
-All requests need these headers (the `api_token` value comes from the device auth flow in Setup above):
-```
-api_token: $BRIA_API_KEY
-Content-Type: application/json
-User-Agent: BriaSkills/1.2.7
-```
+**Story/Reel (9:16):** `"Vertical product showcase of smartphone, floating in gradient background, tech aesthetic"`
 
 ---
 
 ## Additional Resources
 
-- **[Agent-ready API reference — llms.txt](https://docs.bria.ai/llms.txt)** — Full Bria API documentation for assistants; use when stuck on implementation details
-- **[API Endpoints Reference](references/api-endpoints.md)** — Complete endpoint documentation with request/response formats
-- **[Workflows & Pipelines](references/workflows.md)** — Batch generation, parallel pipelines, integration examples
-- **[Python Client](references/code-examples/bria_client.py)** — Full-featured async Python client
-- **[TypeScript Client](references/code-examples/bria_client.ts)** — Typed Node.js client
-- **[API Helper (bria_api.sh)](references/code-examples/bria_api.sh)** — Minimal helper: one function call for any endpoint (recommended)
-- **[Bash/curl Reference](references/code-examples/bria_client.sh)** — Shell functions for all endpoints
+- **[API Endpoints Reference](references/api-endpoints.md)** — Complete endpoint documentation with request/response formats for all 20+ endpoints
+- **[Shell Client (bria_client.sh)](references/code-examples/bria_client.sh)** — Single-function helper: `bria_call` handles auth, base64, JSON, polling
+- **[Full API docs for agents (llms.txt)](https://docs.bria.ai/llms.txt)** — Agent-ready Bria API reference; use when this skill's summary is not enough
 
 ## Related Skills
-
-### Per-Tool Skills
-
-Focused, single-purpose skills for common operations:
-
-- **[remove-background](../remove-background/SKILL.md)** — Remove image background to transparent PNG
-- **[generate-image](../generate-image/SKILL.md)** — Generate images from text descriptions
-- **[edit-image](../edit-image/SKILL.md)** — Edit images using natural language instructions
-- **[replace-background](../replace-background/SKILL.md)** — Replace image background with AI-generated scene
-- **[upscale](../upscale/SKILL.md)** — Upscale image resolution 2x or 4x
-- **[lifestyle-shot](../lifestyle-shot/SKILL.md)** — Create product lifestyle photography
-
-### Companion Skills
 
 - **[vgl](../vgl/SKILL.md)** — Write structured VGL JSON prompts for precise, deterministic control over FIBO image generation
 - **[image-utils](../image-utils/SKILL.md)** — Classic image manipulation (resize, crop, composite, watermarks) for post-processing

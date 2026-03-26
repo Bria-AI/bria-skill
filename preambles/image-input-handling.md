@@ -7,7 +7,7 @@ Shared pattern for Bria skills that accept image parameters.
 Replace `IMAGE_PATH_OR_URL` with the image URL or local file path.
 
 ```bash
-source ~/.agents/skills/bria-ai/references/code-examples/bria_api.sh
+source ~/.agents/skills/bria-ai/references/code-examples/bria_client.sh
 RESULT_URL=$(bria_call <ENDPOINT> "IMAGE_PATH_OR_URL" [extra JSON fields...])
 echo "$RESULT_URL"
 ```
@@ -17,7 +17,7 @@ The helper auto-loads the API key from `~/.bria/credentials` and handles URL pas
 ## Examples
 
 ```bash
-source ~/.agents/skills/bria-ai/references/code-examples/bria_api.sh
+source ~/.agents/skills/bria-ai/references/code-examples/bria_client.sh
 
 # Remove background
 RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/image.png")
