@@ -69,7 +69,7 @@ Wait for the user to provide their API key. Do not proceed until they give you t
 curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
+  -H "User-Agent: BriaSkills/1.3.0" \
   -d '{
     "prompt": "your description",
     "aspect_ratio": "16:9",
@@ -92,7 +92,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/remove_background" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
+  -H "User-Agent: BriaSkills/1.3.0" \
   -d '{"image": "https://..."}'
 ```
 
@@ -104,7 +104,7 @@ Returns PNG with transparency.
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
+  -H "User-Agent: BriaSkills/1.3.0" \
   -d '{
     "images": ["https://..."],
     "instruction": "change the mug to red"
@@ -117,7 +117,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/gen_fill" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
+  -H "User-Agent: BriaSkills/1.3.0" \
   -d '{
     "image": "https://...",
     "mask": "https://...",
@@ -131,7 +131,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/gen_fill" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/expand" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
+  -H "User-Agent: BriaSkills/1.3.0" \
   -d '{
     "image": "base64-or-url",
     "aspect_ratio": "16:9",
@@ -145,7 +145,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/expand" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
+  -H "User-Agent: BriaSkills/1.3.0" \
   -d '{"image": "https://...", "scale": 2}'
 ```
 
@@ -155,7 +155,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution
 curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
+  -H "User-Agent: BriaSkills/1.3.0" \
   -d '{
     "image": "https://product-with-transparent-bg.png",
     "prompt": "modern kitchen countertop, natural morning light"
@@ -170,7 +170,7 @@ Place one or more products at exact coordinates in a scene. Products are automat
 curl -X POST "https://engine.prod.bria-api.com/image/edit/product/integrate" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
+  -H "User-Agent: BriaSkills/1.3.0" \
   -d '{
     "scene": "https://scene-image-url",
     "products": [
@@ -208,7 +208,7 @@ import requests, time
 
 def get_result(status_url, api_key):
     while True:
-        r = requests.get(status_url, headers={"api_token": api_key, "User-Agent": "BriaSkills/1.2.7"})
+        r = requests.get(status_url, headers={"api_token": api_key, "User-Agent": "BriaSkills/1.3.0"})
         data = r.json()
         if data["status"] == "COMPLETED":
             return data["result"]["image_url"]
@@ -301,7 +301,7 @@ All requests need `api_token` header:
 api_token: YOUR_BRIA_API_KEY
 User-Agent: BriaSkills/<version>
 ```
-> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version, e.g. `BriaSkills/1.2.7`) in every API call, including status polling requests.
+> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version, e.g. `BriaSkills/1.3.0`) in every API call, including status polling requests.
 
 ---
 
@@ -326,6 +326,6 @@ User-Agent: BriaSkills/<version>
 
 **Original Work:** This power is converted from the [bria-skill](https://github.com/bria-ai/bria-skill) Claude Code skill by Bria AI.
 
-**Source Version:** Based on version 1.2.7.
+**Source Version:** Based on version 1.3.0.
 
 **Update Frequency:** This power will be updated periodically.
