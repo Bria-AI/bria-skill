@@ -11,7 +11,7 @@ metadata:
 
 Commercially safe, royalty-free image generation and editing through 20+ API endpoints. Generate from text, edit with natural language, remove backgrounds, create product shots, and build automated image pipelines.
 
-If you are stuck on request shapes, parameters, or endpoints not covered here, **fetch the full agent-oriented API reference** at [docs.bria.ai/llms.txt](https://docs.bria.ai/llms.txt) — it is the canonical LLM-ready documentation and the right place to look before guessing.
+For additional endpoint details beyond what is documented here, see the [Bria API reference for agents](https://docs.bria.ai/llms.txt).
 
 ## When to Use This Skill
 
@@ -125,7 +125,8 @@ if [ "$BILLING_STATUS" = "blocked" ]; then
 fi
 ACTIVE=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"active" *: *\([^,}]*\).*/\1/p' | tr -d ' ')
 if [ "$ACTIVE" = "false" ]; then
-  rm -f ~/.bria/credentials
+  # Clear stale tokens so re-auth starts fresh (credentials file is re-created in Step 2c)
+  printf '' > "$HOME/.bria/credentials"
   echo "TOKEN_EXPIRED"
 fi
 BRIA_API_KEY=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"api_token" *: *"\([^"]*\)".*/\1/p')
@@ -202,7 +203,7 @@ echo "$RESULT"
 
 **Generation options:** Aspect ratios `1:1`, `16:9`, `4:3`, `9:16`, `3:4`. Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for single images.
 
-> **Advanced**: For precise control over generation, use **[VGL structured prompts](../vgl/SKILL.md)** instead of natural language.
+> **Advanced**: For precise control over generation, use the **vgl** skill for structured VGL JSON prompts instead of natural language.
 
 See **[API Endpoints Reference](references/api-endpoints.md)** for full parameter documentation on all 20+ endpoints.
 
@@ -239,5 +240,5 @@ See **[API Endpoints Reference](references/api-endpoints.md)** for full paramete
 
 ## Related Skills
 
-- **[vgl](../vgl/SKILL.md)** — Write structured VGL JSON prompts for precise, deterministic control over FIBO image generation
-- **[image-utils](../image-utils/SKILL.md)** — Classic image manipulation (resize, crop, composite, watermarks) for post-processing
+- **vgl** — Write structured VGL JSON prompts for precise, deterministic control over FIBO image generation
+- **image-utils** — Classic image manipulation (resize, crop, composite, watermarks) for post-processing
