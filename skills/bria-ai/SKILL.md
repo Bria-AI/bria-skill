@@ -43,6 +43,30 @@ This skill handles the full spectrum of AI image operations. If the user mention
 
 ---
 
+## Getting Started — Try These Prompts
+
+Copy-paste any of these to see Bria in action:
+
+### See What Bria Can Do
+> Generate a 4MP photo of a red sneaker on a wooden floor in a gym. Then show me what you can do with it — one step at a time: remove the background, replace the background with a city street scene, restyle as a retro comic book illustration, change the season to winter, and relight with golden hour. Save each result and create a simple HTML page showing every step with a label.
+
+### Product Shot Pipeline
+> I have a product image at `https://labs-assets.bria.ai/sandbox-example-inputs/pexels-the-glorious-studio-3584518-5370644.jpg`. Remove the background, place it in a modern kitchen as a lifestyle shot, and upscale to 4x resolution. Then expand it to 1:1 for Instagram, 9:16 for Stories, and 16:9 for a website hero banner. Save each step and create a simple HTML page showing the progression.
+
+### Sketch to Business Asset
+> I have a rough sketch of a brand mascot at `https://bria-datasets.s3.us-east-1.amazonaws.com/gb_assets/generated-image.png`. Convert it to a polished colored illustration, enhance the quality, then create versions restyled as a 3D render and as vector art. Save each version and create a simple HTML page showing each result with a label.
+
+### Precision Edit Chain
+> Generate a photo of a modern office reception area. Then make these edits one by one, showing me the result after each: add a small bonsai tree on the reception desk, replace the wall art with a minimalist logo, change the lighting to warm evening, and remove the chair in the corner. Save each step and create a simple HTML page showing the image after each edit.
+
+### Post-Production Pipeline
+> Take this image `https://labs-assets.bria.ai/sandbox-example-inputs/pexels-the-glorious-studio-3584518-5370644.jpg` and run a full post-production pipeline: first enhance the quality, then expand to 16:9, then upscale to total 8mp resolution. Save each step and create a simple HTML page showing before and after for each stage.
+
+### Build a Product Pipeline in Code
+> Write a Python script that takes a list of product image URLs and processes each one through a pipeline: remove the background, place it in a lifestyle scene based on a prompt I provide, and upscale to 4x. For each step, poll the status URL until complete before moving to the next. Save all outputs to a local folder organized by product.
+
+---
+
 ## Setup — API Key Check
 
 Before making any Bria API call, check for the API key and help the user set it up if missing:
@@ -193,10 +217,12 @@ curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text
   -H "Content-Type: application/json" \
   -H "User-Agent: BriaSkills/1.2.7" \
   -d '{
-    "image": "https://product-with-transparent-bg.png",
-    "prompt": "modern kitchen countertop, natural morning light"
+    "image_url": "https://product-with-transparent-bg.png",
+    "scene_description": "modern kitchen countertop, natural morning light"
   }'
 ```
+
+Use `image_url` when you have a URL (preferred). Use `file` with base64 only when no URL is available. The product image must have a transparent background — use background removal first if needed.
 
 ### Integrate Products into Scene
 
