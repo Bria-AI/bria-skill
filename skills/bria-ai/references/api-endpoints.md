@@ -11,7 +11,7 @@ Content-Type: application/json
 User-Agent: BriaSkills/<version>
 ```
 
-> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.2.6`) in every API call, including status polling requests.
+> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.3.0`) in every API call, including status polling requests.
 
 ---
 
@@ -542,7 +542,7 @@ Check async request status.
 import requests, time
 
 def poll(status_url, api_key, timeout=120):
-    headers = {"api_token": api_key, "User-Agent": "BriaSkills/1.2.6"}
+    headers = {"api_token": api_key, "User-Agent": "BriaSkills/1.3.0"}
     for _ in range(timeout // 2):
         r = requests.get(status_url, headers=headers)
         data = r.json()
