@@ -74,10 +74,7 @@ Ask Kiro to generate images, remove backgrounds, edit photos, and more. The powe
 
 - [bria-ai POWER.md](./bria-ai/POWER.md) — Core power with all capabilities
 - [API Endpoints Reference](./bria-ai/steering/api-endpoints.md) — Complete API documentation
-- [Workflows & Pipelines](./bria-ai/steering/workflows.md) — Batch generation, parallel pipelines, integration examples
 - [VGL Schema Reference](./vgl/steering/schema-reference.md) — Full VGL JSON schema
-- [Python Client](./bria-ai/steering/bria-client-python.py) — Full-featured async client
-- [TypeScript Client](./bria-ai/steering/bria-client-typescript.ts) — Typed Node.js client
 
 ## License
 

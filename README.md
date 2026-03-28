@@ -88,10 +88,8 @@ Copy the `skills/` directory contents to your agent's skills directory.
 
 - [bria-ai SKILL.md](./skills/bria-ai/SKILL.md) — Core skill with all capabilities
 - [API Endpoints Reference](./skills/bria-ai/references/api-endpoints.md) — Complete API documentation
-- [Workflows & Pipelines](./skills/bria-ai/references/workflows.md) — Batch generation, parallel pipelines, integration examples
+- [Shell Client (bria_client.sh)](./skills/bria-ai/references/code-examples/bria_client.sh) — Single-function helper for all endpoints
 - [VGL Schema Reference](./skills/vgl/references/schema-reference.md) — Full VGL JSON schema
-- [Python Client](./skills/bria-ai/references/code-examples/bria_client.py) — Full-featured async client
-- [TypeScript Client](./skills/bria-ai/references/code-examples/bria_client.ts) — Typed Node.js client
 
 ## License
 

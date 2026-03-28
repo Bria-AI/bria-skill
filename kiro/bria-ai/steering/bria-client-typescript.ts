@@ -122,7 +122,7 @@ export class BriaClient {
     return {
       api_token: this.apiKey,
       "Content-Type": "application/json",
-      "User-Agent": "BriaSkills/1.2.7",
+      "User-Agent": "BriaSkills/1.3.0",
     };
   }
 

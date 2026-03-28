@@ -4,16 +4,14 @@ description: AI image generation, editing, and background removal API via Bria.a
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.2.7"
-  dependencies:
-    - type: env
-      name: BRIA_API_KEY
-      description: "Bria AI API key (get one at https://platform.bria.ai/console/account/api-keys)"
+  version: "1.3.0"
 ---
 
 # Bria — AI Image Generation, Editing & Background Removal
 
 Commercially safe, royalty-free image generation and editing through 20+ API endpoints. Generate from text, edit with natural language, remove backgrounds, create product shots, and build automated image pipelines.
+
+For additional endpoint details beyond what is documented here, see the [Bria API reference for agents](https://docs.bria.ai/llms.txt).
 
 ## When to Use This Skill
 
@@ -41,34 +39,108 @@ This skill handles the full spectrum of AI image operations. If the user mention
 
 ---
 
-## Setup — API Key Check
+## Setup — Authentication
 
-Before making any Bria API call, check for the API key and help the user set it up if missing:
+Before making any API call, you need a valid Bria access token.
 
-### Step 1: Check if the key exists (without printing the key)
+### Step 1: Check for existing credentials
 
 ```bash
-if [ -z "$BRIA_API_KEY" ]; then
-  echo "BRIA_API_KEY is not set"
+if [ -f ~/.bria/credentials ]; then
+  BRIA_ACCESS_TOKEN=$(grep '^access_token=' "$HOME/.bria/credentials" | cut -d= -f2-)
+  BRIA_API_KEY=$(grep '^api_token=' "$HOME/.bria/credentials" | cut -d= -f2-)
+fi
+if [ -z "$BRIA_ACCESS_TOKEN" ]; then
+  echo "NO_CREDENTIALS"
+elif [ -n "$BRIA_API_KEY" ]; then
+  echo "READY"
 else
-  echo "BRIA_API_KEY is set"
+  echo "CREDENTIALS_FOUND"
 fi
 ```
 
-If the output says **BRIA_API_KEY is set**, skip to the next section.
+If the output is `READY`, skip straight to making API calls — no introspection needed.
+If the output is `CREDENTIALS_FOUND`, skip to Step 3.
+If the output is `NO_CREDENTIALS`, proceed to Step 2.
 
-### Step 2: If the key is missing, guide the user
+### Step 2: Authenticate via device authorization
 
-Tell the user exactly this:
-> To use image generation, you need a free Bria API key.
->
-> 1. Go to https://platform.bria.ai/console/account/api-keys
-> 2. Sign up or log in
-> 3. Click **Create API Key**
+Start the device authorization flow:
 
-Wait for the user to provide their API key. Do not proceed until they give you the key.
+**2a. Request a device code:**
 
-**Do not proceed with any image generation or editing until the API key is confirmed set.**
+```bash
+DEVICE_RESPONSE=$(curl -s -X POST "https://engine.prod.bria-api.com/v2/auth/device/authorize" \
+  -H "Content-Type: application/json")
+echo "$DEVICE_RESPONSE"
+```
+
+Parse the response fields:
+- `device_code` — used to poll for the token (keep this, don't show to user)
+- `user_code` — the code the user must enter (e.g. `BRIA-XXXX`)
+- `interval` — seconds between poll attempts
+
+**2b. Show the user a single sign-in link.** Tell them exactly this — nothing more:
+
+> **Connect your Bria account:** [Click here to sign in](https://platform.bria.ai/device/verify?user_code={user_code})
+> Your code is **{user_code}** — it's already filled in.
+
+Do NOT show two links. Do NOT show the raw URL separately. Do NOT use `verification_uri` from the API response. Keep it to one clickable link.
+
+**2c. Poll for the token.** After showing the user the code, immediately start polling. Try up to 60 times with the given interval (default 5 seconds):
+
+```bash
+for i in $(seq 1 60); do
+  TOKEN_RESPONSE=$(curl -s -X POST "https://engine.prod.bria-api.com/v2/auth/token" \
+    -d "grant_type=urn:ietf:params:oauth:grant-type:device_code" \
+    -d "device_code=$DEVICE_CODE")
+  ACCESS_TOKEN=$(printf '%s' "$TOKEN_RESPONSE" | sed -n 's/.*"access_token" *: *"\([^"]*\)".*/\1/p')
+  if [ -n "$ACCESS_TOKEN" ]; then
+    BRIA_ACCESS_TOKEN="$ACCESS_TOKEN"
+    REFRESH_TOKEN=$(printf '%s' "$TOKEN_RESPONSE" | sed -n 's/.*"refresh_token" *: *"\([^"]*\)".*/\1/p')
+    mkdir -p ~/.bria
+    printf 'access_token=%s\nrefresh_token=%s\n' "$BRIA_ACCESS_TOKEN" "$REFRESH_TOKEN" > "$HOME/.bria/credentials"
+    echo "AUTHENTICATED"
+    break
+  fi
+  sleep 5
+done
+```
+
+If the output contains `AUTHENTICATED`, proceed to Step 3. Otherwise the code expired — start over from Step 2a.
+
+**Do not proceed with any API call until authentication is confirmed.**
+
+### Step 3: Verify billing status and resolve API key
+
+Introspect the bearer token to check billing status and obtain the real API key for Bria API calls:
+
+```bash
+INTROSPECT=$(curl -s -X POST "https://engine.prod.bria-api.com/v2/auth/token/introspect" \
+  -d "token=$BRIA_ACCESS_TOKEN")
+BILLING_STATUS=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"billing_status" *: *"\([^"]*\)".*/\1/p')
+if [ "$BILLING_STATUS" = "blocked" ]; then
+  BILLING_MSG=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"billing_message" *: *"\([^"]*\)".*/\1/p')
+  echo "BILLING_ERROR: $BILLING_MSG"
+fi
+ACTIVE=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"active" *: *\([^,}]*\).*/\1/p' | tr -d ' ')
+if [ "$ACTIVE" = "false" ]; then
+  # Clear stale tokens so re-auth starts fresh (credentials file is re-created in Step 2c)
+  printf '' > "$HOME/.bria/credentials"
+  echo "TOKEN_EXPIRED"
+fi
+BRIA_API_KEY=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"api_token" *: *"\([^"]*\)".*/\1/p')
+if [ -n "$BRIA_API_KEY" ]; then
+  grep -v '^api_token=' "$HOME/.bria/credentials" > "$HOME/.bria/credentials.tmp" 2>/dev/null || true
+  printf 'api_token=%s\n' "$BRIA_API_KEY" >> "$HOME/.bria/credentials.tmp"
+  mv "$HOME/.bria/credentials.tmp" "$HOME/.bria/credentials"
+fi
+```
+
+Interpret the output:
+- If it prints `BILLING_ERROR: ...` — relay the message to the user exactly as shown and **stop**. Do not make any API calls.
+- If it prints `TOKEN_EXPIRED` — the session is no longer valid. Tell the user their session expired and restart from Step 2.
+- Otherwise, `BRIA_API_KEY` now contains the real API key and is cached for future calls. Proceed to the next section.
 
 ---
 
@@ -95,161 +167,45 @@ Wait for the user to provide their API key. Do not proceed until they give you t
 | Create product lifestyle shots | Lifestyle Shot | Place products in scenes for e-commerce |
 | Integrate products into scenes | Product Integrate | Embed products at exact coordinates |
 
-## Quick Reference
+## How to Call Any Endpoint
 
-### Generate an Image (FIBO)
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{
-    "prompt": "your description",
-    "aspect_ratio": "16:9",
-    "resolution": "1MP",
-    "sync": true
-  }'
-```
-
-**Aspect ratios**: `1:1` (square), `16:9` (hero/banner), `4:3` (presentation), `9:16` (mobile/story), `3:4` (portrait)
-
-**Resolution**: `1MP` (default) or `4MP` (improved details for photorealism, adds ~30s latency)
-
-**Sync mode**: Pass `"sync": true` in the request body for single image generation to get the result directly in the response. For batch/multiple image generation, omit `sync` (or set `false`) and use polling instead.
-
-> **Advanced**: For precise, deterministic control over generation, use **[VGL structured prompts](../vgl/SKILL.md)** instead of natural language. VGL defines every visual attribute (objects, lighting, composition) as explicit JSON.
-
-### Remove Background (RMBG-2.0)
+Use `bria_call` for all API calls. It handles URL passthrough, local file base64 encoding, JSON construction, API call, and async polling in a single function call. The API key is auto-loaded from `~/.bria/credentials`.
 
 ```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/remove_background" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{"image": "https://..."}'
+source ~/.agents/skills/bria-ai/references/code-examples/bria_client.sh
+
+# Generate (no image input — pass empty string)
+RESULT=$(bria_call /v2/image/generate "" '"prompt": "your description", "aspect_ratio": "16:9", "sync": true')
+
+# Remove background
+RESULT=$(bria_call /v2/image/edit/remove_background "/path/to/local/image.png")
+
+# Replace background
+RESULT=$(bria_call /v2/image/edit/replace_background "https://example.com/img.jpg" '"prompt": "sunset beach"')
+
+# Edit image (uses images array — pass --key images)
+RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instruction": "make it look warmer"')
+
+# Upscale
+RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"scale": 4')
+
+# Lifestyle shot
+RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"prompt": "modern kitchen countertop"')
+
+echo "$RESULT"
 ```
 
-Returns PNG with transparency.
+**Calling convention:** `bria_call <endpoint> <image_or_empty> [--key <json_key>] [extra JSON fields...]`
+- Pass a URL, local file path, or `""` (empty) for endpoints without image input
+- Use `--key images` when the endpoint expects an `images` array instead of `image`
+- Extra JSON fields are appended as key-value pairs: `'"key": "value"'`
+- Returns the result image URL on success, or prints an error to stderr
 
-### Edit Image (FIBO-Edit) - No Mask Required
+**Generation options:** Aspect ratios `1:1`, `16:9`, `4:3`, `9:16`, `3:4`. Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for single images.
 
-```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{
-    "images": ["https://..."],
-    "instruction": "change the mug to red"
-  }'
-```
+> **Advanced**: For precise control over generation, use the **vgl** skill for structured VGL JSON prompts instead of natural language.
 
-### Edit Image Region with Mask (GenFill)
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/gen_fill" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{
-    "image": "https://...",
-    "mask": "https://...",
-    "prompt": "what to generate in masked area"
-  }'
-```
-
-### Expand Image (Outpainting)
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/expand" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{
-    "image": "base64-or-url",
-    "aspect_ratio": "16:9",
-    "prompt": "coffee shop background, wooden table"
-  }'
-```
-
-### Upscale Image
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{"image": "https://...", "scale": 2}'
-```
-
-### Create Product Lifestyle Shot
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{
-    "image": "https://product-with-transparent-bg.png",
-    "prompt": "modern kitchen countertop, natural morning light"
-  }'
-```
-
-### Integrate Products into Scene
-
-Place one or more products at exact coordinates in a scene. Products are automatically cut out and matched to the scene's lighting and perspective.
-
-```bash
-curl -X POST "https://engine.prod.bria-api.com/image/edit/product/integrate" \
-  -H "api_token: $BRIA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
-  -d '{
-    "scene": "https://scene-image-url",
-    "products": [
-      {
-        "image": "https://product-image-url",
-        "coordinates": {"x": 100, "y": 200, "width": 300, "height": 400}
-      }
-    ]
-  }'
-```
-
----
-
-## Response Handling
-
-### Sync (single image generation)
-
-For single image requests, pass `"sync": true` in the request body. The response returns the result directly — no polling needed.
-
-### Async with polling (batch generation)
-
-For batch or multiple image generation, omit `sync` (or set `"sync": false`). The response returns a status URL to poll:
-
-```json
-{
-  "request_id": "uuid",
-  "status_url": "https://engine.prod.bria-api.com/v2/status/uuid"
-}
-```
-
-Poll the status_url until `status: "COMPLETED"`, then get `result.image_url`.
-
-```python
-import requests, time
-
-def get_result(status_url, api_key):
-    while True:
-        r = requests.get(status_url, headers={"api_token": api_key, "User-Agent": "BriaSkills/1.2.7"})
-        data = r.json()
-        if data["status"] == "COMPLETED":
-            return data["result"]["image_url"]
-        if data["status"] == "FAILED":
-            raise Exception(data.get("error"))
-        time.sleep(2)
-```
+See **[API Endpoints Reference](references/api-endpoints.md)** for full parameter documentation on all 20+ endpoints.
 
 ---
 
@@ -262,32 +218,27 @@ def get_result(status_url, api_key):
 - **Quality keywords**: "high quality", "professional", "commercial grade", "4K", "sharp focus"
 - **Negative prompts**: "blurry, low quality, pixelated", "text, watermark, logo"
 
----
+### Recipes by Use Case
 
-## API Reference
+**Hero banner (16:9):** `"Modern tech startup workspace with developers collaborating, bright natural lighting, clean minimal aesthetic"` — include "clean background" or "minimal" for text overlay space
 
-See `references/api-endpoints.md` for complete endpoint documentation with request/response formats for all 20+ endpoints.
+**Product photo (1:1):** `"Professional product photo of [item] on white studio background, soft shadows, commercial photography lighting"` — then remove background for transparent PNG
 
-### Authentication
+**Presentation visual (16:9):** `"Abstract visualization of data analytics, blue and purple gradient, modern corporate style, clean composition with space for text"` — common themes: "abstract technology", "business collaboration", "minimalist geometric patterns"
 
-All requests need these headers:
-```
-api_token: YOUR_BRIA_API_KEY
-Content-Type: application/json
-User-Agent: BriaSkills/1.2.7
-```
+**Instagram post (1:1):** `"Lifestyle photo of coffee and laptop on wooden desk, morning light, cozy atmosphere"`
+
+**Story/Reel (9:16):** `"Vertical product showcase of smartphone, floating in gradient background, tech aesthetic"`
 
 ---
 
 ## Additional Resources
 
-- **[API Endpoints Reference](references/api-endpoints.md)** — Complete endpoint documentation with request/response formats
-- **[Workflows & Pipelines](references/workflows.md)** — Batch generation, parallel pipelines, integration examples
-- **[Python Client](references/code-examples/bria_client.py)** — Full-featured async Python client
-- **[TypeScript Client](references/code-examples/bria_client.ts)** — Typed Node.js client
-- **[Bash/curl Reference](references/code-examples/bria_client.sh)** — Shell functions for all endpoints
+- **[API Endpoints Reference](references/api-endpoints.md)** — Complete endpoint documentation with request/response formats for all 20+ endpoints
+- **[Shell Client (bria_client.sh)](references/code-examples/bria_client.sh)** — Single-function helper: `bria_call` handles auth, base64, JSON, polling
+- **[Full API docs for agents (llms.txt)](https://docs.bria.ai/llms.txt)** — Agent-ready Bria API reference; use when this skill's summary is not enough
 
 ## Related Skills
 
-- **[vgl](../vgl/SKILL.md)** — Write structured VGL JSON prompts for precise, deterministic control over FIBO image generation
-- **[image-utils](../image-utils/SKILL.md)** — Classic image manipulation (resize, crop, composite, watermarks) for post-processing
+- **vgl** — Write structured VGL JSON prompts for precise, deterministic control over FIBO image generation
+- **image-utils** — Classic image manipulation (resize, crop, composite, watermarks) for post-processing

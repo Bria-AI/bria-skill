@@ -199,7 +199,7 @@ Only change what the edit strictly requires.
 curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.2.7" \
+  -H "User-Agent: BriaSkills/1.3.0" \
   -d '{
     "structured_prompt": "{\"short_description\": \"...\", ...}",
     "prompt": "Generate this scene",
@@ -226,6 +226,6 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
 
 **Original Work:** This power is converted from the [bria-skill](https://github.com/bria-ai/bria-skill) Claude Code skill by Bria AI.
 
-**Source Version:** Based on version 1.2.7.
+**Source Version:** Based on version 1.3.0.
 
 **Update Frequency:** This power will be updated periodically.
