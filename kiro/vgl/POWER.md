@@ -184,6 +184,71 @@ Only change what the edit strictly requires.
 - Match existing style, lighting, and subject matter
 - Never describe grey masks—describe content that fills them
 
+## Example Output
+
+```json
+{
+  "short_description": "A professional businesswoman in a navy blazer stands confidently in a modern glass office, holding a tablet. Natural daylight streams through floor-to-ceiling windows, creating a warm, productive atmosphere.",
+  "objects": [
+    {
+      "description": "A confident businesswoman in her 30s with shoulder-length dark hair, wearing a tailored navy blazer over a white blouse. She holds a tablet in her left hand while gesturing naturally with her right.",
+      "location": "center-right",
+      "relative_size": "large within frame",
+      "shape_and_color": "Human figure, navy and white clothing",
+      "texture": "smooth fabric, professional attire",
+      "appearance_details": "Minimal jewelry, well-groomed professional appearance",
+      "relationship": "Main subject, interacting with tablet",
+      "orientation": "facing slightly left, three-quarter view",
+      "pose": "Standing upright, relaxed professional stance",
+      "expression": "confident, approachable smile",
+      "clothing": "Tailored navy blazer, white silk blouse, dark trousers",
+      "action": "Presenting or reviewing information on tablet",
+      "gender": "female",
+      "skin_tone_and_texture": "Medium warm skin tone, healthy smooth complexion"
+    },
+    {
+      "description": "A modern tablet device with a bright display showing charts and graphs",
+      "location": "center, held by subject",
+      "relative_size": "small",
+      "shape_and_color": "Rectangular, silver frame with illuminated screen",
+      "texture": "smooth glass and metal",
+      "appearance_details": "Thin profile, business application visible on screen",
+      "relationship": "Held by businesswoman, focus of her attention",
+      "orientation": "vertical, screen facing viewer at slight angle",
+      "pose": null,
+      "expression": null,
+      "clothing": null,
+      "action": null,
+      "gender": null,
+      "skin_tone_and_texture": null,
+      "number_of_objects": null
+    }
+  ],
+  "background_setting": "Modern corporate office interior with floor-to-ceiling windows overlooking a city skyline. Minimalist furniture in neutral tones, potted plants adding touches of green.",
+  "lighting": {
+    "conditions": "bright natural daylight",
+    "direction": "side-lit from left through windows",
+    "shadows": "soft, natural shadows"
+  },
+  "aesthetics": {
+    "composition": "rule of thirds, medium shot",
+    "color_scheme": "professional blues and neutral whites with warm accents",
+    "mood_atmosphere": "confident, professional, welcoming"
+  },
+  "photographic_characteristics": {
+    "depth_of_field": "shallow, background slightly soft",
+    "focus": "sharp focus on subject's face and upper body",
+    "camera_angle": "eye-level",
+    "lens_focal_length": "portrait lens (85mm)"
+  },
+  "style_medium": "photograph",
+  "artistic_style": "realistic",
+  "context": "Corporate portrait photography for company website or LinkedIn professional profile.",
+  "text_render": [],
+  "edit_instruction": "Generate a professional businesswoman in a modern office environment holding a tablet."
+}
+```
+
 ## Common Pitfalls
 
 1. **Don't invent text** - Keep `text_render` empty unless user provides exact text

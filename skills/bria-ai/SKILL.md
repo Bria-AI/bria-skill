@@ -171,8 +171,10 @@ Interpret the output:
 
 Use `bria_call` for all API calls. It handles URL passthrough, local file base64 encoding, JSON construction, API call, and async polling in a single function call. The API key is auto-loaded from `~/.bria/credentials`.
 
+**First**, source the helper script at `references/code-examples/bria_client.sh` (resolve relative to this skill's directory).
+
 ```bash
-source ~/.agents/skills/bria-ai/references/code-examples/bria_client.sh
+source <SKILL_DIR>/references/code-examples/bria_client.sh
 
 # Generate (no image input — pass empty string)
 RESULT=$(bria_call /v2/image/generate "" '"prompt": "your description", "aspect_ratio": "16:9", "sync": true')
