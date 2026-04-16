@@ -274,7 +274,7 @@ Place a product in a lifestyle scene using text description.
 ```json
 {
   "file": "BASE64_ENCODED_IMAGE",
-  "prompt": "modern kitchen countertop, natural lighting",
+  "scene_description": "modern kitchen countertop, natural lighting",
   "placement_type": "automatic"
 }
 ```
