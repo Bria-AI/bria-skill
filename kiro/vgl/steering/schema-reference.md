@@ -2,8 +2,8 @@
 
 Complete JSON schema for VGL prompt output. Use this when validating or generating VGL JSON.
 
-> **Main Power**: See the main VGL POWER.md for usage guide and examples.
-> **API Integration**: See the **bria-ai** power for executing VGL prompts.
+> **Main Skill**: See **[VGL POWER.md](../POWER.md)** for usage guide and examples.
+> **API Integration**: See **[bria-ai](../../bria-ai/POWER.md)** for executing VGL prompts.
 
 ## Full Schema (JSON Schema Format)
 

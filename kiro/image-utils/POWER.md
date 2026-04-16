@@ -19,6 +19,19 @@ Pillow-based utilities for deterministic pixel-level image operations. Use for r
 - **Web optimization**: Compress and resize for fast delivery
 - **Social media preparation**: Crop to platform-specific aspect ratios
 
+## When NOT to Use This Power — Use `bria-ai` Instead
+
+This power handles **deterministic pixel-level operations** only. For any **generative or AI-powered** image work, use the `bria-ai` power instead:
+
+- **Generating images from text prompts** → use `bria-ai`
+- **AI background removal or replacement** → use `bria-ai`
+- **AI image editing (inpainting, object removal/addition)** → use `bria-ai`
+- **Style transfer or AI-driven visual effects** → use `bria-ai`
+- **Creating product lifestyle shots with AI** → use `bria-ai`
+- **Image upscaling with AI super-resolution** → use `bria-ai`
+
+**Rule of thumb**: If the task requires *creating new visual content* or *understanding image semantics*, use `bria-ai`. If the task requires *transforming existing pixels* (resize, crop, format convert, watermark), use this power.
+
 ## Quick Reference
 
 | Operation | Method | Description |
@@ -210,24 +223,70 @@ with open("optimized.webp", "wb") as f:
     f.write(optimized_bytes)
 ```
 
-## Integration with AI Image Generation
+## Integration with Bria AI
+
+Use alongside the **bria-ai** power to post-process AI-generated images. Generate or edit images with Bria's API, then use image-utils for resizing, cropping, watermarking, and web optimization.
 
 ```python
-from bria_client import BriaClient
+import requests
 from image_utils import ImageUtils
 
-client = BriaClient()
-result = client.generate("product photo of headphones", aspect_ratio="1:1")
-image = ImageUtils.load_from_url(result['result']['image_url'])
+# Generate with Bria AI (see bria-ai power for full API reference)
+response = requests.post(
+    "https://engine.prod.bria-api.com/v2/image/generate",
+    headers={"api_token": BRIA_API_KEY, "Content-Type": "application/json"},
+    json={"prompt": "product photo of headphones", "aspect_ratio": "1:1", "sync": True}
+)
+image_url = response.json()["result"]["image_url"]
 
+# Download and post-process
+image = ImageUtils.load_from_url(image_url)
+
+# Create multiple sizes for responsive images
 sizes = {
     "large": ImageUtils.resize(image, width=1200),
     "medium": ImageUtils.resize(image, width=600),
     "thumb": ImageUtils.thumbnail(image, (150, 150))
 }
+
+# Save all as optimized WebP
 for name, img in sizes.items():
     ImageUtils.save(img, f"product_{name}.webp", quality=85)
 ```
+
+## Batch Processing Example
+
+```python
+from pathlib import Path
+from image_utils import ImageUtils
+
+def process_catalog(input_dir, output_dir):
+    """Process all images in a directory."""
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+
+    for image_file in Path(input_dir).glob("*.{jpg,png,webp}"):
+        image = ImageUtils.load(image_file)
+
+        # Crop to square
+        square = ImageUtils.crop_to_aspect(image, "1:1")
+
+        # Resize to standard size
+        resized = ImageUtils.resize(square, width=800, height=800)
+
+        # Add watermark
+        final = ImageUtils.add_text_watermark(resized, "© My Brand")
+
+        # Save optimized
+        output_file = output_path / f"{image_file.stem}.webp"
+        ImageUtils.save(final, output_file, quality=85)
+
+process_catalog("./raw_images", "./processed")
+```
+
+## API Reference
+
+See `steering/image-utils-python.py` for complete implementation with docstrings.
 
 ## Available Steering Files
 
