@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "Official Bria AI skills — text-to-image generation, image editing, background removal and replacement, object removal, inpainting, outpainting, upscale, restyle, product photography and packshots, batch/bulk generation, VGL structured prompts, and image utilities. Commercially licensed, royalty-free, brand-safe AI image generation and editing API.",
-    "version": "1.3.0",
+    "version": "1.3.1",
     "repository": "https://github.com/bria-ai/bria-skill",
     "license": "MIT",
     "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "background-replacement", "image-editing", "vgl", "product-photography", "packshot", "lifestyle-shot", "visual-assets", "text-to-image", "photo-editing", "transparent-png", "upscale", "outpaint", "inpaint", "object-removal", "restyle", "e-commerce", "marketing", "marketing-visuals", "social-media", "thumbnail", "banner", "hero-image", "ad-creative", "photo-restoration", "style-transfer", "royalty-free", "commercial-license", "brand-safe", "batch-generation", "bulk-generation", "image-variations", "compositing", "image-api", "pipeline", "visual-content-creation", "generate-image", "create-image", "ai-art", "photo-retouching", "image-enhancement", "relight", "reseason", "sketch-to-photo", "colorize", "web-design", "content-creation", "cutout", "product-placement", "scene-generation"]
@@ -58,6 +58,25 @@
       "strict": false,
       "skills": [
         "./skills/image-utils"
+      ],
+      "author": {
+        "name": "Bria AI"
+      }
+    },
+    {
+      "name": "remove-background",
+      "description": "Remove backgrounds from images for transparent PNGs, cutouts, and masks. Segment foreground from background using Bria RMBG 2.0. Dedicated background removal skill — faster and simpler than broader image tools for background removal, transparent PNG creation, product cutouts, headshot background removal, and batch background processing.",
+      "source": "./skills/remove-background",
+      "strict": false,
+      "skills": [
+        "./skills/remove-background"
+      ],
+      "dependencies": [
+        {
+          "type": "env",
+          "name": "BRIA_API_KEY",
+          "description": "Bria AI API key (get one at https://platform.bria.ai/console/account/api-keys)"
+        }
       ],
       "author": {
         "name": "Bria AI"
