@@ -5,7 +5,7 @@ const path = require("path");
 const os = require("os");
 
 const PACKAGE_NAME = "bria-skills";
-const SKILLS = ["bria-ai", "vgl", "image-utils"];
+const SKILLS = ["bria-ai", "vgl", "image-utils", "remove-background"];
 
 // Where the skill files live relative to this script
 const packageRoot = path.resolve(__dirname, "..");
@@ -79,9 +79,10 @@ Usage:
   npx ${PACKAGE_NAME} --help       Show this help
 
 Skills included:
-  bria-ai       AI-powered image generation and editing (FIBO, RMBG-2.0)
-  vgl           Visual Generation Language structured prompts
-  image-utils   Classic image manipulation (resize, crop, composite)
+  bria-ai            AI-powered image generation and editing (FIBO, RMBG-2.0)
+  vgl                Visual Generation Language structured prompts
+  image-utils        Classic image manipulation (resize, crop, composite)
+  remove-background  Background removal for transparent PNGs and cutouts (RMBG-2.0)
 
 More info: https://github.com/bria-ai/bria-skills
 `);

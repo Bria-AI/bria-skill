@@ -33,3 +33,4 @@ build/
 *.egg-info/
 tests
 bria-ai-workspace
+remove-background-workspace
