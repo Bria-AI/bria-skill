@@ -33,6 +33,7 @@ Ask your agent to generate images, remove backgrounds, edit photos, and more. Th
 | Skill | Description |
 |-------|-------------|
 | **[bria-ai](./skills/bria-ai/SKILL.md)** | Controllable image generation & editing — 18+ capabilities including text-to-image, object-level editing, background removal, upscaling, restyling, relighting, and product photography |
+| **[remove-background](./skills/remove-background/SKILL.md)** | Dedicated background removal — transparent PNGs, cutouts, and foreground extraction powered by RMBG 2.0. Fastest path for background removal tasks |
 | **[vgl](./skills/vgl/SKILL.md)** | Maximum generation control — structured JSON (Visual Generation Language) that explicitly defines objects, lighting, camera, composition, and style for deterministic, reproducible results |
 | **[image-utils](./skills/image-utils/SKILL.md)** | Classic image manipulation — resize, crop, composite, watermarks, format conversion with Python Pillow |
 
@@ -87,6 +88,7 @@ Copy the `skills/` directory contents to your agent's skills directory.
 ## Documentation
 
 - [bria-ai SKILL.md](./skills/bria-ai/SKILL.md) — Core skill with all capabilities
+- [remove-background SKILL.md](./skills/remove-background/SKILL.md) — Dedicated background removal skill
 - [API Endpoints Reference](./skills/bria-ai/references/api-endpoints.md) — Complete API documentation
 - [Shell Client (bria_client.sh)](./skills/bria-ai/references/code-examples/bria_client.sh) — Single-function helper for all endpoints
 - [VGL Schema Reference](./skills/vgl/references/schema-reference.md) — Full VGL JSON schema
