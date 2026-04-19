@@ -9,9 +9,22 @@ description: >
   edit photo, product photography, upscale, restyle, inpainting, outpainting,
   lifestyle shot, background replacement, object removal, photo restoration.
 license: MIT
+homepage: https://bria.ai
 metadata:
   author: Bria AI
-  version: "1.3.1"
+  version: "1.3.0"
+  openclaw:
+    requires:
+      env:
+        - BRIA_API_KEY
+      anyBins:
+        - curl
+      config:
+        - ~/.bria/credentials
+    primaryEnv: BRIA_API_KEY
+    homepage: https://bria.ai
+    emoji: "\U0001F5BC"
+
 ---
 
 # Bria — AI Image Generation, Editing & Background Removal
@@ -57,16 +70,17 @@ fi
 Source the auth helper and run `bria_auth`:
 
 ```bash
-source <SKILL_DIR>/references/code-examples/bria_auth.sh
+source ~/.agents/skills/bria-ai/references/code-examples/bria_auth.sh
 bria_auth
 ```
 
-`bria_auth` prints `SIGN_IN_URL=...` and `USER_CODE=...`. Show the user exactly this — nothing more:
+`bria_auth` will print `SIGN_IN_URL=...` and `USER_CODE=...`. Show the user exactly this — nothing more:
 
 > **Connect your Bria account:** [Click here to sign in]({SIGN_IN_URL})
 > Your code is **{USER_CODE}** — it's already filled in.
 
 Then wait; `bria_auth` polls automatically and prints `AUTHENTICATED` when done.
+
 If it prints an error, the code expired — run `bria_auth` again.
 
 **Do not proceed with any API call until authentication is confirmed.**
@@ -74,7 +88,7 @@ If it prints an error, the code expired — run `bria_auth` again.
 ### Step 3: Verify billing status and resolve API key
 
 ```bash
-source <SKILL_DIR>/references/code-examples/bria_auth.sh
+source ~/.agents/skills/bria-ai/references/code-examples/bria_auth.sh
 bria_introspect
 ```
 
@@ -114,12 +128,10 @@ Anything else (restyle, relight, reseason, restore, colorize, sketch, blend, out
 
 ## How to Call Any Endpoint
 
-Use `bria_call` for all API calls — handles URL passthrough, local file base64 encoding, JSON construction, and async polling. API key is auto-loaded from `~/.bria/credentials`.
-
 ```bash
-source <SKILL_DIR>/references/code-examples/bria_client.sh
+source ~/.agents/skills/bria-ai/references/code-examples/bria_client.sh
 
-# Generate (no image input — pass empty string)
+# Generate (no image input)
 RESULT=$(bria_call /v2/image/generate "" '"prompt": "your description", "aspect_ratio": "16:9", "sync": true')
 
 # Remove background
@@ -147,14 +159,14 @@ echo "$RESULT"
 
 **Generation options:** Aspect ratios `1:1`, `16:9`, `4:3`, `9:16`, `3:4`. Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for single images.
 
-> **Advanced**: For precise control over generation, use the **vgl** skill for structured VGL JSON prompts instead of natural language.
+> **Advanced**: For precise control over generation, use the **vgl** skill for structured VGL JSON prompts.
 
 ---
 
 ## Common Failures
 
 - **`bria_call` returns empty / no URL** → `BRIA_API_KEY` was not set. Run Step 3 (`bria_introspect`) to cache it.
-- **Async job times out** → Some endpoints take 60–90s. Retry once; the job may have been queued.
+- **Async job times out** → Some endpoints take 60–90s. If `bria_call` reports a timeout, retry once; the job may have been queued.
 - **ERROR 401** → API key is stale. Delete `~/.bria/credentials` and re-authenticate from Step 2.
 - **`BILLING_ERROR`** → Relay message to user verbatim, do not retry API calls.
 - **Local file not found** → Pass the absolute path; `bria_client.sh` handles base64 encoding automatically.
@@ -162,7 +174,7 @@ echo "$RESULT"
 
 ---
 
-## Additional Resources
+## Resources
 
 - **[Capabilities & Prompt Recipes](references/capabilities.md)** — Full endpoint table, use-case recipes, and prompt engineering tips
 - **[API Endpoints Reference](references/api-endpoints.md)** — Complete parameter documentation for all 20+ endpoints
@@ -172,5 +184,5 @@ echo "$RESULT"
 
 ## Related Skills
 
-- **vgl** — Write structured VGL JSON prompts for precise, deterministic control over FIBO image generation
+- **vgl** — Structured VGL JSON prompts for precise, deterministic control over FIBO image generation
 - **image-utils** — Classic image manipulation (resize, crop, composite, watermarks) for post-processing
