@@ -11,7 +11,7 @@ metadata:
 
 Commercially safe, royalty-free image generation and editing through 20+ API endpoints. Generate from text, edit with natural language, remove backgrounds, create product shots, and build automated image pipelines.
 
-For additional endpoint details beyond what is documented here, see the [Bria API reference for agents](https://docs.bria.ai/llms.txt).
+If you are stuck on request shapes, parameters, or endpoints not covered here, **consult the full agent-oriented API reference** at [docs.bria.ai/llms.txt](https://docs.bria.ai/llms.txt) for endpoint schemas, parameters, and code examples. **However, never `curl` endpoints directly** — always use `bria_call` (see below) so the `User-Agent` header and auth token are applied correctly.
 
 ## When to Use This Skill
 
@@ -48,7 +48,8 @@ Before making any API call, you need a valid Bria access token.
 ```bash
 if [ -f ~/.bria/credentials ]; then
   BRIA_ACCESS_TOKEN=$(grep '^access_token=' "$HOME/.bria/credentials" | cut -d= -f2-)
-  BRIA_API_KEY=$(grep '^api_token=' "$HOME/.bria/credentials" | cut -d= -f2-)
+  BRIA_API_KEY=$(grep '^agent_api_token=' "$HOME/.bria/credentials" | cut -d= -f2-)
+  [ -z "$BRIA_API_KEY" ] && BRIA_API_KEY=$(grep '^api_token=' "$HOME/.bria/credentials" | cut -d= -f2-)
 fi
 if [ -z "$BRIA_ACCESS_TOKEN" ]; then
   echo "NO_CREDENTIALS"
@@ -131,8 +132,9 @@ if [ "$ACTIVE" = "false" ]; then
 fi
 BRIA_API_KEY=$(printf '%s' "$INTROSPECT" | sed -n 's/.*"api_token" *: *"\([^"]*\)".*/\1/p')
 if [ -n "$BRIA_API_KEY" ]; then
-  grep -v '^api_token=' "$HOME/.bria/credentials" > "$HOME/.bria/credentials.tmp" 2>/dev/null || true
+  grep -vE '^(api_token|agent_api_token)=' "$HOME/.bria/credentials" > "$HOME/.bria/credentials.tmp" 2>/dev/null || true
   printf 'api_token=%s\n' "$BRIA_API_KEY" >> "$HOME/.bria/credentials.tmp"
+  printf 'agent_api_token=%s\n' "$BRIA_API_KEY" >> "$HOME/.bria/credentials.tmp"
   mv "$HOME/.bria/credentials.tmp" "$HOME/.bria/credentials"
 fi
 ```
