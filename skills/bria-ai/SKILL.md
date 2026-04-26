@@ -72,7 +72,8 @@ Start the device authorization flow:
 
 ```bash
 DEVICE_RESPONSE=$(curl -s -X POST "https://engine.prod.bria-api.com/v2/auth/device/authorize" \
-  -H "Content-Type: application/json")
+  -H "Content-Type: application/json" \
+  -d '{"client_type": "agent"}')
 echo "$DEVICE_RESPONSE"
 ```
 
