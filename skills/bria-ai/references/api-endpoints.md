@@ -255,7 +255,8 @@ Upscale image resolution.
 ```json
 {
   "image": "https://source-image-url",
-  "scale": 2
+  "desired_increase": 4,
+  "preserve_alpha": true
 }
 ```
 
@@ -264,7 +265,8 @@ Upscale image resolution.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `image` | string | required | Source image URL |
-| `scale` | int | 2 | Upscale factor (2 or 4) |
+| `desired_increase` | int | 2 | Upscale factor, range 2–4 |
+| `preserve_alpha` | bool | false | Preserve transparency. Set `true` when input has an alpha channel — the API upscales and recombines the alpha server-side, so you don't need to handle it client-side. |
 
 ### POST /v1/product/lifestyle_shot_by_text
 
