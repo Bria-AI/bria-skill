@@ -188,8 +188,8 @@ RESULT=$(bria_call /v2/image/edit/replace_background "https://example.com/img.jp
 # Edit image (uses images array — pass --key images)
 RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instruction": "make it look warmer"')
 
-# Upscale
-RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"scale": 4')
+# Upscale (use `desired_increase`, range 2-4. Add `"preserve_alpha": true` for transparent inputs)
+RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"desired_increase": 4')
 
 # Lifestyle shot
 RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"prompt": "modern kitchen countertop"')
