@@ -27,7 +27,8 @@ bria_call() {
   done
 
   if [ -z "$BRIA_API_KEY" ] && [ -f "$HOME/.bria/credentials" ]; then
-    BRIA_API_KEY=$(grep '^api_token=' "$HOME/.bria/credentials" | cut -d= -f2-)
+    BRIA_API_KEY=$(grep '^agent_api_token=' "$HOME/.bria/credentials" | cut -d= -f2-)
+    [ -z "$BRIA_API_KEY" ] && BRIA_API_KEY=$(grep '^api_token=' "$HOME/.bria/credentials" | cut -d= -f2-)
   fi
   [ -z "$BRIA_API_KEY" ] && { echo "ERROR: BRIA_API_KEY not set. Run auth first." >&2; return 1; }
 
