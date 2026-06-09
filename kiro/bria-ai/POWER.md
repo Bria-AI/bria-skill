@@ -191,7 +191,7 @@ RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instructio
 RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"scale": 4')
 
 # Lifestyle shot
-RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"prompt": "modern kitchen countertop"')
+RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"scene_description": "modern kitchen countertop"')
 
 # Generate with tailored model (no image input — pass empty string)
 RESULT=$(bria_call /image/generate/tailored "" '"prompt": "product photo in brand style", "model_id": "your_model_id", "sync": true')

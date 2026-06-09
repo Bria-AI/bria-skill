@@ -192,7 +192,7 @@ RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instructio
 RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"desired_increase": 4')
 
 # Lifestyle shot
-RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"prompt": "modern kitchen countertop"')
+RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"scene_description": "modern kitchen countertop"')
 
 echo "$RESULT"
 ```
