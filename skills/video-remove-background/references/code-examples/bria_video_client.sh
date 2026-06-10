@@ -13,6 +13,8 @@
 
 BRIA_API_BASE="${BRIA_API_BASE:-https://engine.prod.bria-api.com}"
 BRIA_USER_AGENT="BriaSkills/1.3.0"
+BRIA_POLL_INTERVAL="${BRIA_POLL_INTERVAL:-5}"    # seconds between status polls
+BRIA_POLL_ATTEMPTS="${BRIA_POLL_ATTEMPTS:-120}"  # max polls (default 120 x 5s = 10 min)
 
 _bria_load_key() {
   if [ -z "$BRIA_API_KEY" ] && [ -f "$HOME/.bria/credentials" ]; then
@@ -105,7 +107,7 @@ bria_video_call() {
     401) echo "ERROR 401: API key invalid. Delete ~/.bria/credentials and re-authenticate." >&2; return 1 ;;
     403) echo "ERROR 403: Billing/quota issue. Visit https://platform.bria.ai/pricing" >&2; echo "$body" >&2; return 1 ;;
     413) echo "ERROR 413: Video too large (max resolution 16000x16000)." >&2; return 1 ;;
-    422) echo "ERROR 422: Invalid combination — Transparent background requires an alpha-capable preset (webm_vp9, mov_proresks, mkv_vp9, gif, mov_h265). Response: $body" >&2; return 1 ;;
+    422) echo "ERROR 422: Invalid combination — Transparent background requires an alpha-capable preset (webm_vp9, mkv_vp9, mov_proresks). Use a solid background_color for other presets. Response: $body" >&2; return 1 ;;
     5*) echo "ERROR $http_code: Server error. Try again shortly." >&2; return 1 ;;
   esac
 
@@ -117,8 +119,8 @@ bria_video_call() {
   status_url=$(printf '%s' "$body" | sed -n 's/.*"status_url" *: *"\([^"]*\)".*/\1/p')
   if [ -n "$status_url" ]; then
     i=0
-    while [ "$i" -lt 120 ]; do
-      sleep 5
+    while [ "$i" -lt "$BRIA_POLL_ATTEMPTS" ]; do
+      sleep "$BRIA_POLL_INTERVAL"
       poll=$(curl -s "$status_url" \
         -H "api_token: $BRIA_API_KEY" \
         -H "User-Agent: $BRIA_USER_AGENT")
@@ -130,7 +132,8 @@ bria_video_call() {
       [ -n "$url" ] && { echo "$url"; return 0; }
       i=$((i + 1))
     done
-    echo "ERROR: Polling timed out after 10 minutes" >&2
+    echo "ERROR: Polling timed out after $((BRIA_POLL_ATTEMPTS * BRIA_POLL_INTERVAL)) seconds." >&2
+    echo "The job may still complete — resume polling manually: curl -s \"$status_url\" -H \"api_token: \$BRIA_API_KEY\"" >&2
     return 1
   fi
 

@@ -170,18 +170,26 @@ Pass extra JSON fields as a second argument:
 | Option | Values | Default | Notes |
 |--------|--------|---------|-------|
 | `background_color` | `Transparent`, `Black`, `White`, `Gray`, `Red`, `Green`, `Blue`, `Yellow`, `Cyan`, `Magenta`, `Orange` | `Transparent` | Predefined names only — hex values are not supported |
-| `output_container_and_codec` | `mp4_h264`, `mp4_h265`, `webm_vp9`, `mov_h265`, `mov_proresks`, `mkv_h264`, `mkv_h265`, `mkv_vp9`, `gif` | — | See alpha-support rule below |
+| `output_container_and_codec` | `mp4_h264`, `mp4_h265`, `webm_vp9`, `mov_h265`, `mov_proresks`, `mkv_h264`, `mkv_h265`, `mkv_vp9`, `gif` | `webm_vp9` | See alpha-support rule below |
 | `preserve_audio` | `true` / `false` | — | Retain the input's audio track |
 
-> **Important — alpha support:** With `background_color: Transparent` (the default), the output preset must support alpha: `webm_vp9`, `mov_proresks`, `mkv_vp9`, `gif`, or `mov_h265` (HEVC with Alpha). Combining Transparent with `mp4_h264`, `mp4_h265`, `mkv_h264`, or `mkv_h265` returns **422 Unprocessable Entity**. When the user asks for an MP4 output, set a solid `background_color` — MP4 cannot hold transparency.
+> **Important — alpha support:** With `background_color: Transparent` (the default), the output preset must support alpha. The server accepts only **`webm_vp9`, `mkv_vp9`, or `mov_proresks`** with Transparent — any other preset returns **422 Unprocessable Entity**. When the user asks for an MP4 output, set a solid `background_color` — MP4 cannot hold transparency.
+
+> **Known issues (verified June 2026):** the `gif` preset fails server-side with a 500 error even with a solid background — produce `webm_vp9` and convert with ffmpeg instead (example below). `mov_proresks` completes and returns ProRes 4444, but in testing the file lacked an alpha plane — verify alpha before relying on it, and prefer `webm_vp9`/`mkv_vp9` for transparency.
 
 ### Output
 
-A URL to the processed video. Output keeps the input's resolution, aspect ratio, and frame rate. Download it to save locally:
+A URL to the processed video (default: transparent `.webm`). Output keeps the input's resolution, aspect ratio, and frame rate. Short clips process in roughly 30–60 seconds. Download the result to save it locally:
 
 ```bash
 curl -sL "$RESULT_URL" -o output.webm
 ```
+
+> **Verifying transparency:** for VP9 outputs, `ffprobe` reports `pix_fmt=yuv420p` even when alpha is present — VP9 stores alpha in a WebM side channel. Check the `ALPHA_MODE` tag instead, or decode with libvpx:
+> ```bash
+> ffprobe -v error -select_streams v:0 -show_entries stream_tags=alpha_mode -of default=noprint_wrappers=1 output.webm   # TAG:ALPHA_MODE=1 → has alpha
+> ffmpeg -c:v libvpx-vp9 -i output.webm -frames:v 1 frame.png   # frame.png will be rgba
+> ```
 
 ---
 
@@ -206,20 +214,25 @@ RESULT_URL=$(bria_video_call "/path/to/product_spin.mp4" '"background_color":"Wh
 curl -sL "$RESULT_URL" -o product_white_bg.mp4
 ```
 
-### ProRes with alpha for video editing (Premiere / After Effects / Final Cut)
+### MKV with alpha for video editing pipelines
 
 ```bash
 source ~/.agents/skills/video-remove-background/references/code-examples/bria_video_client.sh
-RESULT_URL=$(bria_video_call "https://example.com/talent.mov" '"output_container_and_codec":"mov_proresks"')
-curl -sL "$RESULT_URL" -o talent_alpha.mov
+RESULT_URL=$(bria_video_call "https://example.com/talent.mov" '"output_container_and_codec":"mkv_vp9"')
+curl -sL "$RESULT_URL" -o talent_alpha.mkv
 ```
 
 ### Transparent animated GIF
 
+The API's `gif` output preset currently fails server-side — get a transparent webm and convert locally with ffmpeg:
+
 ```bash
 source ~/.agents/skills/video-remove-background/references/code-examples/bria_video_client.sh
-RESULT_URL=$(bria_video_call "/path/to/animation.gif" '"output_container_and_codec":"gif"')
-curl -sL "$RESULT_URL" -o animation_transparent.gif
+RESULT_URL=$(bria_video_call "/path/to/animation.mp4")
+curl -sL "$RESULT_URL" -o cutout.webm
+ffmpeg -c:v libvpx-vp9 -i cutout.webm \
+  -filter_complex "[0:v]split[a][b];[a]palettegen=reserve_transparent=1[p];[b][p]paletteuse=alpha_threshold=128" \
+  animation_transparent.gif
 ```
 
 ### Batch video background removal
@@ -254,10 +267,11 @@ done
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| `422 Unprocessable Entity` | Transparent background with a non-alpha preset | Use `webm_vp9`/`mov_proresks`/`mkv_vp9`/`gif`, or set a solid `background_color` |
+| `422 Unprocessable Entity` | Transparent background with a non-alpha preset | Use `webm_vp9`/`mkv_vp9`/`mov_proresks`, or set a solid `background_color` |
+| `500 "list index out of range"` (job status `ERROR`) | `gif` output preset (currently broken server-side) | Output `webm_vp9` and convert to GIF with ffmpeg (see example) |
 | `413 Payload Too Large` | Input resolution above 16000x16000 | Downscale the input video |
 | `400` with duration message | Input longer than 60 seconds | Trim the video to ≤ 60s first |
-| Polling timeout | Long/high-res job still processing | Re-poll the `status_url` manually — the job may still complete |
+| Polling timeout | Long/high-res job still processing | The helper prints the `status_url` — re-poll it manually, or raise `BRIA_POLL_ATTEMPTS` / `BRIA_POLL_INTERVAL` |
 
 ---
 

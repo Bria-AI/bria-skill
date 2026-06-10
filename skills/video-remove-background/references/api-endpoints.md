@@ -37,7 +37,7 @@ Initiates an asynchronous background removal job for a video. Returns HTTP 202 w
 |-----------|------|----------|---------|-------------|
 | `video` | string | Yes | — | Publicly accessible URL of the input video. Input resolution supported up to 16000x16000 (16K) |
 | `background_color` | string | No | `Transparent` | Predefined string only — one of: `Transparent`, `Black`, `White`, `Gray`, `Red`, `Green`, `Blue`, `Yellow`, `Cyan`, `Magenta`, `Orange`. Hex values are not supported |
-| `output_container_and_codec` | string | No | — | Output preset — one of: `mp4_h264`, `mp4_h265`, `webm_vp9`, `mov_h265`, `mov_proresks`, `mkv_h264`, `mkv_h265`, `mkv_vp9`, `gif` |
+| `output_container_and_codec` | string | No | `webm_vp9` (observed) | Output preset — one of: `mp4_h264`, `mp4_h265`, `webm_vp9`, `mov_h265`, `mov_proresks`, `mkv_h264`, `mkv_h265`, `mkv_vp9`, `gif` |
 | `preserve_audio` | boolean | No | — | Retain the audio track in the output if present in the input |
 | `webhook_url` | string | No | — | Optional URL for receiving the result via webhook when the async job completes |
 
@@ -78,9 +78,18 @@ Initiates an asynchronous background removal job for a video. Returns HTTP 202 w
 
 If `background_color` is `Transparent` (the default), the selected output preset **must support alpha**, otherwise the server responds with `422 Unprocessable Entity`.
 
-| Alpha supported | Alpha NOT supported |
-|-----------------|---------------------|
-| `webm_vp9`, `mov_proresks`, `mkv_vp9`, `mkv_raw`, `gif`, `mov_h265` (HEVC with Alpha) | `mp4_h264`, `mp4_h265`, `mkv_h264`, `mkv_h265`, `avi_h264` |
+| Alpha supported (server-enforced) | Alpha NOT supported |
+|-----------------------------------|---------------------|
+| `webm_vp9`, `mkv_vp9`, `mov_proresks` | `mp4_h264`, `mp4_h265`, `mkv_h264`, `mkv_h265`, `gif`, `mov_h265` |
+
+> The public docs also list `gif` and `mov_h265` (HEVC with Alpha) as alpha-capable, but the server's 422 response only accepts `webm_vp9`, `mkv_vp9`, `mov_proresks` (verified June 2026).
+
+**Verified behavior (June 2026):**
+- Default output (no `output_container_and_codec`) is a transparent `.webm` (`webm_vp9`) with `ALPHA_MODE=1`.
+- `mkv_vp9` carries a real alpha channel (decodes to RGBA with libvpx).
+- `mov_proresks` returns ProRes 4444 but **without an alpha plane** — verify before relying on it.
+- `gif` fails server-side with `500 "list index out of range"` even with a solid background — convert a webm result to GIF locally instead.
+- VP9 alpha lives in a WebM side channel: `ffprobe` shows `pix_fmt=yuv420p`; check the `ALPHA_MODE` stream tag or decode with `-c:v libvpx-vp9`.
 
 ---
 
@@ -151,4 +160,4 @@ Poll for async job completion. The `bria_video_call` helper handles this automat
 
 **HTTP codes:** `200` standard response (regardless of job success), `404` request ID doesn't exist or expired, `5XX` Status Service internal error.
 
-**Polling strategy:** 5-second intervals, up to 120 attempts (10 minutes max — video jobs take longer than image jobs). The `bria_video_call` helper implements this automatically.
+**Polling strategy:** 5-second intervals, up to 120 attempts (10 minutes max — video jobs take longer than image jobs; short clips complete in ~30–60s). The `bria_video_call` helper implements this automatically; override with the `BRIA_POLL_INTERVAL` and `BRIA_POLL_ATTEMPTS` environment variables.
