@@ -305,6 +305,6 @@ See `steering/image-utils-python.py` for complete implementation with docstrings
 
 **Original Work:** This power is converted from the [bria-skill](https://github.com/bria-ai/bria-skill) Claude Code skill by Bria AI.
 
-**Source Version:** Based on version 1.4.0.
+**Source Version:** Based on version 1.3.4.
 
 **Update Frequency:** This power will be updated periodically.
