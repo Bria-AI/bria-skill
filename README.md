@@ -8,6 +8,17 @@ Generate, edit, and precisely control images directly from your AI coding agent 
 
 ### 1. Install
 
+**Claude Code (plugin):** add the marketplace, then install the plugin:
+
+```
+/plugin marketplace add Bria-AI/bria-skill
+/plugin install bria-ai@bria-skills
+```
+
+The marketplace also bundles the `remove-background`, `vgl`, and `image-utils` plugins — install any of them the same way (e.g. `/plugin install remove-background@bria-skills`).
+
+**Other agents** (Cursor, Cline, Codex, and [37+ more](https://skills.sh)):
+
 ```bash
 npx skills add bria-ai/bria-skill
 ```
