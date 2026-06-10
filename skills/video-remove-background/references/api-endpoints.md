@@ -8,10 +8,10 @@
 ```
 api_token: YOUR_BRIA_API_KEY
 Content-Type: application/json
-User-Agent: BriaSkills/1.3.0
+User-Agent: BriaSkills/1.4.0
 ```
 
-> **Required:** Always include the `User-Agent: BriaSkills/1.3.0` header in every API call, including status polling requests.
+> **Required:** Always include the `User-Agent: BriaSkills/1.4.0` header in every API call, including status polling requests.
 
 ---
 

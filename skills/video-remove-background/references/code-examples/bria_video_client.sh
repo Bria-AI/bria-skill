@@ -12,7 +12,7 @@
 # BRIA_API_KEY is auto-loaded from ~/.bria/credentials if not already set.
 
 BRIA_API_BASE="${BRIA_API_BASE:-https://engine.prod.bria-api.com}"
-BRIA_USER_AGENT="BriaSkills/1.3.0"
+BRIA_USER_AGENT="BriaSkills/1.4.0"
 BRIA_POLL_INTERVAL="${BRIA_POLL_INTERVAL:-5}"    # seconds between status polls
 BRIA_POLL_ATTEMPTS="${BRIA_POLL_ATTEMPTS:-120}"  # max polls (default 120 x 5s = 10 min)
 
