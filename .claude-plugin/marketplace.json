@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "Official Bria AI skills — text-to-image generation, image editing, background removal and replacement, object removal, inpainting, outpainting, upscale, restyle, product photography and packshots, batch/bulk generation, VGL structured prompts, and image utilities. Commercially licensed, royalty-free, brand-safe AI image generation and editing API.",
-    "version": "1.3.3",
+    "version": "1.3.4",
     "repository": "https://github.com/bria-ai/bria-skill",
     "license": "MIT",
     "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "background-replacement", "image-editing", "vgl", "product-photography", "packshot", "lifestyle-shot", "visual-assets", "text-to-image", "photo-editing", "transparent-png", "upscale", "outpaint", "inpaint", "object-removal", "restyle", "e-commerce", "marketing", "marketing-visuals", "social-media", "thumbnail", "banner", "hero-image", "ad-creative", "photo-restoration", "style-transfer", "royalty-free", "commercial-license", "brand-safe", "batch-generation", "bulk-generation", "image-variations", "compositing", "image-api", "pipeline", "visual-content-creation", "generate-image", "create-image", "ai-art", "photo-retouching", "image-enhancement", "relight", "reseason", "sketch-to-photo", "colorize", "web-design", "content-creation", "cutout", "product-placement", "scene-generation"]
@@ -70,6 +70,25 @@
       "strict": false,
       "skills": [
         "./skills/remove-background"
+      ],
+      "dependencies": [
+        {
+          "type": "env",
+          "name": "BRIA_API_KEY",
+          "description": "Bria AI API key (get one at https://platform.bria.ai/console/account/api-keys)"
+        }
+      ],
+      "author": {
+        "name": "Bria AI"
+      }
+    },
+    {
+      "name": "video-remove-background",
+      "description": "Remove backgrounds from videos for transparent clips, alpha-channel footage, and green-screen-free overlays. Segment moving subjects from background using Bria's video editing pipeline. Dedicated video background removal skill — transparent webm/mkv output, solid-color backgrounds for MP4, local file upload, and batch video processing.",
+      "source": "./skills/video-remove-background",
+      "strict": false,
+      "skills": [
+        "./skills/video-remove-background"
       ],
       "dependencies": [
         {
