@@ -10,6 +10,10 @@ This is a **skill-bundle plugin**: it ships two Bria skills and an `openclaw.plu
 |-------|--------------|
 | **bria-ai** | Text-to-image (FIBO), instruction-based editing (FIBO-Edit), background remove/replace, product photography & lifestyle shots, upscale, restyle, relight, inpaint/outpaint — 20+ endpoints. |
 | **video-remove-background** | Remove backgrounds from video → transparent / alpha-channel clips, green-screen-free matting, solid-color backgrounds. |
+| **remove-background** | Dedicated image background removal (RMBG-2.0) → transparent PNGs, cutouts, foreground extraction. |
+| **vgl** | Structured VGL JSON for deterministic, reproducible generation — explicit control of objects, lighting, camera, composition, and style. |
+| **image-utils** | Classic image manipulation with Pillow — resize, crop, composite, watermarks, format conversion, web optimization. |
+| **automotive** | Vehicle-focused imagery generation and editing. |
 
 ## Authentication
 
