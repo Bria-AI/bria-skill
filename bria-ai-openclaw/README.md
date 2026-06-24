@@ -22,7 +22,7 @@ Both skills authenticate through Bria's **device-authorization flow** on first u
 ## Install
 
 ```bash
-clawhub package install @bria/bria-ai-openclaw
+clawhub package install @galbria/bria-ai-openclaw
 ```
 
 ## Publishing (for maintainers)
@@ -34,13 +34,13 @@ From a GitHub-backed checkout of this directory:
 clawhub package validate ./bria-ai-openclaw
 
 # 2. Dry-run the publish
-clawhub package publish ./bria-ai-openclaw --dry-run
+clawhub package publish ./bria-ai-openclaw --family bundle-plugin --owner galbria --dry-run
 
-# 3. Publish under the @bria owner (scope must match the publish owner)
-clawhub package publish ./bria-ai-openclaw
+# 3. Publish (scope must match the selected publish owner)
+clawhub package publish ./bria-ai-openclaw --family bundle-plugin --owner galbria
 ```
 
-> The package scope `@bria` must match the selected publish owner. Claim the `@bria` namespace on ClawHub first if it isn't already owned.
+> The package scope must match the selected publish owner. This package is `@galbria/bria-ai-openclaw`; to ship it under an official `@bria` namespace instead, claim the `bria` publisher org on ClawHub and rename the package accordingly.
 
 New releases stay out of public install surfaces until ClawHub's automated security checks and verification finish.
 
@@ -49,7 +49,7 @@ New releases stay out of public install surfaces until ClawHub's automated secur
 ```
 bria-ai-openclaw/
 ├── openclaw.plugin.json        # plugin manifest (id, skills, configSchema)
-├── package.json                # @bria/bria-ai-openclaw + openclaw.compat/build
+├── package.json                # @galbria/bria-ai-openclaw + openclaw.compat/build
 ├── README.md
 ├── LICENSE
 └── skills/

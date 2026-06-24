@@ -1,5 +1,5 @@
 {
-  "name": "@bria/bria-ai-openclaw",
+  "name": "@galbria/bria-ai-openclaw",
   "version": "1.3.4",
   "description": "Official Bria AI plugin for OpenClaw — commercially-safe AI image & video toolkit. Bundles six skills: bria-ai, video-remove-background, remove-background, vgl, image-utils, and automotive.",
   "type": "module",
