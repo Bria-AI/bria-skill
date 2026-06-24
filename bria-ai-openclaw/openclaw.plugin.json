@@ -1,0 +1,16 @@
+{
+  "id": "bria-ai",
+  "name": "Bria AI",
+  "description": "Commercially-safe AI image generation, editing, background removal, and video background removal via Bria.ai. Bundles the bria-ai image skill (text-to-image, instruction editing, background replace, product photography, upscale, restyle, 20+ endpoints) and the video-remove-background skill (transparent / alpha-channel video, green-screen-free matting). Royalty-free, brand-safe, production-ready.",
+  "version": "1.3.4",
+  "icon": "https://bria.ai/favicon.ico",
+  "skills": [
+    "./skills/bria-ai",
+    "./skills/video-remove-background"
+  ],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}

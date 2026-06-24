@@ -1,0 +1,52 @@
+{
+  "name": "@bria/bria-ai-openclaw",
+  "version": "1.3.4",
+  "description": "Official Bria AI plugin for OpenClaw — commercially-safe AI image generation, editing, background removal, and video background removal. Bundles the bria-ai and video-remove-background skills.",
+  "type": "module",
+  "license": "MIT",
+  "author": {
+    "name": "Bria AI",
+    "url": "https://bria.ai"
+  },
+  "homepage": "https://github.com/bria-ai/bria-skill/tree/main/bria-ai-openclaw#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bria-ai/bria-skill.git",
+    "directory": "bria-ai-openclaw"
+  },
+  "keywords": [
+    "openclaw",
+    "clawbot",
+    "clawhub",
+    "bria",
+    "ai-images",
+    "image-generation",
+    "image-editing",
+    "background-removal",
+    "video-background-removal",
+    "transparent-video",
+    "text-to-image",
+    "fibo",
+    "rmbg",
+    "product-photography",
+    "royalty-free",
+    "commercial-license",
+    "brand-safe"
+  ],
+  "files": [
+    "openclaw.plugin.json",
+    "skills/",
+    "README.md",
+    "LICENSE"
+  ],
+  "openclaw": {
+    "compat": {
+      "pluginApi": ">=2026.3.24-beta.2",
+      "minGatewayVersion": "2026.3.24-beta.2"
+    },
+    "build": {
+      "openclawVersion": "2026.3.24-beta.2",
+      "pluginSdkVersion": "2026.3.24-beta.2"
+    }
+  }
+}
