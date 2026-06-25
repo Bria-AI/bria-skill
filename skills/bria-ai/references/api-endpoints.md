@@ -336,6 +336,63 @@ Integrate and embed one or more products into a predefined scene at precise user
 }
 ```
 
+### POST /v2/image/edit/product_dimensions
+
+Render a marketplace-ready dimension image from a product photo: the background is removed automatically, then measurement callout lines + labels are drawn around the product, with an optional title and optional weight/capacity text. Three visual styles. Useful for e-commerce listings (Amazon-style "dimensions" images).
+
+**Request:**
+```json
+{
+  "image": "https://product-image-url",
+  "style": "default",
+  "dimensions": [
+    {"name": "height", "value": 12, "unit": "cm", "position": "left"},
+    {"name": "width_bottom", "value": 6, "unit": "cm", "position": "bottom"}
+  ],
+  "title": "Gummies Bottle",
+  "weight": {"value": 250, "unit": "g", "label": "Net Weight"},
+  "capacity": {"value": 500, "unit": "ml"},
+  "background": "white",
+  "output_format": "png"
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `image` | string | required | Product photo URL or base64. Background is removed automatically — no pre-cutout needed |
+| `dimensions` | array | required | One or more dimension callouts (min 1) |
+| `dimensions[].name` | string | required | `height`, `width_bottom`, or `width_top` (`length`/`depth` not currently enabled) |
+| `dimensions[].value` | float | required | Physical measurement value (must be > 0) |
+| `dimensions[].unit` | string | required | `mm`, `cm`, `m`, `in`, `"` (inches), `ft`, `'` (feet) |
+| `dimensions[].position` | string | per-name | Callout side: `top`, `bottom`, `left`, `right`. Defaults: height→`left`, width_bottom→`bottom`, width_top→`top` |
+| `style` | string | required | `default`, `childlike`, or `elegant` |
+| `units_display` | string | "single" | `single`, `dual_bullet`, `dual_slash`, `dual_parens`. For dual modes, supply two `dimensions` entries with the same `name`+`position` but different `unit` (e.g. `in` and `cm`) — they merge into one dual-unit label |
+| `background` | string | "white" | `white`, `cream`, `charcoal`, or a hex color (e.g. `#f5f0e8`) |
+| `title` | string | - | Optional headline above the product (max 80 chars) |
+| `title_position` | string | "top_center" | `top_left`, `top_center`, `top_right` |
+| `weight` | object | - | Optional weight callout below the product |
+| `weight.value` | float | required* | Weight value (> 0) *if `weight` is provided |
+| `weight.unit` | string | required* | `lb`, `oz`, `g`, `kg` |
+| `weight.label` | string | "Weight" | `Weight` or `Net Weight` |
+| `capacity` | object | - | Optional capacity callout below the product |
+| `capacity.value` | float | required* | Capacity value (> 0) *if `capacity` is provided |
+| `capacity.unit` | string | required* | `fl_oz`, `ml`, `l`, `qt`, `gal`, `cups` |
+| `output_format` | string | "png" | `png`, `jpeg`, or `dual` (composite PNG + a transparent overlay-only PNG, returned as two images) |
+| `output_size` | int | 2200 | Square output edge length in px (256–2200) |
+| `proportional_lines` | bool | true | Scale each dimension line's length to its measurement (the largest per axis spans the product) |
+
+**Async Response (202):**
+```json
+{
+  "request_id": "uuid",
+  "status_url": "https://..."
+}
+```
+
+Poll `status_url` for the result. `dual` output returns two images: `[composite, overlay]`.
+
 ---
 
 ## Text-Based Object Editing

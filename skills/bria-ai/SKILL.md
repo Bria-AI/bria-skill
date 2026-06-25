@@ -166,6 +166,7 @@ Interpret the output:
 | Sketch to photo | Sketch2Image | Convert drawings to realistic photos |
 | Create product lifestyle shots | Lifestyle Shot | Place products in scenes for e-commerce |
 | Integrate products into scenes | Product Integrate | Embed products at exact coordinates |
+| Add dimension callouts to products | Product Dimensions | Marketplace-style measurement images with size/weight/capacity labels |
 
 ## How to Call Any Endpoint
 
@@ -193,6 +194,10 @@ RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.j
 
 # Lifestyle shot
 RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"scene_description": "modern kitchen countertop"')
+
+# Product dimensions — auto-removes background, draws measurement callouts
+RESULT=$(bria_call /v2/image/edit/product_dimensions "/path/to/product.png" \
+  '"style": "default", "dimensions": [{"name": "height", "value": 12, "unit": "cm", "position": "left"}, {"name": "width_bottom", "value": 6, "unit": "cm", "position": "bottom"}], "title": "Gummies Bottle", "weight": {"value": 250, "unit": "g"}')
 
 echo "$RESULT"
 ```
