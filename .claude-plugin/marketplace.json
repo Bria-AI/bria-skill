@@ -26,7 +26,8 @@
       "source": "./skills/bria-ai",
       "strict": false,
       "skills": [
-        "./skills/bria-ai"
+        "./skills/bria-ai",
+        "./skills/ecommerce"
       ],
       "dependencies": [
         {

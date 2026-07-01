@@ -195,9 +195,11 @@ RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.j
 # Lifestyle shot
 RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"scene_description": "modern kitchen countertop"')
 
-# Product dimensions — auto-removes background, draws measurement callouts
+# Product dimensions — auto-removes background, draws measurement callouts.
+# Dual cm / in labels: repeat each dimension with the same name+position in both
+# units and set "units_display": "dual_slash" so they merge into one "12 cm / 4.7 in" label.
 RESULT=$(bria_call /v2/image/edit/product_dimensions "/path/to/product.png" \
-  '"style": "default", "dimensions": [{"name": "height", "value": 12, "unit": "cm", "position": "left"}, {"name": "width_bottom", "value": 6, "unit": "cm", "position": "bottom"}], "title": "Gummies Bottle", "weight": {"value": 250, "unit": "g"}')
+  '"style": "default", "units_display": "dual_slash", "dimensions": [{"name": "height", "value": 12, "unit": "cm", "position": "left"}, {"name": "height", "value": 4.7, "unit": "in", "position": "left"}, {"name": "width_bottom", "value": 6, "unit": "cm", "position": "bottom"}, {"name": "width_bottom", "value": 2.4, "unit": "in", "position": "bottom"}], "title": "Gummies Bottle", "capacity": {"value": 500, "unit": "ml"}, "weight": {"value": 250, "unit": "g", "label": "Net Weight"}')
 
 echo "$RESULT"
 ```
