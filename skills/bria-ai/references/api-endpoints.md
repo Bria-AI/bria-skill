@@ -268,6 +268,41 @@ Upscale image resolution.
 | `desired_increase` | int | 2 | Upscale factor, range 2–4 |
 | `preserve_alpha` | bool | false | Preserve transparency. Set `true` when input has an alpha channel — the API upscales and recombines the alpha server-side, so you don't need to handle it client-side. |
 
+### POST /v1/product/cutout
+
+Remove the background from a product photo → clean transparent PNG. The `/v1/product/*` endpoints take `image_url` (URL) or `file` (base64).
+
+**Request:**
+```json
+{ "image_url": "https://…/raw.jpg" }
+```
+Response: `{ "result_url": "https://…png" }` (synchronous).
+
+### POST /v1/product/packshot
+
+Standardized 2000×2000 packshot on a solid/clean background.
+
+| Parameter | Type | Notes |
+|-----------|------|-------|
+| `image_url` / `file` | string | Product image (a cutout is recommended) |
+| `background_color` | string | Hex like `#FFFFFF`, or `transparent` |
+| `sku` | string | Optional label/id |
+
+Response: `{ "result_url": "…" }` (synchronous).
+
+### POST /v1/product/shadow
+
+Add a realistic shadow to a product cutout.
+
+| Parameter | Type | Notes |
+|-----------|------|-------|
+| `image_url` / `file` | string | Product cutout |
+| `type` | string | `regular` (drop) or `float` (elliptical) |
+| `background_color` | string | Hex or `transparent` |
+| `shadow_intensity` | int | 0–100 (approx) |
+
+Response: `{ "result_url": "…" }` (synchronous).
+
 ### POST /v1/product/lifestyle_shot_by_text
 
 Place a product in a lifestyle scene using text description.
@@ -280,6 +315,34 @@ Place a product in a lifestyle scene using text description.
   "placement_type": "automatic"
 }
 ```
+
+**Parameters:**
+
+| Parameter | Type | Notes |
+|-----------|------|-------|
+| `image_url` / `file` | string | Product (cutout recommended) |
+| `scene_description` | string | Environment + lighting + mood |
+| `mode` | string | `base`, `high_control` (recommended), `fast` |
+| `placement_type` | string | `automatic`, `automatic_aspect_ratio`, `manual_placement`, `custom_coordinates`, `manual_padding`, `original` |
+| `aspect_ratio` | string | e.g. `1:1`, `4:5`, `16:9` (with `automatic_aspect_ratio`) |
+| `num_results` | int | Number of variations |
+| `sync` | bool | `true` returns results inline |
+| `optimize_description` | bool | Let Bria refine the prompt |
+
+Response: `{ "result": [[ "image_url", "seed", "session_id" ], …] }` — extract `result[0][0]`.
+
+### POST /v1/product/lifestyle_shot_by_image
+
+Same as `lifestyle_shot_by_text`, but the scene comes from a reference background image instead of a text description.
+
+| Parameter | Type | Notes |
+|-----------|------|-------|
+| `image_url` / `file` | string | Product |
+| `ref_image_urls` | array | One or more background reference URLs |
+| `placement_type` | string | see above |
+| `num_results` | int | variations |
+
+Response: `{ "result": [[ "image_url", … ], …] }`.
 
 ### POST /image/edit/product/integrate
 
