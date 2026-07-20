@@ -496,6 +496,35 @@ Remove a specific object by name.
 }
 ```
 
+### POST /v2/image/edit/extract_object
+
+Extract a named object from an image → transparent PNG containing only that object. The object to isolate is identified by a text name (no mask required).
+
+**Request:**
+```json
+{
+  "image": "base64-or-url",
+  "object_name": "coffee mug"
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `image` | string | required | Source image URL or base64 |
+| `object_name` | string | required | Natural-language name of the object to extract (e.g. `coffee mug`, `red sneaker`) |
+
+**Async Response (202):**
+```json
+{
+  "request_id": "uuid",
+  "status_url": "https://..."
+}
+```
+
+Poll `status_url` for the result. The completed `result.image_url` is a transparent PNG of just the extracted object.
+
 ---
 
 ## Image Transformation
