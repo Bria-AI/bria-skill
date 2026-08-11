@@ -195,9 +195,12 @@ def main():
     KEY = api_key()
     scenes = [s.strip() for s in args.scenes.split("|") if s.strip()]
     channels = [c.strip() for c in args.variants.split(",") if c.strip()]
-    # Resolve measurements: explicit --dims, else auto-detect ./dims.json or <input>/dims.json
+    # Resolve measurements: explicit --dims, else auto-detect ./dims.json or <input>/dims.json.
+    # --no-dims means no dimension images at all, so don't auto-detect a measurements file either.
     dims_path = args.dims
-    if not dims_path:
+    if args.no_dims:
+        dims_path = None
+    elif not dims_path:
         for cand in ("dims.json", "dims.csv",
                      os.path.join(args.input, "dims.json"), os.path.join(args.input, "dims.csv")):
             if os.path.exists(cand):
