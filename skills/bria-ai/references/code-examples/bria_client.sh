@@ -12,7 +12,7 @@
 # BRIA_API_KEY is auto-loaded from ~/.bria/credentials if not already set.
 
 BRIA_API_BASE="${BRIA_API_BASE:-https://engine.prod.bria-api.com}"
-BRIA_USER_AGENT="BriaSkills/1.3.4"
+BRIA_USER_AGENT="BriaSkills/1.3.5"
 
 bria_call() {
   local endpoint image key extra payload result http_code body url status_url poll i
@@ -94,6 +94,9 @@ bria_call() {
   [ -n "$url" ] && { echo "$url"; return 0; }
   url=$(printf '%s' "$body" | sed -n 's/.*"image_url" *: *"\([^"]*\)".*/\1/p')
   [ -n "$url" ] && { echo "$url"; return 0; }
+  # Multi-image results (e.g. product_dimensions output_format=dual) use "image_urls": [...].
+  url=$(printf '%s' "$body" | sed -n 's/.*"image_urls" *: *\[ *"\([^"]*\)".*/\1/p')
+  [ -n "$url" ] && { echo "$url"; return 0; }
 
   # --- Async: poll status_url ---
   status_url=$(printf '%s' "$body" | sed -n 's/.*"status_url" *: *"\([^"]*\)".*/\1/p')
@@ -109,6 +112,7 @@ bria_call() {
       fi
       url=$(printf '%s' "$poll" | sed -n 's/.*"result_url" *: *"\([^"]*\)".*/\1/p')
       [ -z "$url" ] && url=$(printf '%s' "$poll" | sed -n 's/.*"image_url" *: *"\([^"]*\)".*/\1/p')
+      [ -z "$url" ] && url=$(printf '%s' "$poll" | sed -n 's/.*"image_urls" *: *\[ *"\([^"]*\)".*/\1/p')
       [ -n "$url" ] && { echo "$url"; return 0; }
       i=$((i + 1))
     done
