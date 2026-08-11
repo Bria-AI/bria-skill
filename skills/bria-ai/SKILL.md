@@ -1,10 +1,10 @@
 ---
 name: bria-ai
-description: AI image generation, editing, and background removal API via Bria.ai — remove backgrounds to get transparent PNGs and cutouts, generate images from text prompts, and edit photos with natural language instructions. Also create product photography and lifestyle shots, replace or blur backgrounds, upscale resolution, restyle, and batch-generate visual assets. Use this skill whenever the user wants to remove a background, create transparent PNGs, generate, edit, modify, or transform any image — including hero images, banners, social media visuals, product photos, illustrations, icons, thumbnails, ad creatives, or marketing materials. Also triggers on cutout, inpainting, outpainting, object removal or addition, photo restoration, style transfer, image enhancement, relight, reseason, sketch-to-photo, or any visual content creation. Commercially safe, royalty-free. 20+ specialized endpoints for e-commerce, web design, and content pipelines.
+description: Image generation, photo editing, background removal — transparent PNG images, cutouts, ecommerce packshots, product catalogs, lifestyle shots via Bria.ai. Build store-ready e-commerce catalogs at scale — shadows, product dimensions images, lifestyle scenes, marketplace listing variants. ALWAYS use this skill when the user wants to generate, edit, or transform any image — hero images, banners, social media visuals, product photos, illustrations, icons, thumbnails, ad creatives, or marketing materials — or to build a product catalog, create a packshot, stage a lifestyle shot, remove a background, make transparent PNGs, or batch-process product photos. Triggers on packshot, product catalog, product shot creator, lifestyle shot, cutout, product dimensions image, inpainting, outpainting, object removal, upscale, photo restoration, style transfer, relight, reseason, sketch-to-photo. Commercially safe, royalty-free.
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.3.4"
+  version: "1.3.5"
 ---
 
 # Bria — AI Image Generation, Editing & Background Removal
@@ -164,8 +164,13 @@ Interpret the output:
 | Restore old photos | Restoration | Fix old/damaged photos |
 | Colorize images | Colorization | Add color to B&W, or convert to B&W |
 | Sketch to photo | Sketch2Image | Convert drawings to realistic photos |
+| Product cutout | Product Cutout | Clean transparent PNG from a raw product photo |
+| Product packshot | Product Packshot | Standardized 2000×2000 shot on a solid/clean background |
+| Product shadow | Product Shadow | Add a realistic drop or float shadow to a cutout |
 | Create product lifestyle shots | Lifestyle Shot | Place products in scenes for e-commerce |
 | Integrate products into scenes | Product Integrate | Embed products at exact coordinates |
+| Add dimension callouts to products | Product Dimensions | Marketplace-style measurement images with size/weight/capacity labels |
+| Build a full product catalog | Catalog Pipeline | Batch a folder of photos → packshots, dimensions, lifestyle, marketplace variants |
 
 ## How to Call Any Endpoint
 
@@ -191,8 +196,20 @@ RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instructio
 # Upscale (use `desired_increase`, range 2-4. Add `"preserve_alpha": true` for transparent inputs)
 RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"desired_increase": 4')
 
+# Product cutout → transparent PNG (use --key file for a local image)
+CUTOUT=$(bria_call /v1/product/cutout "/path/to/raw.jpg" --key file)
+
+# Packshot on white from the cutout URL
+RESULT=$(bria_call /v1/product/packshot "$CUTOUT" --key image_url '"background_color": "#FFFFFF"')
+
 # Lifestyle shot
 RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"scene_description": "modern kitchen countertop"')
+
+# Product dimensions — auto-removes background, draws measurement callouts.
+# Dual cm / in labels: repeat each dimension with the same name+position in both
+# units and set "units_display": "dual_slash" so they merge into one "12 cm / 4.7 in" label.
+RESULT=$(bria_call /v2/image/edit/product_dimensions "/path/to/product.png" \
+  '"style": "default", "units_display": "dual_slash", "dimensions": [{"name": "height", "value": 12, "unit": "cm", "position": "left"}, {"name": "height", "value": 4.7, "unit": "in", "position": "left"}, {"name": "width_bottom", "value": 6, "unit": "cm", "position": "bottom"}, {"name": "width_bottom", "value": 2.4, "unit": "in", "position": "bottom"}], "title": "Gummies Bottle", "capacity": {"value": 500, "unit": "ml"}, "weight": {"value": 250, "unit": "g", "label": "Net Weight"}')
 
 echo "$RESULT"
 ```
@@ -208,6 +225,54 @@ echo "$RESULT"
 > **Advanced**: For precise control over generation, use the **vgl** skill for structured VGL JSON prompts instead of natural language.
 
 See **[API Endpoints Reference](references/api-endpoints.md)** for full parameter documentation on all 20+ endpoints.
+
+---
+
+## Product Catalog Pipeline (batch)
+
+When the user wants **listing-ready imagery for physical products at scale** — "build a product catalog from ./products", "turn this folder of photos into a catalog", "make these Amazon/Shopify/Etsy compliant" — use the bundled driver instead of calling endpoints one by one. It is **zero-config**: with no arguments it reads `./products` and writes `./catalog`.
+
+```bash
+python3 <SKILL_DIR>/references/code-examples/build_catalog.py
+```
+
+Per product it runs **cutout → packshot + lifestyle scenes (+ dimensions) → marketplace variants** and writes `cutout.png`, `packshot.jpg`, `lifestyle_N.jpg`, `dimensions.png` (when measurements are available), per-channel variants, and a `listing.json` copy scaffold. Override only what you need:
+
+```bash
+python3 <SKILL_DIR>/references/code-examples/build_catalog.py \
+  --input ./photos --output ./store \
+  --scenes "clean marble surface, soft studio light|cozy wooden desk, warm morning light" \
+  --variants amazon,shopify --dims ./dims.json
+```
+
+**Dimensions need real measurements — ask, don't guess.** With no measurements file and no `--no-dims`, the driver prints `NEEDS_DIMENSIONS` and exits (code 2). When that happens, stop and ask the user to either provide height/width (and optional weight/capacity) per product — as a `dims.json`/CSV — or re-run with `--no-dims` to skip only the dimensions image. Never fabricate sizes. `dims.json` format:
+
+```json
+{ "soap.jpg": {"title": "Hand Wash", "height_cm": 19, "width_cm": 6, "capacity_ml": 250} }
+```
+
+Store measurements in **cm** — callouts render dual **`cm / in`** automatically. Requires `pip install requests Pillow`.
+
+### Marketplace-ready variants
+
+`export_variants.py` turns one master image (packshot or cutout) into a compliant file per channel — enforcing background, aspect ratio, product fill, and minimum resolution:
+
+```bash
+python3 <SKILL_DIR>/references/code-examples/export_variants.py \
+  --input ./catalog/soap/packshot.jpg --output ./catalog/soap --channels amazon,shopify,etsy
+```
+
+| Channel | Aspect | Background | Product fill | Min resolution |
+|---------|--------|------------|--------------|----------------|
+| Amazon (main) | 1:1 | pure white `#FFFFFF` | ~85% | 1600 px (≥ 3000 ideal) |
+| Shopify | 1:1 (+ 4:5) | white / transparent | ~90% | 2048 px |
+| Etsy | 5:4 | white / lifestyle | ~85% | 2000 px |
+
+Full rules: **[Marketplace Presets](references/marketplace-presets.md)**.
+
+### Write the listing copy (SEO)
+
+Bria generates images, not text — **you, the agent, write the copy**. `build_catalog.py` writes a `listing.json` scaffold per product; after the images are generated, **view each `packshot.jpg`** and fill it: `seo_title` (≤ 60 chars, keyword-first), `meta_description` (≤ 160 chars), `description` (1–2 paragraphs), `bullets` (4–6 benefit-led), `tags` (8–15 keywords). Ground every claim in what's visible — don't invent specs — and fold in any known dimensions.
 
 ---
 
@@ -238,6 +303,9 @@ See **[API Endpoints Reference](references/api-endpoints.md)** for full paramete
 
 - **[API Endpoints Reference](references/api-endpoints.md)** — Complete endpoint documentation with request/response formats for all 20+ endpoints
 - **[Shell Client (bria_client.sh)](references/code-examples/bria_client.sh)** — Single-function helper: `bria_call` handles auth, base64, JSON, polling
+- **[build_catalog.py](references/code-examples/build_catalog.py)** — Batch a folder of product photos into a store-ready catalog
+- **[export_variants.py](references/code-examples/export_variants.py)** — Turn a master image into Amazon/Shopify/Etsy variants
+- **[Marketplace Presets](references/marketplace-presets.md)** — Amazon / Shopify / Etsy image specs
 - **[Full API docs for agents (llms.txt)](https://docs.bria.ai/llms.txt)** — Agent-ready Bria API reference; use when this skill's summary is not enough
 
 ## Related Skills
