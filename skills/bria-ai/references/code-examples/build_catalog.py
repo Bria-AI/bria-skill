@@ -44,7 +44,8 @@ def api_key():
 
 KEY = None
 def H():
-    return {"api_token": KEY, "Content-Type": "application/json"}
+    return {"api_token": KEY, "Content-Type": "application/json",
+            "User-Agent": "BriaSkills/1.3.5"}
 
 
 def post(path, payload, tries=3):
@@ -75,13 +76,19 @@ def result_url(j):
         first = res[0]
         return first[0] if isinstance(first, list) else first
     if isinstance(res, dict):
-        return res.get("image_url") or res.get("url")
+        u = res.get("image_url") or res.get("url")
+        if u:
+            return u
+        # Multi-image results (e.g. product_dimensions output_format=dual) use image_urls.
+        urls = res.get("image_urls")
+        if isinstance(urls, list) and urls:
+            return urls[0]
     return None
 
 
 def poll(status_url, tries=40):
     for _ in range(tries):
-        j = requests.get(status_url, headers={"api_token": KEY}, timeout=60).json()
+        j = requests.get(status_url, headers=H(), timeout=60).json()
         if str(j.get("status", "")).upper() in ("FAILED", "ERROR"):
             raise RuntimeError(f"job failed: {json.dumps(j)[:200]}")
         u = result_url(j)

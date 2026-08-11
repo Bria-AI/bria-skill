@@ -1,6 +1,6 @@
 ---
 name: bria-ai
-description: Image generation, photo editing, background removal — transparent PNG images, cutouts, ecommerce packshots, product catalogs, lifestyle shots, object extraction via Bria.ai. Build store-ready e-commerce catalogs at scale — shadows, product dimensions images, lifestyle scenes, marketplace listing variants. ALWAYS use this skill when the user wants to generate, edit, or transform any image — hero images, banners, social media visuals, product photos, illustrations, icons, thumbnails, ad creatives, or marketing materials — or to build a product catalog, create a packshot, stage a lifestyle shot, remove a background, make transparent PNGs, or batch-process product photos. Triggers on packshot, product catalog, product shot creator, lifestyle shot, cutout, product dimensions image, inpainting, outpainting, object removal, object extraction, upscale, photo restoration, style transfer, relight, reseason, sketch-to-photo. Commercially safe, royalty-free.
+description: Image generation, photo editing, background removal — transparent PNG images, cutouts, ecommerce packshots, product catalogs, lifestyle shots via Bria.ai. Build store-ready e-commerce catalogs at scale — shadows, product dimensions images, lifestyle scenes, marketplace listing variants. ALWAYS use this skill when the user wants to generate, edit, or transform any image — hero images, banners, social media visuals, product photos, illustrations, icons, thumbnails, ad creatives, or marketing materials — or to build a product catalog, create a packshot, stage a lifestyle shot, remove a background, make transparent PNGs, or batch-process product photos. Triggers on packshot, product catalog, product shot creator, lifestyle shot, cutout, product dimensions image, inpainting, outpainting, object removal, upscale, photo restoration, style transfer, relight, reseason, sketch-to-photo. Commercially safe, royalty-free.
 license: MIT
 metadata:
   author: Bria AI
@@ -152,7 +152,6 @@ Interpret the output:
 | Edit images by text instruction | FIBO-Edit | Change colors, modify objects, transform scenes |
 | Edit image region with mask | GenFill/Erase | Precise inpainting, add/replace specific regions |
 | Add/Replace/Remove objects | Text-based editing | Add vase, replace apple with pear, remove table |
-| Extract a named object | Extract Object | Isolate one object by name → transparent PNG cutout |
 | Remove background (transparent PNG) | RMBG-2.0 | Extract subjects for overlays, logos, cutouts |
 | Replace/blur/erase background | Background ops | Change, blur, or remove backgrounds |
 | Expand/outpaint images | Outpainting | Extend boundaries, change aspect ratios |
@@ -196,9 +195,6 @@ RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instructio
 
 # Upscale (use `desired_increase`, range 2-4. Add `"preserve_alpha": true` for transparent inputs)
 RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"desired_increase": 4')
-
-# Extract a named object → transparent PNG of just that object
-RESULT=$(bria_call /v2/image/edit/extract_object "https://example.com/scene.jpg" '"object_name": "coffee mug"')
 
 # Product cutout → transparent PNG (use --key file for a local image)
 CUTOUT=$(bria_call /v1/product/cutout "/path/to/raw.jpg" --key file)

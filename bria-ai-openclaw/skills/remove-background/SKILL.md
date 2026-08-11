@@ -4,7 +4,7 @@ description: Remove backgrounds from images — background removal API for trans
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.3.4"
+  version: "1.3.5"
 ---
 
 # Remove Background — Transparent PNGs & Cutouts with RMBG 2.0

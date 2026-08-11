@@ -4,7 +4,7 @@ description: Classic image manipulation with Python Pillow - resize, crop, compo
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.3.4"
+  version: "1.3.5"
 ---
 
 # Image Utilities

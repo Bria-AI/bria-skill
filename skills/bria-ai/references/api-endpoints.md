@@ -11,7 +11,7 @@ Content-Type: application/json
 User-Agent: BriaSkills/<version>
 ```
 
-> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.3.4`) in every API call, including status polling requests.
+> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.3.5`) in every API call, including status polling requests.
 
 ---
 
@@ -496,35 +496,6 @@ Remove a specific object by name.
 }
 ```
 
-### POST /v2/image/edit/extract_object
-
-Extract a named object from an image → transparent PNG containing only that object. The object to isolate is identified by a text name (no mask required).
-
-**Request:**
-```json
-{
-  "image": "base64-or-url",
-  "object_name": "coffee mug"
-}
-```
-
-**Parameters:**
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `image` | string | required | Source image URL or base64 |
-| `object_name` | string | required | Natural-language name of the object to extract (e.g. `coffee mug`, `red sneaker`) |
-
-**Async Response (202):**
-```json
-{
-  "request_id": "uuid",
-  "status_url": "https://..."
-}
-```
-
-Poll `status_url` for the result. The completed `result.image_url` is a transparent PNG of just the extracted object.
-
 ---
 
 ## Image Transformation
@@ -693,7 +664,7 @@ Check async request status.
 import requests, time
 
 def poll(status_url, api_key, timeout=120):
-    headers = {"api_token": api_key, "User-Agent": "BriaSkills/1.3.4"}
+    headers = {"api_token": api_key, "User-Agent": "BriaSkills/1.3.5"}
     for _ in range(timeout // 2):
         r = requests.get(status_url, headers=headers)
         data = r.json()

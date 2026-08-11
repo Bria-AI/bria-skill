@@ -4,7 +4,7 @@ description: Vehicle/automotive image editing for cars, trucks, SUVs, motorcycle
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.0.0"
+  version: "1.3.5"
 ---
 
 # Bria Automotive — Vehicle Image Editing & Shot Generation

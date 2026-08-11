@@ -4,7 +4,7 @@ description: Remove backgrounds from videos — video background removal API for
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.3.4"
+  version: "1.3.5"
 ---
 
 # Video Remove Background — Transparent Videos & Alpha-Channel Clips
