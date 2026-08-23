@@ -194,7 +194,7 @@ RESULT=$(bria_call /v2/image/edit "https://example.com/man.jpg" --key images \
   '"instruction": "dress the man in image 1 in the santa outfit from image 2"')
 
 # Upscale
-RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"scale": 4')
+RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"desired_increase": 4')
 
 # Lifestyle shot
 RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"scene_description": "modern kitchen countertop"')

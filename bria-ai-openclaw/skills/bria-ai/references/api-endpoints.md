@@ -28,7 +28,6 @@ Generate images from text prompts using FIBO's structured prompt system.
   "aspect_ratio": "1:1",
   "resolution": "1MP",
   "negative_prompt": "string",
-  "num_results": 1,
   "seed": null
 }
 ```
@@ -38,22 +37,22 @@ Generate images from text prompts using FIBO's structured prompt system.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `prompt` | string | required* | Image description (* or use `structured_prompt`) |
-| `aspect_ratio` | string | "1:1" | "1:1", "4:3", "16:9", "3:4", "9:16" |
+| `aspect_ratio` | string | "1:1" | "1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9" |
 | `resolution` | string | "1MP" | Output image resolution. "1MP" or "4MP". "4MP" improves image details, especially for photorealism, but increases latency by ~30 seconds. |
 | `negative_prompt` | string | - | What to exclude |
-| `num_results` | int | 1 | Number of images (1-4) |
 | `seed` | int | random | For reproducibility |
 | `structured_prompt` | string | - | JSON from previous generation (for refinement). Use with `prompt` to refine, or alone with `seed` to recreate. |
-| `image_url` | string | - | Reference image (for inspire mode) |
+| `images` | array | - | Reference image for inspire mode: an array holding one image URL or base64 string |
 
-**Input Combination Rules** (mutually exclusive):
+**Input Combinations** — at least one of `prompt`, `images` or `structured_prompt` is required:
 - `prompt` — Generate from text
-- `image_url` — Generate inspired by a reference image
-- `image_url` + `prompt` — Generate inspired by image, guided by text
+- `images` — Generate inspired by a reference image
+- `images` + `prompt` — Generate inspired by image, guided by text
 - `structured_prompt` + `seed` — Recreate a previous image exactly
 - `structured_prompt` + `prompt` + `seed` — Refine a previous image with new instructions
 
-All combinations support `aspect_ratio`, `negative_prompt`, `num_results`, and `seed`.
+All combinations support `aspect_ratio`, `negative_prompt` and `seed`. Note that `"sync": true`
+cannot be combined with `"resolution": "4MP"` — that pairing is rejected.
 
 **Response:**
 ```json
@@ -149,7 +148,7 @@ position — the first is "image 1", the second "image 2", and so on:
 | `images` | array | required | 1–4 image URLs or base64 data URLs. **Order matters** — the instruction refers to them as "image 1", "image 2", … in the order they are sent |
 | `instruction` | string | required | Edit instruction in natural language. Refer to additional images by position |
 | `seed` | int | random | For reproducibility — the same images, instruction and seed reproduce the same result |
-| `aspect_ratio` | string | - | Output ratio: "1:1", "4:3", "16:9", "3:4", "9:16". Honored with 2+ images; with a single image the output follows that image and the response `warning` says so. Omit it to follow the first image |
+| `aspect_ratio` | string | - | Output ratio: "1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9". Honored with 2+ images; with a single image the output follows that image and the response `warning` says so. Omit it to follow the first image |
 | `model_version` | string | - | Deprecated and ignored — the service picks the edit model from the request contents. A value that is sent comes back with a notice in `warning`; omit it |
 
 **Writing a multi-reference instruction:**
@@ -171,10 +170,15 @@ position — the first is "image 1", the second "image 2", and so on:
   "result": {
     "image_url": "https://...",
     "seed": 1234,
+    "structured_prompt": "{...}",
     "warning": null
   }
 }
 ```
+
+The result also carries the structured instruction the edit was rendered from — named
+`structured_prompt` on a polled result and `structured_instruction` on an inline `"sync": true`
+response. Read whichever is present.
 
 `warning` is set when a parameter was accepted but not honored — `aspect_ratio` on a single-image
 request, a supplied `model_version`, or a tuning parameter the serving model does not read. Relay it
@@ -190,9 +194,7 @@ Generate content in a masked region (inpainting).
   "image": "https://source-image-url",
   "mask": "https://mask-image-url",
   "prompt": "what to generate",
-  "mask_type": "manual",
-  "negative_prompt": "string",
-  "num_results": 1
+  "mask_type": "manual"
 }
 ```
 
@@ -204,8 +206,6 @@ Generate content in a masked region (inpainting).
 | `mask` | string | required | Mask URL (white=edit, black=keep) |
 | `prompt` | string | required | What to generate in masked area |
 | `mask_type` | string | "manual" | "manual" or "automatic" |
-| `negative_prompt` | string | - | What to avoid |
-| `num_results` | int | 1 | Number of variations |
 
 **Mask Requirements:**
 - White pixels (255) = area to edit
@@ -276,7 +276,7 @@ Expand/outpaint an image to extend its boundaries.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `image` | string | required | Source image URL or base64 string |
-| `aspect_ratio` | string | required | Target ratio: "1:1", "4:3", "16:9", "3:4", "9:16" |
+| `aspect_ratio` | string \| float | - | Target ratio: "1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", or a float. Omit it and pass `canvas_size` instead |
 | `prompt` | string | - | Optional - describe content to generate |
 
 ### POST /v2/image/edit/enhance
@@ -308,8 +308,8 @@ Upscale image resolution.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `image` | string | required | Source image URL |
-| `desired_increase` | int | 2 | Upscale factor, range 2–4 |
-| `preserve_alpha` | bool | false | Preserve transparency. Set `true` when input has an alpha channel — the API upscales and recombines the alpha server-side, so you don't need to handle it client-side. |
+| `desired_increase` | int | 2 | Upscale factor: 2 or 4 |
+| `preserve_alpha` | bool | true | Preserve transparency. Set `true` when input has an alpha channel — the API upscales and recombines the alpha server-side, so you don't need to handle it client-side. |
 
 ### POST /v1/product/cutout
 
@@ -387,7 +387,7 @@ Same as `lifestyle_shot_by_text`, but the scene comes from a reference backgroun
 
 Response: `{ "result": [[ "image_url", … ], …] }`.
 
-### POST /image/edit/product/integrate
+### POST /v2/image/edit/product/integrate
 
 Integrate and embed one or more products into a predefined scene at precise user-defined coordinates. The product is automatically matched to the scene's lighting, perspective, and aesthetics. Products are automatically cut out from their background as part of the pipeline.
 
@@ -442,9 +442,12 @@ Integrate and embed one or more products into a predefined scene at precise user
 }
 ```
 
-### POST /v2/image/edit/product_dimensions
+### POST /v2/image/edit/product/generate/dimensions
 
-Render a marketplace-ready dimension image from a product photo: the background is removed automatically, then measurement callout lines + labels are drawn around the product, with an optional title and optional weight/capacity text. Three visual styles. Useful for e-commerce listings (Amazon-style "dimensions" images).
+Render a marketplace-ready dimension image from a product photo. (The older
+`/v2/image/edit/product_dimensions` path still works but is deprecated — use this one.)
+
+How it works: the background is removed automatically, then measurement callout lines + labels are drawn around the product, with an optional title and optional weight/capacity text. Three visual styles. Useful for e-commerce listings (Amazon-style "dimensions" images).
 
 **Request:**
 ```json
@@ -551,8 +554,7 @@ Blend/merge images or apply textures.
 ```json
 {
   "image": "base64-or-url",
-  "overlay": "texture-or-art-url",
-  "instruction": "Place the art on the shirt, keep the art exactly the same"
+  "instruction": "Place the art from this image on the shirt, keep the art exactly the same"
 }
 ```
 
@@ -602,7 +604,7 @@ Modify the lighting setup of an image.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `image` | string | required | Source image URL or base64 |
-| `light_type` | string | required | Lighting preset (see values below) |
+| `light_type` | string | "soft overcast daylight lighting" | Lighting preset (see values below) |
 | `light_direction` | string | required | `front`, `side`, `bottom`, `top-down` |
 
 **Light Types:** `midday`, `blue hour light`, `low-angle sunlight`, `sunrise light`, `spotlight on subject`, `overcast light`, `soft overcast daylight lighting`, `cloud-filtered lighting`, `fog-diffused lighting`, `side lighting`, `moonlight lighting`, `starlight nighttime`, `soft bokeh lighting`, `harsh studio lighting`
@@ -618,8 +620,7 @@ Convert a sketch or line drawing to a photorealistic image.
 **Request:**
 ```json
 {
-  "image": "sketch-base64-or-url",
-  "prompt": "optional description"
+  "image": "sketch-base64-or-url"
 }
 ```
 
@@ -689,7 +690,7 @@ Check async request status.
 **Response:**
 ```json
 {
-  "status": "IN_PROGRESS | COMPLETED | FAILED",
+  "status": "IN_PROGRESS | COMPLETED | ERROR",
   "result": {
     "image_url": "https://..."
   },
@@ -700,7 +701,8 @@ Check async request status.
 **Status Values:**
 - `IN_PROGRESS` - Still processing
 - `COMPLETED` - Success, result available
-- `FAILED` - Error occurred
+- `ERROR` - The request failed (this is the literal value; there is no `FAILED`)
+- `UNKNOWN` - No such request id
 
 **Polling Pattern:**
 ```python
@@ -713,7 +715,7 @@ def poll(status_url, api_key, timeout=120):
         data = r.json()
         if data["status"] == "COMPLETED":
             return data["result"]["image_url"]
-        if data["status"] == "FAILED":
+        if data["status"] in ("ERROR", "UNKNOWN"):
             raise Exception(data.get("error"))
         time.sleep(2)
     raise TimeoutError()
