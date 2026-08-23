@@ -148,7 +148,7 @@ position — the first is "image 1", the second "image 2", and so on:
 | `images` | array | required | 1–4 image URLs or base64 data URLs. **Order matters** — the instruction refers to them as "image 1", "image 2", … in the order they are sent |
 | `instruction` | string | required | Edit instruction in natural language. Refer to additional images by position |
 | `seed` | int | random | For reproducibility — the same images, instruction and seed reproduce the same result |
-| `aspect_ratio` | string | - | Output ratio: "1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9". Honored with 2+ images; with a single image the output follows that image and the response `warning` says so. Omit it to follow the first image |
+| `aspect_ratio` | string | - | Output ratio: "1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9". Honored only with 2 or more images. Do not send it on a single-image request — the output follows that image regardless and the response carries a `warning`; to change one image's ratio, use `/v2/image/edit/expand` |
 | `model_version` | string | - | Deprecated and ignored — the service picks the edit model from the request contents. A value that is sent comes back with a notice in `warning`; omit it |
 
 **Writing a multi-reference instruction:**
