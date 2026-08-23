@@ -157,8 +157,12 @@ position — the first is "image 1", the second "image 2", and so on:
   just that it exists.
 - Plain prose, plain words — "image 1", "image 2". No brackets, tags, or markup.
 
+This endpoint is asynchronous: it answers with `request_id` and `status_url`, which you poll. Do
+not send `"sync": true` here — an instruction edit takes longer than a single response is allowed to
+take, so a synchronous request fails with a gateway timeout even though the job itself is fine.
+
 **Constraints** — each returns 422 with a readable message:
-- More than 4 images.
+- More than 4 images. Trim the set before sending; the request is refused, not truncated.
 - A `mask` together with 2 or more images (masked edits are single-image only).
 - 2 or more images together with a tailored `model_id` or `model_version: FIBO_BBQ` — both of those
   run on the single-reference model.
