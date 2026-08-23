@@ -255,7 +255,8 @@ Upscale image resolution.
 ```json
 {
   "image": "https://source-image-url",
-  "scale": 2
+  "desired_increase": 4,
+  "preserve_alpha": true
 }
 ```
 
@@ -264,7 +265,43 @@ Upscale image resolution.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `image` | string | required | Source image URL |
-| `scale` | int | 2 | Upscale factor (2 or 4) |
+| `desired_increase` | int | 2 | Upscale factor, range 2–4 |
+| `preserve_alpha` | bool | false | Preserve transparency. Set `true` when input has an alpha channel — the API upscales and recombines the alpha server-side, so you don't need to handle it client-side. |
+
+### POST /v1/product/cutout
+
+Remove the background from a product photo → clean transparent PNG. The `/v1/product/*` endpoints take `image_url` (URL) or `file` (base64).
+
+**Request:**
+```json
+{ "image_url": "https://…/raw.jpg" }
+```
+Response: `{ "result_url": "https://…png" }` (synchronous).
+
+### POST /v1/product/packshot
+
+Standardized 2000×2000 packshot on a solid/clean background.
+
+| Parameter | Type | Notes |
+|-----------|------|-------|
+| `image_url` / `file` | string | Product image (a cutout is recommended) |
+| `background_color` | string | Hex like `#FFFFFF`, or `transparent` |
+| `sku` | string | Optional label/id |
+
+Response: `{ "result_url": "…" }` (synchronous).
+
+### POST /v1/product/shadow
+
+Add a realistic shadow to a product cutout.
+
+| Parameter | Type | Notes |
+|-----------|------|-------|
+| `image_url` / `file` | string | Product cutout |
+| `type` | string | `regular` (drop) or `float` (elliptical) |
+| `background_color` | string | Hex or `transparent` |
+| `shadow_intensity` | int | 0–100 (approx) |
+
+Response: `{ "result_url": "…" }` (synchronous).
 
 ### POST /v1/product/lifestyle_shot_by_text
 
@@ -274,10 +311,38 @@ Place a product in a lifestyle scene using text description.
 ```json
 {
   "file": "BASE64_ENCODED_IMAGE",
-  "prompt": "modern kitchen countertop, natural lighting",
+  "scene_description": "modern kitchen countertop, natural lighting",
   "placement_type": "automatic"
 }
 ```
+
+**Parameters:**
+
+| Parameter | Type | Notes |
+|-----------|------|-------|
+| `image_url` / `file` | string | Product (cutout recommended) |
+| `scene_description` | string | Environment + lighting + mood |
+| `mode` | string | `base`, `high_control` (recommended), `fast` |
+| `placement_type` | string | `automatic`, `automatic_aspect_ratio`, `manual_placement`, `custom_coordinates`, `manual_padding`, `original` |
+| `aspect_ratio` | string | e.g. `1:1`, `4:5`, `16:9` (with `automatic_aspect_ratio`) |
+| `num_results` | int | Number of variations |
+| `sync` | bool | `true` returns results inline |
+| `optimize_description` | bool | Let Bria refine the prompt |
+
+Response: `{ "result": [[ "image_url", "seed", "session_id" ], …] }` — extract `result[0][0]`.
+
+### POST /v1/product/lifestyle_shot_by_image
+
+Same as `lifestyle_shot_by_text`, but the scene comes from a reference background image instead of a text description.
+
+| Parameter | Type | Notes |
+|-----------|------|-------|
+| `image_url` / `file` | string | Product |
+| `ref_image_urls` | array | One or more background reference URLs |
+| `placement_type` | string | see above |
+| `num_results` | int | variations |
+
+Response: `{ "result": [[ "image_url", … ], …] }`.
 
 ### POST /image/edit/product/integrate
 
@@ -333,6 +398,63 @@ Integrate and embed one or more products into a predefined scene at precise user
   "status_url": "https://..."
 }
 ```
+
+### POST /v2/image/edit/product_dimensions
+
+Render a marketplace-ready dimension image from a product photo: the background is removed automatically, then measurement callout lines + labels are drawn around the product, with an optional title and optional weight/capacity text. Three visual styles. Useful for e-commerce listings (Amazon-style "dimensions" images).
+
+**Request:**
+```json
+{
+  "image": "https://product-image-url",
+  "style": "default",
+  "dimensions": [
+    {"name": "height", "value": 12, "unit": "cm", "position": "left"},
+    {"name": "width_bottom", "value": 6, "unit": "cm", "position": "bottom"}
+  ],
+  "title": "Gummies Bottle",
+  "weight": {"value": 250, "unit": "g", "label": "Net Weight"},
+  "capacity": {"value": 500, "unit": "ml"},
+  "background": "white",
+  "output_format": "png"
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `image` | string | required | Product photo URL or base64. Background is removed automatically — no pre-cutout needed |
+| `dimensions` | array | required | One or more dimension callouts (min 1) |
+| `dimensions[].name` | string | required | `height`, `width_bottom`, or `width_top` (`length`/`depth` not currently enabled) |
+| `dimensions[].value` | float | required | Physical measurement value (must be > 0) |
+| `dimensions[].unit` | string | required | `mm`, `cm`, `m`, `in`, `"` (inches), `ft`, `'` (feet) |
+| `dimensions[].position` | string | per-name | Callout side: `top`, `bottom`, `left`, `right`. Defaults: height→`left`, width_bottom→`bottom`, width_top→`top` |
+| `style` | string | required | `default`, `childlike`, or `elegant` |
+| `units_display` | string | "single" | `single`, `dual_bullet`, `dual_slash`, `dual_parens`. For dual modes, supply two `dimensions` entries with the same `name`+`position` but different `unit` (e.g. `in` and `cm`) — they merge into one dual-unit label |
+| `background` | string | "white" | `white`, `cream`, `charcoal`, or a hex color (e.g. `#f5f0e8`) |
+| `title` | string | - | Optional headline above the product (max 80 chars) |
+| `title_position` | string | "top_center" | `top_left`, `top_center`, `top_right` |
+| `weight` | object | - | Optional weight callout below the product |
+| `weight.value` | float | required* | Weight value (> 0) *if `weight` is provided |
+| `weight.unit` | string | required* | `lb`, `oz`, `g`, `kg` |
+| `weight.label` | string | "Weight" | `Weight` or `Net Weight` |
+| `capacity` | object | - | Optional capacity callout below the product |
+| `capacity.value` | float | required* | Capacity value (> 0) *if `capacity` is provided |
+| `capacity.unit` | string | required* | `fl_oz`, `ml`, `l`, `qt`, `gal`, `cups` |
+| `output_format` | string | "png" | `png`, `jpeg`, or `dual` (composite PNG + a transparent overlay-only PNG, returned as two images) |
+| `output_size` | int | 2200 | Square output edge length in px (256–2200) |
+| `proportional_lines` | bool | true | Scale each dimension line's length to its measurement (the largest per axis spans the product) |
+
+**Async Response (202):**
+```json
+{
+  "request_id": "uuid",
+  "status_url": "https://..."
+}
+```
+
+Poll `status_url` for the result. `dual` output returns two images: `[composite, overlay]`.
 
 ---
 
