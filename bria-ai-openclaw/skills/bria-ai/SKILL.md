@@ -171,7 +171,9 @@ echo "$RESULT"
 address them by position — *"dress the man in image 1 in the santa outfit from image 2"*. Say what
 each reference contributes, in plain prose. Single-image edits need no positional wording.
 
-**Generation options:** Aspect ratios `1:1`, `16:9`, `4:3`, `9:16`, `3:4`. Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for single images.
+**Generation options:** Aspect ratios `1:1`, `16:9`, `4:3`, `9:16`, `3:4`. Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for a single generated image. Editing endpoints are the other way round —
+they answer with a `status_url` you poll, and `"sync": true` on an edit fails with a gateway
+timeout.
 
 > **Advanced**: For precise control over generation, use the **vgl** skill for structured VGL JSON prompts.
 
