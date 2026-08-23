@@ -11,7 +11,7 @@ Content-Type: application/json
 User-Agent: BriaSkills/<version>
 ```
 
-> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.3.5`) in every API call, including status polling requests.
+> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.3.6`) in every API call, including status polling requests.
 
 ---
 
@@ -120,7 +120,9 @@ Remove background from image. Returns PNG with transparency.
 
 ### POST /v2/image/edit
 
-Edit an image using natural language instructions. No mask required.
+Edit an image with a natural language instruction — no mask required. Send one image to change it,
+or 2–4 images to combine them: the subject from one with an outfit, product, style, or background
+from another.
 
 **Request:**
 ```json
@@ -130,12 +132,53 @@ Edit an image using natural language instructions. No mask required.
 }
 ```
 
+**Multi-reference request.** `images` is ordered, and the instruction addresses each entry by its
+position — the first is "image 1", the second "image 2", and so on:
+```json
+{
+  "images": ["https://man-image-url", "https://santa-outfit-image-url"],
+  "instruction": "dress the man in image 1 in the santa outfit from image 2",
+  "seed": 1234
+}
+```
+
 **Parameters:**
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `images` | array | required | Array of image URLs or base64 data URLs |
-| `instruction` | string | required | Edit instruction in natural language |
+| `images` | array | required | 1–4 image URLs or base64 data URLs. **Order matters** — the instruction refers to them as "image 1", "image 2", … in the order they are sent |
+| `instruction` | string | required | Edit instruction in natural language. Refer to additional images by position |
+| `seed` | int | random | For reproducibility — the same images, instruction and seed reproduce the same result |
+| `aspect_ratio` | string | - | Output ratio: "1:1", "4:3", "16:9", "3:4", "9:16". Honored with 2+ images; with a single image the output follows that image and the response `warning` says so. Omit it to follow the first image |
+| `model_version` | string | - | Deprecated and ignored — the service picks the edit model from the request contents. A value that is sent comes back with a notice in `warning`; omit it |
+
+**Writing a multi-reference instruction:**
+- Put the image being edited first and the references after it.
+- Say what each reference contributes ("the outfit from image 2", "the background of image 3"), not
+  just that it exists.
+- Plain prose, plain words — "image 1", "image 2". No brackets, tags, or markup.
+
+**Constraints** — each returns 422 with a readable message:
+- More than 4 images.
+- A `mask` together with 2 or more images (masked edits are single-image only).
+- 2 or more images together with a tailored `model_id` or `model_version: FIBO_BBQ` — both of those
+  run on the single-reference model.
+
+**Completed Result:**
+```json
+{
+  "status": "COMPLETED",
+  "result": {
+    "image_url": "https://...",
+    "seed": 1234,
+    "warning": null
+  }
+}
+```
+
+`warning` is set when a parameter was accepted but not honored — `aspect_ratio` on a single-image
+request, a supplied `model_version`, or a tuning parameter the serving model does not read. Relay it
+to the user rather than dropping it.
 
 ### POST /v2/image/edit/gen_fill
 
@@ -664,7 +707,7 @@ Check async request status.
 import requests, time
 
 def poll(status_url, api_key, timeout=120):
-    headers = {"api_token": api_key, "User-Agent": "BriaSkills/1.3.5"}
+    headers = {"api_token": api_key, "User-Agent": "BriaSkills/1.3.6"}
     for _ in range(timeout // 2):
         r = requests.get(status_url, headers=headers)
         data = r.json()

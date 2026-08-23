@@ -122,7 +122,7 @@ export class BriaClient {
     return {
       api_token: this.apiKey,
       "Content-Type": "application/json",
-      "User-Agent": "BriaSkills/1.3.5",
+      "User-Agent": "BriaSkills/1.3.6",
     };
   }
 
@@ -521,20 +521,25 @@ export class BriaClient {
 
   /**
    * Edit an image using natural language instructions.
-   * @param imageUrl - Source image URL or base64 data URL
-   * @param instruction - Edit instruction (e.g., "change the mug to red")
-   * @param maskUrl - Optional mask for localized editing (white=edit, black=keep)
+   * @param imageUrl - Source image URL or base64 data URL, or an array of 2-4 of them to
+   *                   combine. The array is ordered, and the instruction addresses each entry
+   *                   by position: the first is "image 1", the second "image 2", and so on.
+   * @param instruction - Edit instruction (e.g., "change the mug to red", or
+   *                      "dress the man in image 1 in the santa outfit from image 2")
+   * @param maskUrl - Optional mask for localized editing (white=edit, black=keep).
+   *                  Supported for single-image edits only.
    * @param wait - Wait for completion
    * @returns Response with edited image_url
    */
   async editImage(
-    imageUrl: string,
+    imageUrl: string | string[],
     instruction: string,
     maskUrl?: string,
     wait = true
   ): Promise<BriaResponse> {
+    const images = Array.isArray(imageUrl) ? imageUrl : [imageUrl];
     const data: Record<string, unknown> = {
-      images: [this.resolveImage(imageUrl, true)],
+      images: images.map((image) => this.resolveImage(image, true)),
       instruction,
     };
     if (maskUrl) data.mask = this.resolveImage(maskUrl, true);

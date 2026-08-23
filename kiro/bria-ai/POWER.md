@@ -149,6 +149,7 @@ Interpret the output:
 |------|------------|----------|
 | Generate images from text | FIBO Generate | Hero images, product shots, illustrations, social media images, banners |
 | Edit images by text instruction | FIBO-Edit | Change colors, modify objects, transform scenes |
+| Combine 2–4 images in one edit | FIBO-Edit multi-reference | Put the outfit, product, logo, style, or background of one image into another |
 | Edit image region with mask | GenFill/Erase | Precise inpainting, add/replace specific regions |
 | Add/Replace/Remove objects | Text-based editing | Add vase, replace apple with pear, remove table |
 | Remove background (transparent PNG) | RMBG-2.0 | Extract subjects for overlays, logos, cutouts |
@@ -187,6 +188,11 @@ RESULT=$(bria_call /v2/image/edit/replace_background "https://example.com/img.jp
 # Edit image (uses images array — pass --key images)
 RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instruction": "make it look warmer"')
 
+# Edit with reference images — each --image adds the next one, in order
+RESULT=$(bria_call /v2/image/edit "https://example.com/man.jpg" --key images \
+  --image "https://example.com/santa.png" \
+  '"instruction": "dress the man in image 1 in the santa outfit from image 2"')
+
 # Upscale
 RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"scale": 4')
 
@@ -205,8 +211,17 @@ echo "$RESULT"
 **Calling convention:** `bria_call <endpoint> <image_or_empty> [--key <json_key>] [extra JSON fields...]`
 - Pass a URL, local file path, or `""` (empty) for endpoints without image input
 - Use `--key images` when the endpoint expects an `images` array instead of `image`
+- Add `--image <url_or_path>` once per extra reference image (`--key images`, up to 4 in total).
+  Order is preserved: the positional image is "image 1", the first `--image` is "image 2", …
 - Extra JSON fields are appended as key-value pairs: `'"key": "value"'`
 - Returns the result image URL on success, or prints an error to stderr
+
+**Editing with several images (2–4):** reach for a second image when the look the user wants
+already exists as a picture — a specific outfit, product, logo, or scene — instead of something you
+can describe in words. Put the image being edited first, references after it, and address them by
+position in the instruction: *"dress the man in image 1 in the santa outfit from image 2"*. Say what
+each reference contributes ("the background of image 3"), in plain prose. A single-image edit needs
+no positional wording: *"change the mug color to red"*.
 
 **Generation options:** Aspect ratios `1:1`, `16:9`, `4:3`, `9:16`, `3:4`. Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for single images.
 
@@ -316,7 +331,7 @@ All requests need `api_token` header:
 api_token: YOUR_BRIA_API_KEY
 User-Agent: BriaSkills/<version>
 ```
-> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version, e.g. `BriaSkills/1.3.5`) in every API call, including status polling requests.
+> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version, e.g. `BriaSkills/1.3.6`) in every API call, including status polling requests.
 
 ---
 
@@ -339,6 +354,6 @@ User-Agent: BriaSkills/<version>
 
 **Original Work:** This power is converted from the [bria-skill](https://github.com/bria-ai/bria-skill) Claude Code skill by Bria AI.
 
-**Source Version:** Based on version 1.3.5.
+**Source Version:** Based on version 1.3.6.
 
 **Update Frequency:** This power will be updated periodically.

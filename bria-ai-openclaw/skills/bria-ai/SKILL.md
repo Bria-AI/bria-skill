@@ -12,7 +12,7 @@ license: MIT
 homepage: https://bria.ai
 metadata:
   author: Bria AI
-  version: "1.3.5"
+  version: "1.3.6"
   openclaw:
     requires:
       env:
@@ -111,6 +111,9 @@ Generate image from scratch (text → image)?
 Edit existing image with text instruction?
   → /v2/image/edit  (use --key images)
 
+Combine 2-4 images — outfit, product, logo, style, or background from one into another?
+  → /v2/image/edit  (--key images, then one --image per extra reference)
+
 Change / replace / blur background?
   → /v2/image/edit/replace_background  (prompt: "blur" or describe new bg)
 
@@ -143,6 +146,11 @@ RESULT=$(bria_call /v2/image/edit/replace_background "https://example.com/img.jp
 # Edit image (uses images array — pass --key images)
 RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instruction": "make it look warmer"')
 
+# Edit with reference images — each --image adds the next one, in order
+RESULT=$(bria_call /v2/image/edit "https://example.com/man.jpg" --key images \
+  --image "https://example.com/santa.png" \
+  '"instruction": "dress the man in image 1 in the santa outfit from image 2"')
+
 # Upscale
 RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"scale": 4')
 
@@ -155,7 +163,13 @@ echo "$RESULT"
 **Calling convention:** `bria_call <endpoint> <image_or_empty> [--key <json_key>] [extra JSON fields...]`
 - Pass a URL, local file path, or `""` for endpoints without image input
 - Use `--key images` when the endpoint expects an `images` array instead of `image`
+- Add `--image <url_or_path>` once per extra reference image (`--key images`, up to 4 in total).
+  Order is preserved: the positional image is "image 1", the first `--image` is "image 2", …
 - Returns the result image URL on success, or prints an error to stderr
+
+**Editing with several images (2-4):** put the image being edited first, references after it, and
+address them by position — *"dress the man in image 1 in the santa outfit from image 2"*. Say what
+each reference contributes, in plain prose. Single-image edits need no positional wording.
 
 **Generation options:** Aspect ratios `1:1`, `16:9`, `4:3`, `9:16`, `3:4`. Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for single images.
 
