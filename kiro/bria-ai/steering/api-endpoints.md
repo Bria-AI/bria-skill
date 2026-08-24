@@ -29,7 +29,8 @@ Generate images from text prompts using FIBO's structured prompt system.
   "resolution": "1MP",
   "negative_prompt": "string",
   "num_results": 1,
-  "seed": null
+  "seed": null,
+  "style_id": "default"
 }
 ```
 
@@ -43,6 +44,7 @@ Generate images from text prompts using FIBO's structured prompt system.
 | `negative_prompt` | string | - | What to exclude |
 | `num_results` | int | 1 | Number of images (1-4) |
 | `seed` | int | random | For reproducibility |
+| `style_id` | string | "default" | Named prompt style that shapes how the prompt becomes the image (e.g. more cinematic or illustrative results). Optional — omit for the standard style. Only `default` is available by default; additional styles are account-specific. Format: lowercase letters, digits, `-`, `_`. |
 | `structured_prompt` | string | - | JSON from previous generation (for refinement). Use with `prompt` to refine, or alone with `seed` to recreate. |
 | `image_url` | string | - | Reference image (for inspire mode) |
 
@@ -53,7 +55,7 @@ Generate images from text prompts using FIBO's structured prompt system.
 - `structured_prompt` + `seed` — Recreate a previous image exactly
 - `structured_prompt` + `prompt` + `seed` — Refine a previous image with new instructions
 
-All combinations support `aspect_ratio`, `negative_prompt`, `num_results`, and `seed`.
+All combinations support `aspect_ratio`, `negative_prompt`, `num_results`, `seed`, and `style_id`.
 
 **Response:**
 ```json
