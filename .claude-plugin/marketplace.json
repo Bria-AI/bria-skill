@@ -6,11 +6,11 @@
     "url": "https://bria.ai"
   },
   "metadata": {
-    "description": "Official Bria AI skills — text-to-image generation, image editing, background removal and replacement, object removal, inpainting, outpainting, upscale, restyle, product photography and packshots, batch/bulk generation, VGL structured prompts, and image utilities. Commercially licensed, royalty-free, brand-safe AI image generation and editing API.",
-    "version": "1.3.5",
+    "description": "Official Bria AI skills — text-to-image generation, image editing, background removal and replacement, object removal, inpainting, outpainting, upscale, restyle, product photography and packshots, ad delayering back into editable layers, batch/bulk generation, VGL structured prompts, and image utilities. Commercially licensed, royalty-free, brand-safe AI image generation and editing API.",
+    "version": "1.3.7",
     "repository": "https://github.com/bria-ai/bria-skill",
     "license": "MIT",
-    "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "background-replacement", "image-editing", "vgl", "product-photography", "packshot", "lifestyle-shot", "visual-assets", "text-to-image", "photo-editing", "transparent-png", "upscale", "outpaint", "inpaint", "object-removal", "restyle", "e-commerce", "marketing", "marketing-visuals", "social-media", "thumbnail", "banner", "hero-image", "ad-creative", "photo-restoration", "style-transfer", "royalty-free", "commercial-license", "brand-safe", "batch-generation", "bulk-generation", "image-variations", "compositing", "image-api", "pipeline", "visual-content-creation", "generate-image", "create-image", "ai-art", "photo-retouching", "image-enhancement", "relight", "reseason", "sketch-to-photo", "colorize", "web-design", "content-creation", "cutout", "product-placement", "scene-generation"]
+    "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "background-replacement", "image-editing", "vgl", "product-photography", "packshot", "lifestyle-shot", "visual-assets", "text-to-image", "photo-editing", "transparent-png", "upscale", "outpaint", "inpaint", "object-removal", "restyle", "e-commerce", "marketing", "marketing-visuals", "social-media", "thumbnail", "banner", "hero-image", "ad-creative", "photo-restoration", "style-transfer", "royalty-free", "commercial-license", "brand-safe", "batch-generation", "bulk-generation", "image-variations", "compositing", "image-api", "pipeline", "visual-content-creation", "generate-image", "create-image", "ai-art", "photo-retouching", "image-enhancement", "relight", "reseason", "sketch-to-photo", "colorize", "web-design", "content-creation", "cutout", "product-placement", "scene-generation", "ad-delayer", "delayering", "de-layer", "image-to-layers", "layer-extraction", "psd-recovery", "editable-ad", "ad-resizing"]
   },
   "dependencies": [
     {
@@ -90,6 +90,25 @@
       "strict": false,
       "skills": [
         "./skills/video-remove-background"
+      ],
+      "dependencies": [
+        {
+          "type": "env",
+          "name": "BRIA_API_KEY",
+          "description": "Bria AI API key (get one at https://platform.bria.ai/console/account/api-keys)"
+        }
+      ],
+      "author": {
+        "name": "Bria AI"
+      }
+    },
+    {
+      "name": "ad-delayer",
+      "description": "Turn a finished, flat ad image back into editable layers — background, product shot, logo, headline, body copy, and CTA, each as its own asset with position, size, and typography. Dedicated ad delayering skill for recovering a lost PSD or design file, making a shipped creative editable again, resizing or localising an ad, and reading an ad's structure. Powered by Bria's Ad Delayer.",
+      "source": "./skills/ad-delayer",
+      "strict": false,
+      "skills": [
+        "./skills/ad-delayer"
       ],
       "dependencies": [
         {
