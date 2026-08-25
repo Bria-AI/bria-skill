@@ -193,7 +193,7 @@ RESULT=$(bria_call /v2/image/edit/replace_background "https://example.com/img.jp
 # Edit image (uses images array — pass --key images)
 RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instruction": "make it look warmer"')
 
-# Upscale (use `desired_increase`, range 2-4. Add `"preserve_alpha": true` for transparent inputs)
+# Upscale (`desired_increase` is 2 or 4 — no other value. Transparency is preserved by default)
 RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"desired_increase": 4')
 
 # Product cutout → transparent PNG (use --key file for a local image)
