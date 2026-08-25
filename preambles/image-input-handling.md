@@ -29,4 +29,9 @@ RESULT_URL=$(bria_call /v2/image/edit/replace_background "https://example.com/im
 
 # Edit image (uses images array)
 RESULT_URL=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instruction": "make it warmer"')
+
+# Edit with reference images — each --image adds the next one, in order ("image 1", "image 2", …)
+RESULT_URL=$(bria_call /v2/image/edit "https://example.com/man.jpg" --key images \
+  --image "https://example.com/santa.png" \
+  '"instruction": "dress the man in image 1 in the santa outfit from image 2"')
 ```

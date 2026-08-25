@@ -427,16 +427,37 @@ bria_blur_background() {
 }
 
 bria_edit_image() {
-  local image_url
-  image_url=$(bria_resolve_image "$1" "data_url")
-  local instruction="$2"
-  local mask_url="${3:-}"
+  # Usage: bria_edit_image <image> <instruction> [mask_url] [--image <reference>]...
+  # The images array is ordered: <image> is "image 1", each --image adds the next reference.
+  local references=() ref image_url="" instruction="" mask_url="" seen=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --image) references+=("$2"); shift 2 ;;
+      # Assigned by position rather than read out of an array: bash indexes arrays from 0 and
+      # zsh from 1, and this file gets sourced from both.
+      *)
+        case "$seen" in
+          0) image_url="$1" ;;
+          1) instruction="$1" ;;
+          2) mask_url="$1" ;;
+        esac
+        seen=$((seen + 1)); shift ;;
+    esac
+  done
+
+  image_url=$(bria_resolve_image "$image_url" "data_url")
 
   local data
   data=$(jq -n \
     --arg image "$image_url" \
     --arg inst "$instruction" \
     '{images: [$image], instruction: $inst}')
+
+  if [[ ${#references[@]} -gt 0 ]]; then
+    for ref in "${references[@]}"; do
+      data=$(echo "$data" | jq --arg ref "$(bria_resolve_image "$ref" "data_url")" '.images += [$ref]')
+    done
+  fi
 
   if [[ -n "$mask_url" ]]; then
     local resolved_mask
