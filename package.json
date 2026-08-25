@@ -68,7 +68,15 @@
     "web-design",
     "content-creation",
     "product-placement",
-    "scene-generation"
+    "scene-generation",
+    "ad-delayer",
+    "delayering",
+    "de-layer",
+    "image-to-layers",
+    "layer-extraction",
+    "psd-recovery",
+    "editable-ad",
+    "ad-resizing"
   ],
   "author": {
     "name": "Bria AI",
