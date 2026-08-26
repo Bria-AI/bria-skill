@@ -8,6 +8,12 @@
 #   RESULT=$(bria_call /v2/image/edit/remove_background "/path/to/image.png")
 #   RESULT=$(bria_call /v2/image/edit/replace_background "https://example.com/img.jpg" '"prompt":"sunset beach"')
 #   RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instruction":"make it red"')
+#   RESULT=$(bria_call /v2/image/edit "https://example.com/man.jpg" --key images \
+#     --image "https://example.com/santa.png" \
+#     '"instruction":"dress the man in image 1 in the santa outfit from image 2"')
+#
+# Each extra --image adds the next reference image, in order: the positional image is "image 1",
+# the first --image is "image 2", and so on. Only the images array (--key images) takes references.
 #
 # BRIA_API_KEY is auto-loaded from ~/.bria/credentials if not already set.
 
@@ -15,13 +21,15 @@ BRIA_API_BASE="${BRIA_API_BASE:-https://engine.prod.bria-api.com}"
 BRIA_USER_AGENT="BriaSkills/1.3.5"
 
 bria_call() {
-  local endpoint image key extra payload result http_code body url status_url poll i
+  local endpoint image key extra payload result http_code body url status_url poll i img
+  local references=()
   endpoint="$1"; image="$2"; shift 2
 
   key="image"; extra=""
   while [ $# -gt 0 ]; do
     case "$1" in
       --key) key="$2"; shift 2 ;;
+      --image) references+=("$2"); shift 2 ;;
       *) extra="${extra:+$extra, }$1"; shift ;;
     esac
   done
@@ -36,25 +44,32 @@ bria_call() {
 
   if [ -z "$image" ]; then
     printf '{' > "$payload"
+  elif [ "$key" = "images" ]; then
+    # Written one entry at a time, in argument order: the array position is how the instruction
+    # addresses each image ("image 1", "image 2"), so nothing here may reorder them.
+    printf '{"images": [' > "$payload"
+    i=0
+    # ${arr[@]+"${arr[@]}"} expands to nothing for an empty array instead of failing under `set -u`.
+    for img in "$image" ${references[@]+"${references[@]}"}; do
+      [ "$i" -gt 0 ] && printf ', ' >> "$payload"
+      if printf '%s' "$img" | grep -qE '^https?://'; then
+        printf '"%s"' "$img" >> "$payload"
+      else
+        [ ! -f "$img" ] && { echo "ERROR: File not found: $img" >&2; return 1; }
+        printf '"' >> "$payload"
+        base64 < "$img" | tr -d '\n' >> "$payload"
+        printf '"' >> "$payload"
+      fi
+      i=$((i + 1))
+    done
+    printf ']' >> "$payload"
   elif printf '%s' "$image" | grep -qE '^https?://'; then
-    if [ "$key" = "images" ]; then
-      printf '{"images": ["%s"]' "$image" > "$payload"
-    else
-      printf '{"%s": "%s"' "$key" "$image" > "$payload"
-    fi
+    printf '{"%s": "%s"' "$key" "$image" > "$payload"
   else
     [ ! -f "$image" ] && { echo "ERROR: File not found: $image" >&2; return 1; }
-    if [ "$key" = "images" ]; then
-      printf '{"images": ["' > "$payload"
-    else
-      printf '{"%s": "' "$key" > "$payload"
-    fi
+    printf '{"%s": "' "$key" > "$payload"
     base64 < "$image" | tr -d '\n' >> "$payload"
-    if [ "$key" = "images" ]; then
-      printf '"]' >> "$payload"
-    else
-      printf '"' >> "$payload"
-    fi
+    printf '"' >> "$payload"
   fi
 
   if [ -n "$extra" ]; then

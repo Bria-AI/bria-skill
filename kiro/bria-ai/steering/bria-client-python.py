@@ -25,7 +25,7 @@ import base64
 import time
 import mimetypes
 import requests
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List, Union
 
 
 class BriaClient:
@@ -513,7 +513,7 @@ class BriaClient:
 
     def edit_image(
         self,
-        image_url: str,
+        image_url: Union[str, List[str]],
         instruction: str,
         mask_url: Optional[str] = None,
         wait: bool = True,
@@ -522,16 +522,21 @@ class BriaClient:
         Edit an image using natural language instructions.
 
         Args:
-            image_url: Source image URL or base64 data URL
-            instruction: Edit instruction (e.g., "change the mug to red")
-            mask_url: Optional mask for localized editing (white=edit, black=keep)
+            image_url: Source image URL or base64 data URL, or a list of 2-4 of them to
+                combine. The list is ordered, and the instruction addresses each entry by
+                position: the first is "image 1", the second "image 2", and so on.
+            instruction: Edit instruction (e.g., "change the mug to red", or
+                "dress the man in image 1 in the santa outfit from image 2")
+            mask_url: Optional mask for localized editing (white=edit, black=keep).
+                Supported for single-image edits only.
             wait: Wait for completion
 
         Returns:
             Dict with edited image_url
         """
+        images = [image_url] if isinstance(image_url, str) else list(image_url)
         data = {
-            "images": [self._resolve_image(image_url, as_data_url=True)],
+            "images": [self._resolve_image(image, as_data_url=True) for image in images],
             "instruction": instruction,
         }
         if mask_url:
