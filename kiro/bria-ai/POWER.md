@@ -188,7 +188,7 @@ RESULT=$(bria_call /v2/image/edit/replace_background "https://example.com/img.jp
 RESULT=$(bria_call /v2/image/edit "/path/to/image.png" --key images '"instruction": "make it look warmer"')
 
 # Upscale
-RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"scale": 4')
+RESULT=$(bria_call /v2/image/edit/increase_resolution "https://example.com/img.jpg" '"desired_increase": 4')
 
 # Lifestyle shot
 RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"scene_description": "modern kitchen countertop"')
