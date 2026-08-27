@@ -328,7 +328,5 @@ Bria generates images, not text — **you, the agent, write the copy**. `build_c
 ## Related Skills
 
 - **vgl** — Write structured VGL JSON prompts for precise, deterministic control over FIBO image generation
-- **remove-background** — Dedicated background removal (RMBG 2.0). Prefer it over `remove_background` here when a transparent PNG or cutout is the whole task
-- **video-remove-background** — Background removal for video: transparent webm/mkv, alpha-channel clips, moving subjects
 - **ad-delayer** — Take a finished, flat ad apart into editable layers (background, logo, copy, CTA) when the design file is gone
 - **image-utils** — Classic image manipulation (resize, crop, composite, watermarks) for post-processing
