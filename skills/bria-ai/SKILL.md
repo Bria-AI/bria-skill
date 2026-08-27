@@ -154,6 +154,7 @@ Interpret the output:
 | Edit image region with mask | GenFill/Erase | Precise inpainting, add/replace specific regions |
 | Add/Replace/Remove objects | Text-based editing | Add vase, replace apple with pear, remove table |
 | Remove background (transparent PNG) | RMBG-2.0 | Extract subjects for overlays, logos, cutouts |
+| Turn a finished ad back into layers | Ad Delayer |  make a shipped creative editable, resize or localise an ad |
 | Replace/blur/erase background | Background ops | Change, blur, or remove backgrounds |
 | Expand/outpaint images | Outpainting | Extend boundaries, change aspect ratios |
 | Upscale image resolution | Super Resolution | Increase resolution 2x or 4x |
@@ -328,4 +329,5 @@ Bria generates images, not text — **you, the agent, write the copy**. `build_c
 ## Related Skills
 
 - **vgl** — Write structured VGL JSON prompts for precise, deterministic control over FIBO image generation
+- **ad-delayer** — Take a finished, flat ad apart into editable layers (background, hero image, logo, copy, CTA)
 - **image-utils** — Classic image manipulation (resize, crop, composite, watermarks) for post-processing

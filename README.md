@@ -15,7 +15,7 @@ Generate, edit, and precisely control images directly from your AI coding agent 
 /plugin install bria-ai@bria-skills
 ```
 
-The marketplace also bundles the `remove-background`, `vgl`, and `image-utils` plugins — install any of them the same way (e.g. `/plugin install remove-background@bria-skills`).
+The marketplace also bundles the `remove-background`, `ad-delayer`, `vgl`, and `image-utils` plugins — install any of them the same way (e.g. `/plugin install remove-background@bria-skills`).
 
 **Other agents** (Cursor, Cline, Codex, and [37+ more](https://skills.sh)):
 
@@ -46,6 +46,7 @@ Ask your agent to generate images, remove backgrounds, edit photos, and more. Th
 | **[bria-ai](./skills/bria-ai/SKILL.md)** | Controllable image generation & editing — 18+ capabilities including text-to-image, object-level editing, background removal, upscaling, restyling, relighting, and product photography |
 | **[remove-background](./skills/remove-background/SKILL.md)** | Dedicated background removal — transparent PNGs, cutouts, and foreground extraction powered by RMBG 2.0. Fastest path for background removal tasks |
 | **[vgl](./skills/vgl/SKILL.md)** | Maximum generation control — structured JSON (Visual Generation Language) that explicitly defines objects, lighting, camera, composition, and style for deterministic, reproducible results |
+| **[ad-delayer](./skills/ad-delayer/SKILL.md)** | Flat ads back into editable layers — background, product shot, logo, headline, copy, and CTA recovered as separate assets with position, size, and typography |
 | **[image-utils](./skills/image-utils/SKILL.md)** | Classic image manipulation — resize, crop, composite, watermarks, format conversion with Python Pillow |
 
 ## What You Can Control
