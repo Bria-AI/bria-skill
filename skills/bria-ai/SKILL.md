@@ -329,5 +329,5 @@ Bria generates images, not text — **you, the agent, write the copy**. `build_c
 ## Related Skills
 
 - **vgl** — Write structured VGL JSON prompts for precise, deterministic control over FIBO image generation
-- **ad-delayer** — Take a finished, flat ad apart into editable layers (background, logo, copy, CTA) when the design file is gone
+- **ad-delayer** — Take a finished, flat ad apart into editable layers (background, hero image, logo, copy, CTA)
 - **image-utils** — Classic image manipulation (resize, crop, composite, watermarks) for post-processing
