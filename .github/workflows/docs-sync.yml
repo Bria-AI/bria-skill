@@ -24,9 +24,9 @@ name: Docs Sync
 #   DOCS_SYNC_SLACK_CHANNEL - Slack channel ID to notify (e.g. C0XXXXXXXXX).
 #
 # Required repo (or org) secrets:
-#   RELEASE_TOKEN       - PAT with write access to the docs repo (push branch + open PR).
-#   ANTHROPIC_API_KEY   - Anthropic API key for the Claude Code action.
-#   BRIA_SLACKBOT_TOKEN - Slack bot token (xoxb-, needs chat:write; bot invited to the channel).
+#   RELEASE_TOKEN            - PAT with write access to the docs repo (push branch + open PR).
+#   ANTHROPIC_SKILLS_API_KEY - Anthropic API key for the Claude Code action.
+#   BRIA_SLACKBOT_TOKEN      - Slack bot token (xoxb-, needs chat:write; bot invited to the channel).
 
 on:
   pull_request:
@@ -62,5 +62,5 @@ jobs:
           there to match the source, following its existing style.
     secrets:
       docs_repo_token: ${{ secrets.RELEASE_TOKEN }}
-      anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+      anthropic_api_key: ${{ secrets.ANTHROPIC_SKILLS_API_KEY }}
       slack_bot_token: ${{ secrets.BRIA_SLACKBOT_TOKEN }}
