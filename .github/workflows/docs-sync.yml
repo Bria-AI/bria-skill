@@ -1,0 +1,46 @@
+name: Docs Sync
+
+# Keeps the Bria skills' customer docs (Bria-AI/BRIAPI_docs_new) in sync with this repo.
+#
+# On every commit landing on main, the shared docs-sync workflow checks whether anything
+# customer-facing in the skills changed and, if so, uses Claude Code to update the docs,
+# maintains a single rolling PR there, and posts the PR link + summary to Slack. The
+# behaviour lives in Bria-AI/github-workflows; this file only describes this repo.
+#
+# The skills' customer-facing surface:
+#   - the skill definitions under skills/ (each skill's SKILL.md, plus its references/)
+#   - the repo README shown to users
+#
+# Required repo (or org) secrets:
+#   DEVOPS_PAT_TOKEN    - PAT with write access to Bria-AI/BRIAPI_docs_new (push branch + open PR).
+#   ANTHROPIC_API_KEY   - Anthropic API key for the Claude Code action.
+#   BRIA_SLACKBOT_TOKEN - Slack bot token (xoxb-, needs chat:write; bot invited to the channel).
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  docs-sync:
+    uses: Bria-AI/github-workflows/.github/workflows/docs-sync.yml@main
+    with:
+      docs_repo: Bria-AI/BRIAPI_docs_new
+      user_facing_paths: |
+        skills/
+        README.md
+      slack_channel: C0BSNEFC2R5
+      rolling_branch: docs-sync/bria-skill
+      pr_title: "docs: Sync Bria skills docs"
+      source_description: |
+        - This repository is the Bria AI Skills collection for coding agents. Its user-facing
+          surface is the skills under skills/ — each skill directory has a SKILL.md (the name,
+          description, and instructions the agent and customer see) and optional references/
+          files (API references, schema references, code examples) — plus the repo README.md.
+        - The skills are documented in ./docs-repo primarily in integration-methods/bria-skill.md
+          ("Bria AI Skills"); update the skills list, capabilities, install steps, and links
+          there to match the source, following its existing style.
+    secrets:
+      docs_repo_token: ${{ secrets.DEVOPS_PAT_TOKEN }}
+      anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+      slack_bot_token: ${{ secrets.BRIA_SLACKBOT_TOKEN }}
