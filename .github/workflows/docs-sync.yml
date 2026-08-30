@@ -11,8 +11,17 @@ name: Docs Sync
 #   - the skill definitions under skills/ (each skill's SKILL.md, plus its references/)
 #   - the repo README shown to users
 #
+# This is a public repo, so internal identifiers are kept out of the file. The
+# secrets context cannot be used in a reusable workflow's `with:` block, so the
+# non-credential identifiers (docs repo name, Slack channel ID) are Actions
+# variables instead; the actual credentials are secrets.
+#
+# Required repo (or org) variables:
+#   DOCS_SYNC_REPO          - owner/name of the docs repo to update (e.g. Bria-AI/BRIAPI_docs_new).
+#   DOCS_SYNC_SLACK_CHANNEL - Slack channel ID to notify (e.g. C0XXXXXXXXX).
+#
 # Required repo (or org) secrets:
-#   DEVOPS_PAT_TOKEN    - PAT with write access to Bria-AI/BRIAPI_docs_new (push branch + open PR).
+#   DEVOPS_PAT_TOKEN    - PAT with write access to the docs repo (push branch + open PR).
 #   ANTHROPIC_API_KEY   - Anthropic API key for the Claude Code action.
 #   BRIA_SLACKBOT_TOKEN - Slack bot token (xoxb-, needs chat:write; bot invited to the channel).
 
@@ -25,11 +34,11 @@ jobs:
   docs-sync:
     uses: Bria-AI/github-workflows/.github/workflows/docs-sync.yml@main
     with:
-      docs_repo: Bria-AI/BRIAPI_docs_new
+      docs_repo: ${{ vars.DOCS_SYNC_REPO }}
       user_facing_paths: |
         skills/
         README.md
-      slack_channel: C0BSNEFC2R5
+      slack_channel: ${{ vars.DOCS_SYNC_SLACK_CHANNEL }}
       rolling_branch: docs-sync/bria-skill
       pr_title: "docs: Sync Bria skills docs"
       source_description: |
