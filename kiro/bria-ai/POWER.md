@@ -333,7 +333,7 @@ All requests need `api_token` header:
 api_token: YOUR_BRIA_API_KEY
 User-Agent: BriaSkills/<version>
 ```
-> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version, e.g. `BriaSkills/1.3.5`) in every API call, including status polling requests.
+> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version, e.g. `BriaSkills/1.3.6`) in every API call, including status polling requests.
 
 ---
 
@@ -356,6 +356,6 @@ User-Agent: BriaSkills/<version>
 
 **Original Work:** This power is converted from the [bria-skill](https://github.com/bria-ai/bria-skill) Claude Code skill by Bria AI.
 
-**Source Version:** Based on version 1.3.5.
+**Source Version:** Based on version 1.3.6.
 
 **Update Frequency:** This power will be updated periodically.

@@ -4,7 +4,7 @@ description: Image generation, photo editing, background removal — transparent
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.3.5"
+  version: "1.3.6"
 ---
 
 # Bria — AI Image Generation, Editing & Background Removal

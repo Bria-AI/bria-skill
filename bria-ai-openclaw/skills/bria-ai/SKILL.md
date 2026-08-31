@@ -12,7 +12,7 @@ license: MIT
 homepage: https://bria.ai
 metadata:
   author: Bria AI
-  version: "1.3.5"
+  version: "1.3.6"
   openclaw:
     requires:
       env:

@@ -25,7 +25,7 @@ BRIA_BASE_URL="${BRIA_BASE_URL:-https://engine.prod.bria-api.com}"
 BRIA_API_KEY="${BRIA_API_KEY:-}"
 BRIA_POLL_INTERVAL="${BRIA_POLL_INTERVAL:-2}"
 BRIA_TIMEOUT="${BRIA_TIMEOUT:-120}"
-BRIA_USER_AGENT="BriaSkills/1.3.5"
+BRIA_USER_AGENT="BriaSkills/1.3.6"
 
 # ==================== Helper Functions ====================
 
@@ -663,7 +663,7 @@ print_curl_examples() {
 curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "prompt": "Modern tech startup office, developers collaborating",
     "aspect_ratio": "16:9",
@@ -675,13 +675,13 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/generate" \
 # --- Poll Status (replace STATUS_URL) ---
 curl -X GET "STATUS_URL" \
   -H "api_token: $BRIA_API_KEY" \
-  -H "User-Agent: BriaSkills/1.3.5"
+  -H "User-Agent: BriaSkills/1.3.6"
 
 # --- Remove Background ---
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/remove_background" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg"
   }'
@@ -690,7 +690,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/remove_background" 
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/gen_fill" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg",
     "mask": "https://example.com/mask.png",
@@ -702,7 +702,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/gen_fill" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/erase" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg",
     "mask": "https://example.com/mask.png"
@@ -712,7 +712,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/erase" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/replace_background" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg",
     "prompt": "tropical beach at sunset"
@@ -722,7 +722,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/replace_background"
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/expand" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg",
     "aspect_ratio": "16:9",
@@ -733,7 +733,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/expand" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/enhance" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg"
   }'
@@ -742,7 +742,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/enhance" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg",
     "scale": 2
@@ -752,7 +752,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/increase_resolution
 curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "file": "BASE64_ENCODED_IMAGE",
     "prompt": "modern kitchen countertop, morning light",
@@ -763,7 +763,7 @@ curl -X POST "https://engine.prod.bria-api.com/v1/product/lifestyle_shot_by_text
 curl -X POST "https://engine.prod.bria-api.com/image/edit/product/integrate" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "scene": "https://example.com/scene.jpg",
     "products": [
@@ -778,7 +778,7 @@ curl -X POST "https://engine.prod.bria-api.com/image/edit/product/integrate" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "images": ["https://example.com/image.jpg"],
     "instruction": "change the mug to red"
@@ -788,7 +788,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/add_object_by_text" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg",
     "instruction": "Place a red vase on the table"
@@ -798,7 +798,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/add_object_by_text"
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/replace_object_by_text" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg",
     "instruction": "Replace the red apple with a green pear"
@@ -808,7 +808,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/replace_object_by_t
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/erase_by_text" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg",
     "object_name": "table"
@@ -818,7 +818,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/erase_by_text" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/blend" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/base.jpg",
     "overlay": "https://example.com/texture.png",
@@ -829,7 +829,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/blend" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/reseason" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg",
     "season": "winter"
@@ -839,7 +839,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/reseason" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/restyle" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg",
     "style": "oil_painting"
@@ -849,7 +849,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/restyle" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/relight" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg",
     "light_type": "sunrise light",
@@ -860,7 +860,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/relight" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/sketch_to_colored_image" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/sketch.png",
     "prompt": "modern sports car"
@@ -870,7 +870,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/sketch_to_colored_i
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/restore" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/old-photo.jpg"
   }'
@@ -879,7 +879,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/restore" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/colorize" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/bw-photo.jpg",
     "color": "contemporary color"
@@ -889,7 +889,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/colorize" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/crop_foreground" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg"
   }'
@@ -898,7 +898,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/crop_foreground" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/blur_background" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg"
   }'
@@ -907,7 +907,7 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/blur_background" \
 curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/erase_foreground" \
   -H "api_token: $BRIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "User-Agent: BriaSkills/1.3.5" \
+  -H "User-Agent: BriaSkills/1.3.6" \
   -d '{
     "image": "https://example.com/image.jpg"
   }'
