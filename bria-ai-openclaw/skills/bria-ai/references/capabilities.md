@@ -18,11 +18,12 @@
 |------|------------|----------|
 | Generate images from text | FIBO Generate | `/v2/image/generate` |
 | Edit images by text instruction | FIBO-Edit | `/v2/image/edit` |
-| Edit image region with mask | GenFill/Erase | `/v2/image/edit/genfill` |
+| Combine 2-4 images in one edit | FIBO-Edit multi-reference | `/v2/image/edit` (ordered `images` array) |
+| Edit image region with mask | GenFill/Erase | `/v2/image/edit/gen_fill` |
 | Add/Replace/Remove objects | Text-based editing | `/v2/image/edit` |
 | Remove background (transparent PNG) | RMBG-2.0 | `/v2/image/edit/remove_background` |
 | Replace/blur/erase background | Background ops | `/v2/image/edit/replace_background` |
-| Expand/outpaint images | Outpainting | `/v2/image/edit/increase_outpaint` |
+| Expand/outpaint images | Outpainting | `/v2/image/edit/expand` |
 | Upscale image resolution | Super Resolution | `/v2/image/edit/increase_resolution` |
 | Enhance image quality | Enhancement | `/v2/image/edit/enhance` |
 | Restyle images | Restyle | `/v2/image/edit/restyle` |
@@ -31,9 +32,9 @@
 | Composite/blend images | Image Blending | `/v2/image/edit/blend` |
 | Restore old photos | Restoration | `/v2/image/edit/restore` |
 | Colorize images | Colorization | `/v2/image/edit/colorize` |
-| Sketch to photo | Sketch2Image | `/v2/image/edit/sketch2image` |
+| Sketch to photo | Sketch2Image | `/v2/image/edit/sketch_to_colored_image` |
 | Create product lifestyle shots | Lifestyle Shot | `/v1/product/lifestyle_shot_by_text` |
-| Integrate products into scenes | Product Integrate | `/v1/product/product_integrate` |
+| Integrate products into scenes | Product Integrate | `/v2/image/edit/product/integrate` |
 
 ---
 
