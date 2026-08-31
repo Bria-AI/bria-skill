@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# Disable CodeRabbit automatic reviews for this repo. CodeRabbit will no longer
+# auto-review or summarize pull requests; it only acts if explicitly invoked with
+# an @coderabbitai mention. To turn it off completely (including mentions), remove
+# this repo from the CodeRabbit GitHub App installation in the org settings.
+reviews:
+  auto_review:
+    enabled: false

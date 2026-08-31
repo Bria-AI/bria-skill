@@ -28,7 +28,8 @@ Generate images from text prompts using FIBO's structured prompt system.
   "aspect_ratio": "1:1",
   "resolution": "1MP",
   "negative_prompt": "string",
-  "seed": null
+  "seed": null,
+  "style_id": "default"
 }
 ```
 
@@ -41,6 +42,7 @@ Generate images from text prompts using FIBO's structured prompt system.
 | `resolution` | string | "1MP" | Output image resolution. "1MP" or "4MP". "4MP" improves image details, especially for photorealism, but increases latency by ~30 seconds. |
 | `negative_prompt` | string | - | What to exclude |
 | `seed` | int | random | For reproducibility |
+| `style_id` | string | "default" | Named prompt style that shapes how the prompt becomes the image. `"default"` (standard) or `"photoreal"` (tuned for photorealistic results). Optional — omit for the standard style. |
 | `structured_prompt` | string | - | JSON from previous generation (for refinement). Use with `prompt` to refine, or alone with `seed` to recreate. |
 | `images` | array | - | Reference image for inspire mode: an array holding one image URL or base64 string |
 
@@ -51,7 +53,7 @@ Generate images from text prompts using FIBO's structured prompt system.
 - `structured_prompt` + `seed` — Recreate a previous image exactly
 - `structured_prompt` + `prompt` + `seed` — Refine a previous image with new instructions
 
-All combinations support `aspect_ratio`, `negative_prompt` and `seed`. Note that `"sync": true`
+All combinations support `aspect_ratio`, `negative_prompt`, `seed`, and `style_id`. Note that `"sync": true`
 cannot be combined with `"resolution": "4MP"` — that pairing is rejected.
 
 **Response:**

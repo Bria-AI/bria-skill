@@ -1,0 +1,66 @@
+name: Docs Sync
+
+# Keeps the Bria skills' customer docs (Bria-AI/BRIAPI_docs_new) in sync with this repo.
+#
+# On every pull request that changes the skills' customer-facing surface, the shared
+# docs-sync workflow uses Claude Code to update the docs and maintains a matching docs
+# PR (one per code PR) in the docs repo, posting the PR link + summary to Slack. The
+# behaviour lives in Bria-AI/github-workflows; this file only describes this repo.
+#
+# It runs only for PRs from branches in THIS repo — fork PRs are skipped, since they
+# cannot (and must not) access the secrets below. That also gates it to trusted authors.
+#
+# The skills' customer-facing surface:
+#   - the skill definitions under skills/ (each skill's SKILL.md, plus its references/)
+#   - the repo README shown to users
+#
+# This is a public repo, so internal identifiers are kept out of the file. The
+# secrets context cannot be used in a reusable workflow's `with:` block, so the
+# non-credential identifiers (docs repo name, Slack channel ID) are Actions
+# variables instead; the actual credentials are secrets.
+#
+# Required repo (or org) variables:
+#   DOCS_SYNC_REPO          - owner/name of the docs repo to update (e.g. Bria-AI/BRIAPI_docs_new).
+#   DOCS_SYNC_SLACK_CHANNEL - Slack channel ID to notify (e.g. C0XXXXXXXXX).
+#
+# Required repo (or org) secrets:
+#   RELEASE_TOKEN            - PAT with write access to the docs repo (push branch + open PR).
+#   ANTHROPIC_SKILLS_API_KEY - Anthropic API key for the Claude Code action.
+#   BRIA_SLACKBOT_TOKEN      - Slack bot token (xoxb-, needs chat:write; bot invited to the channel).
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'skills/**'
+      - 'README.md'
+
+jobs:
+  docs-sync:
+    # Skip fork PRs: they get no secrets, so the job would fail — and they must not
+    # be trusted with the docs-repo token. Same-repo PRs (trusted authors) run.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    uses: Bria-AI/github-workflows/.github/workflows/docs-sync.yml@main
+    with:
+      docs_repo: ${{ vars.DOCS_SYNC_REPO }}
+      user_facing_paths: |
+        skills/
+        README.md
+      slack_channel: ${{ vars.DOCS_SYNC_SLACK_CHANNEL }}
+      # One docs PR per code PR, so concurrent PRs don't clobber a shared branch.
+      rolling_branch: docs-sync/bria-skill-pr-${{ github.event.pull_request.number }}
+      pr_title: "docs: Sync Bria skills docs (PR #${{ github.event.pull_request.number }})"
+      source_description: |
+        - This repository is the Bria AI Skills collection for coding agents. Its user-facing
+          surface is the skills under skills/ — each skill directory has a SKILL.md (the name,
+          description, and instructions the agent and customer see) and optional references/
+          files (API references, schema references, code examples) — plus the repo README.md.
+        - The skills are documented in ./docs-repo primarily in integration-methods/bria-skill.md
+          ("Bria AI Skills"); update the skills list, capabilities, install steps, and links
+          there to match the source, following its existing style.
+    secrets:
+      docs_repo_token: ${{ secrets.RELEASE_TOKEN }}
+      anthropic_api_key: ${{ secrets.ANTHROPIC_SKILLS_API_KEY }}
+      slack_bot_token: ${{ secrets.BRIA_SLACKBOT_TOKEN }}

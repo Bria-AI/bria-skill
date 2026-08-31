@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'skills/**'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -26,7 +27,7 @@ jobs:
               skill_name=$(basename "$dir")
               echo "Zipping skill: $skill_name"
               cd skills
-              zip -r "../release-assets/${skill_name}.zip" "$skill_name" \
+              zip -r "../release-assets/${skill_name}.skill" "$skill_name" \
                 -x "*/.DS_Store" "*/__pycache__/*" "*.pyc" "*/.DS_Store"
               cd ..
               skills="${skills}${skill_name}, "
@@ -48,4 +49,4 @@ jobs:
           name: ${{ steps.version.outputs.tag }}
           generate_release_notes: true
           make_latest: true
-          files: release-assets/*.zip
+          files: release-assets/*.skill
