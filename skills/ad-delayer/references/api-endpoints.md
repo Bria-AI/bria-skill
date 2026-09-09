@@ -15,10 +15,10 @@
 ```
 api_token: YOUR_BRIA_API_KEY
 Content-Type: application/json
-User-Agent: BriaSkills/1.3.6
+User-Agent: BriaSkills/1.3.7
 ```
 
-> **Required:** always include the `User-Agent: BriaSkills/1.3.6` header on every call, including
+> **Required:** always include the `User-Agent: BriaSkills/1.3.7` header on every call, including
 > status polls. It is how delayering traffic from this skill is identified server-side.
 
 ---
