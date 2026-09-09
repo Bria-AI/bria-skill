@@ -188,9 +188,10 @@ One folder per input ad, named `<input-stem>-layers/`:
 ```
 summer-sale-layers/
 ├── result.json          # the layer manifest
-├── background_1.png     # one image file per image layer, named by its layer id
+├── background_1.png     # one file per image layer, named by its layer id
 ├── logo_1.png
-└── product_1.png
+├── product_1.png
+└── text_1_svg.svg       # each text layer's outlined-glyph twin (see below)
 ```
 
 `result.json` is the full description of the ad:
@@ -238,7 +239,7 @@ summer-sale-layers/
 
 Layer ids are role slots — `canvas_background`, `background_1`, `logo_1`, `image_1`, `product_1`, `primary_copy_1`, `secondary_copy_1`, `cta_1`, and so on, falling back to `{subtype}_{index}` when no slot was assigned. Filenames come straight from those ids; nothing is renamed or invented. Text layers carry their copy and typography in the manifest rather than as a flat image, which is what makes the headline editable. Only image layers have an `asset_path`, so a text-heavy ad yields fewer files than layers. `z_order` is paint order, back to front.
 
-**Copy comes back twice.** Each piece of text is a pair: `text_<n>_svg` is an image layer holding a pixel-accurate raster of the text as it was originally set, and `text_<n>_font` is a text layer holding the same words as editable copy plus its `text_style`. The `_font` twin is marked `"hidden": true`, because the raster is what reproduces the ad exactly. Rebuilding the ad unchanged means painting the `_svg` layers and skipping every `hidden` layer; changing a headline, a font, or the language means dropping that `_svg` layer and rendering its `_font` twin instead. Painting both draws the text on top of itself.
+**Copy comes back twice.** Each piece of text is a pair: `text_<n>_svg` is an image layer holding an `.svg` of the text with its glyphs outlined as paths — an exact reproduction, but no longer editable text, and `text_<n>_font` is a text layer holding the same words as editable copy plus its `text_style`. The `_font` twin is marked `"hidden": true`, because the outlined SVG is what reproduces the ad exactly. Rebuilding the ad unchanged means painting the `_svg` layers and skipping every `hidden` layer; changing a headline, a font, or the language means dropping that `_svg` layer and rendering its `_font` twin instead. Painting both draws the text on top of itself.
 
 ---
 

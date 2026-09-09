@@ -156,7 +156,7 @@ Null-valued keys are omitted entirely, so a layer only carries the fields that a
 | `bbox` | object | always | `{x, y, width, height}` in canvas pixels, 2 decimal places |
 | `z_order` | int | always | Paint order, back to front. `0` is the synthetic `canvas_background` base fill |
 | `text` | string | text layers, and labelled placeholders | The copy, newlines preserved |
-| `asset_path` | string | image layers only | Public URL of that layer's extracted image |
+| `asset_path` | string | image layers only | Public URL of that layer's extracted image — `.png` for real imagery, `.svg` for the outlined `text_*_svg` layers |
 | `hidden` | bool | layers not meant to be painted | `true` marks a layer that the ad's own render leaves out — every `text_*_font` layer carries it (see below). Painting a hidden layer double-draws it |
 | `style` | object | when it has any | Box paint: `background_color`, `background_gradient`, `border_*`, `border_radius_*`, `box_shadow`, `opacity`, `rotation_deg`, `skew_x_deg`, `blend_mode`, `vector_shape` |
 | `text_style` | object | text layers | `color`, `font_family`, `font_weight`, `font_size_px`, `letter_spacing_px`, `line_height`, `text_align`, `align_x`, `align_y`, `uppercase`, `underline`, `italic`, `no_wrap`, `direction`, `text_shadows`, `rotation_deg`, `translate_*_px` |
@@ -172,11 +172,11 @@ Every piece of copy is returned as a **pair** of layers over the same box:
 
 | Layer | Type | Carries | `hidden` |
 |-------|------|---------|----------|
-| `text_<n>_svg` | `image` | `asset_path` — a pixel-accurate raster of the text as it was set | absent (this is what the ad renders) |
+| `text_<n>_svg` | `image` | `asset_path` — an `.svg` of the text with its glyphs outlined as paths: exact, but no longer editable text | absent (this is what the ad renders) |
 | `text_<n>_font` | `text` | `text`, `text_style`, `text_runs` — the editable copy and typography | `true` |
 
-The raster is the faithful reproduction; the `_font` twin is the editable reconstruction, held back
-so a straight paint of every layer matches the original. Which one to use follows the job:
+The outlined SVG is the faithful reproduction; the `_font` twin is the editable reconstruction, held
+back so a straight paint of every layer matches the original. Which one to use follows the job:
 
 - **Reproducing the ad as-is** — paint the `_svg` layer, skip anything `hidden`.
 - **Changing the copy, the font, or the language** — drop the `_svg` layer and render the `_font`
