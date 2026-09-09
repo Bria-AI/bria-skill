@@ -4,7 +4,7 @@ description: Turn a finished, flat ad image back into editable layers — backgr
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.3.6"
+  version: "1.3.7"
 ---
 
 # Ad Delayer — Flat Ads Back Into Editable Layers
