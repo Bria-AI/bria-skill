@@ -15,10 +15,10 @@
 ```
 api_token: YOUR_BRIA_API_KEY
 Content-Type: application/json
-User-Agent: BriaSkills/1.3.5
+User-Agent: BriaSkills/1.3.6
 ```
 
-> **Required:** always include the `User-Agent: BriaSkills/1.3.5` header on every call, including
+> **Required:** always include the `User-Agent: BriaSkills/1.3.6` header on every call, including
 > status polls. It is how delayering traffic from this skill is identified server-side.
 
 ---
@@ -157,6 +157,7 @@ Null-valued keys are omitted entirely, so a layer only carries the fields that a
 | `z_order` | int | always | Paint order, back to front. `0` is the synthetic `canvas_background` base fill |
 | `text` | string | text layers, and labelled placeholders | The copy, newlines preserved |
 | `asset_path` | string | image layers only | Public URL of that layer's extracted image |
+| `hidden` | bool | layers not meant to be painted | `true` marks a layer that the ad's own render leaves out — every `text_*_font` layer carries it (see below). Painting a hidden layer double-draws it |
 | `style` | object | when it has any | Box paint: `background_color`, `background_gradient`, `border_*`, `border_radius_*`, `box_shadow`, `opacity`, `rotation_deg`, `skew_x_deg`, `blend_mode`, `vector_shape` |
 | `text_style` | object | text layers | `color`, `font_family`, `font_weight`, `font_size_px`, `letter_spacing_px`, `line_height`, `text_align`, `align_x`, `align_y`, `uppercase`, `underline`, `italic`, `no_wrap`, `direction`, `text_shadows`, `rotation_deg`, `translate_*_px` |
 | `text_runs` | array | text with mixed styling | Per-run `{text, style}`, where `style` holds only what differs from `text_style` |
@@ -164,6 +165,25 @@ Null-valued keys are omitted entirely, so a layer only carries the fields that a
 
 Only image layers have an `asset_path`, so a text-heavy ad produces fewer files than layers —
 its copy lives in the manifest as editable text, which is the point of delayering.
+
+### Text arrives twice: a raster twin and an editable twin
+
+Every piece of copy is returned as a **pair** of layers over the same box:
+
+| Layer | Type | Carries | `hidden` |
+|-------|------|---------|----------|
+| `text_<n>_svg` | `image` | `asset_path` — a pixel-accurate raster of the text as it was set | absent (this is what the ad renders) |
+| `text_<n>_font` | `text` | `text`, `text_style`, `text_runs` — the editable copy and typography | `true` |
+
+The raster is the faithful reproduction; the `_font` twin is the editable reconstruction, held back
+so a straight paint of every layer matches the original. Which one to use follows the job:
+
+- **Reproducing the ad as-is** — paint the `_svg` layer, skip anything `hidden`.
+- **Changing the copy, the font, or the language** — drop the `_svg` layer and render the `_font`
+  twin instead, using its `text_style` (and `font_stylesheets` for the webfont).
+
+Both twins share the layer's `subtype`, so the semantic role (`primary_copy`, `cta`, …) is readable
+from either one.
 
 ---
 
