@@ -45,7 +45,7 @@ def api_key():
 KEY = None
 def H():
     return {"api_token": KEY, "Content-Type": "application/json",
-            "User-Agent": "BriaSkills/1.3.6"}
+            "User-Agent": "BriaSkills/1.3.7"}
 
 
 def post(path, payload, tries=3):

@@ -11,7 +11,7 @@ Content-Type: application/json
 User-Agent: BriaSkills/<version>
 ```
 
-> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.3.6`) in every API call, including status polling requests.
+> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.3.7`) in every API call, including status polling requests.
 
 ---
 
@@ -687,6 +687,50 @@ Generate a structured JSON instruction from natural language (no image generated
 
 ---
 
+## Ad Delayer - Flat Ad to Editable Layers
+
+### POST /v2/ads/image_to_layers
+
+Take a finished, flat ad apart into layers. Asynchronous, and a typical ad takes **2-3 minutes**.
+
+**Request:**
+```json
+{
+  "attachments": ["https://publicly-accessible-image-url"],
+  "prompt": "optional guidance for the extraction",
+  "thinking_effort": "medium",
+  "output_format": "json",
+  "sync": false
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `attachments` | array | The source ad. **Exactly one** entry: a public direct image URL, raw base64, or a `data:` URI |
+| `prompt` | string | Optional natural-language guidance for the extraction |
+| `thinking_effort` | string | `minimal`, `low`, `medium` (default), `high` |
+| `output_format` | string | `json` for the layer manifest (default), `html` for the reconstructed render |
+| `sync` | boolean | Send `false` — the run is far longer than an HTTP response can wait |
+
+Unknown fields are rejected. Dimensions are capped at 800 px per side unless the organisation has
+enterprise-tier entitlement.
+
+**The result is a pointer, not the layers.** On completion the status response carries
+`result.url`, which is a link to `creation.json` — a manifest of every layer with its box, paint
+order, text and typography. Only image layers carry an `asset_path`, which is a public URL to
+download separately; text layers keep their copy in the manifest, which is what makes them
+editable.
+
+> **`bria_call` does not complete this flow.** It looks for `result_url` / `image_url` in the
+> status response and gives up after 90 seconds, whereas this endpoint returns `result.url` after
+> 2-3 minutes, and the layers then need a second and third fetch. Use the **ad-delayer** skill,
+> which polls for up to 6 minutes, follows the pointer, and downloads every layer into a folder
+> named after the input.
+
+---
+
 ## Status Polling
 
 ### GET /v2/status/{request_id}
@@ -715,7 +759,7 @@ Check async request status.
 import requests, time
 
 def poll(status_url, api_key, timeout=120):
-    headers = {"api_token": api_key, "User-Agent": "BriaSkills/1.3.6"}
+    headers = {"api_token": api_key, "User-Agent": "BriaSkills/1.3.7"}
     for _ in range(timeout // 2):
         r = requests.get(status_url, headers=headers)
         data = r.json()

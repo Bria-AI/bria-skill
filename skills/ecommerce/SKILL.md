@@ -4,7 +4,7 @@ description: End-to-end e-commerce product catalog generation — turn a folder 
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.3.6"
+  version: "1.3.7"
 ---
 
 # Bria E-commerce — Product Catalog Builder

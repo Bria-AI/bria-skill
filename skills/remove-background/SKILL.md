@@ -4,7 +4,7 @@ description: Remove backgrounds from images — background removal API for trans
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.3.6"
+  version: "1.3.7"
 ---
 
 # Remove Background — Transparent PNGs & Cutouts with RMBG 2.0
@@ -258,5 +258,6 @@ RMBG 2.0 handles complex edges with production-grade accuracy:
 
 ## Related Skills
 
+- **ad-delayer** — Take a whole flat ad apart into editable layers, keeping text as text. Use it instead of this skill when the ask is "turn this ad into layers", not "cut out the subject"
 - **bria-ai** — Full Bria API access: generate images, edit photos, replace/blur backgrounds, upscale, restyle, product photography, and 20+ more endpoints
 - **image-utils** — Post-processing with Python Pillow: resize, crop, composite, watermarks, format conversion
