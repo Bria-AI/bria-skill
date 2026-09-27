@@ -176,7 +176,7 @@ Supported formats: **PNG, JPEG, WEBP, AVIF, GIF, TIFF, BMP, SVG, PDF**. There is
 | Option | Values | Default | Notes |
 |--------|--------|---------|-------|
 | `--prompt` | free text | none | Guidance for the extraction. Use it to state something the pixels alone do not settle — "the headline and the sub-headline are separate lines", "the roundel top-right is the brand logo, not part of the product", "keep the price and the currency symbol as one text layer". Not needed for a normal run. |
-| `--effort` | `minimal`, `low`, `medium`, `high` | `medium` | How much reasoning Bria spends reading the ad. Raise it for a dense or unusual creative; lower it for a simple one. |
+| `--effort` | `low`, `medium`, `high` | `medium` | How much reasoning Bria spends reading the ad. Raise it for a dense or unusual creative; lower it for a simple one. |
 | `--out-dir` | path | `<input-stem>-layers` | Where the layers land. |
 
 Two environment variables control the wait: `BRIA_POLL_INTERVAL` (default `10` seconds) and `BRIA_POLL_ATTEMPTS` (default `36`, giving a 6-minute ceiling).
@@ -295,7 +295,7 @@ Runs are sequential on purpose: the default limit is 9 delayering submits a minu
 
 ## How It Works
 
-1. The ad is sent to Bria's delayering endpoint (`POST /v2/ads/image_to_layers`) — a local file is encoded into the request, a URL is passed through
+1. The ad is sent to Bria's delayering endpoint (`POST /v2/ads/delayer`) — a local file is encoded into the request, a URL is passed through
 2. The API accepts the job with HTTP 202 and a `status_url`; the work runs asynchronously
 3. The helper polls that status URL every 10 seconds until the run reaches a terminal state
 4. On completion the response carries a pointer to the layer manifest; the helper fetches it as `result.json`
