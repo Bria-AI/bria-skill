@@ -42,7 +42,23 @@ jobs:
           echo "tag=v${next}" >> "$GITHUB_OUTPUT"
           echo "Version: v${next}"
 
+      # action-gh-release overwrites an existing tag's assets in place, so without this a
+      # skills change that forgot the version bump silently rewrites the last published release.
+      - name: Check whether this version is already released
+        id: released
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ steps.version.outputs.tag }}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::warning::$tag is already published and was left untouched. Bump the version in package.json to release these changes."
+            echo "new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create release
+        if: steps.released.outputs.new == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
