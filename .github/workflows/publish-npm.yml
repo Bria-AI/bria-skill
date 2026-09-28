@@ -1,0 +1,52 @@
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+
+# release-please cuts bare vX.Y.Z tags for this package.
+jobs:
+  npm:
+    name: Publish to npm
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # npm trusted publishing (OIDC)
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+      # OIDC trusted publishing requires npm >= 11.5.1.
+      - run: npm install -g npm@latest
+      - run: npm install --ignore-scripts
+      - run: npm run build --if-present
+      # Tokenless OIDC trusted publishing (no NODE_AUTH_TOKEN); npm mints a
+      # short-lived credential and attaches provenance automatically.
+      - run: npm publish
+
+  skills:
+    name: Attach skill assets
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # upload .skill assets to the release
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package skills
+        run: |
+          mkdir -p release-assets
+          for dir in skills/*/; do
+            if [ -f "${dir}SKILL.md" ]; then
+              skill_name=$(basename "$dir")
+              echo "Zipping skill: $skill_name"
+              (cd skills && zip -r "../release-assets/${skill_name}.skill" "$skill_name" \
+                -x "*/.DS_Store" "*/__pycache__/*" "*.pyc")
+            fi
+          done
+      - name: Upload skill assets to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.event.release.tag_name }}" release-assets/*.skill --clobber
