@@ -689,7 +689,7 @@ Generate a structured JSON instruction from natural language (no image generated
 
 ## Ad Delayer - Flat Ad to Editable Layers
 
-### POST /v2/ads/image_to_layers
+### POST /v2/ads/delayer
 
 Take a finished, flat ad apart into layers. Asynchronous, and a typical ad takes **2-3 minutes**.
 
@@ -710,7 +710,7 @@ Take a finished, flat ad apart into layers. Asynchronous, and a typical ad takes
 |-----------|------|-------------|
 | `attachments` | array | The source ad. **Exactly one** entry: a public direct image URL, raw base64, or a `data:` URI |
 | `prompt` | string | Optional natural-language guidance for the extraction |
-| `thinking_effort` | string | `minimal`, `low`, `medium` (default), `high` |
+| `thinking_effort` | string | `low`, `medium` (default), `high` |
 | `output_format` | string | `json` for the layer manifest (default), `html` for the reconstructed render |
 | `sync` | boolean | Send `false` — the run is far longer than an HTTP response can wait |
 

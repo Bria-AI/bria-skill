@@ -1,6 +1,6 @@
 # Ad Delayer API Reference
 
-> This file documents the delayering API **as implemented**, verified 2026-08-24 against the
+> This file documents the delayering API **as implemented**, verified 2026-09-27 against the
 > service source. When it drifts, the source of truth is the ads service's own request model
 > (`services/ads/app/parse_api_input.py`), its error mapping (`services/ads/app/errors.py`), and
 > the layer-manifest exporter in Bria's deflatter library — not the product spec. Fields the
@@ -25,13 +25,13 @@ User-Agent: BriaSkills/1.3.7
 
 ## Delayering
 
-### POST /v2/ads/image_to_layers
+### POST /v2/ads/delayer
 
 Takes one flat ad image apart into layers. Asynchronous: returns HTTP 202 with a `request_id` and
 a `status_url` to poll. A typical ad takes **2–3 minutes**.
 
-Use this path, not `/v2/ads/delayer`. The alias exists in the service code but is not routed by
-the load balancer in either environment, so it is unreachable from the public API.
+`/v2/ads/image_to_layers` is the other engine: it writes HTML only, and answers
+`output_format: "json"` with a 422 before any work starts.
 
 **Request:**
 ```json
@@ -50,7 +50,7 @@ the load balancer in either environment, so it is unreachable from the public AP
 |-----------|------|----------|---------|-------------|
 | `attachments` | array of string | Yes | — | The source ad. **Exactly one** entry: a public direct image URL, raw base64, or a `data:` URI. Two or more entries is a 422 |
 | `prompt` | string | No | — | Natural-language guidance for the extraction |
-| `thinking_effort` | string | No | `medium` | `minimal`, `low`, `medium`, or `high` |
+| `thinking_effort` | string | No | `medium` | `low`, `medium`, or `high` |
 | `output_format` | string | No | `json` | `json` for the layer manifest, `html` for the reconstructed HTML render of the same run |
 | `sync` | boolean | No | `false` | Send `false` explicitly. `true` holds the connection open for the entire 2–3 minute run — far longer than an HTTP response can wait |
 | `webhook_url` | string | No | — | Delivers the result instead of requiring polling. Ignored when `sync` is `true` |
@@ -129,7 +129,7 @@ and `BRIA_POLL_ATTEMPTS`.
 `result.url` is a **link to the layer manifest**, not the manifest itself — delayering is a
 three-hop flow:
 
-1. `POST /v2/ads/image_to_layers` → 202 + `status_url`
+1. `POST /v2/ads/delayer` → 202 + `status_url`
 2. `GET {status_url}` until `COMPLETED` → `result.url`
 3. `GET {result.url}` → `creation.json`, the manifest below; then GET each layer's `asset_path`
 

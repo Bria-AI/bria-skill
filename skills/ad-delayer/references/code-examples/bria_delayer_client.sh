@@ -68,7 +68,7 @@ _bria_report_error() {
 }
 
 # Submit one ad for delayering. Echoes the status_url to poll.
-#   bria_delayer_submit <image-path-or-url> [--prompt "..."] [--effort minimal|low|medium|high]
+#   bria_delayer_submit <image-path-or-url> [--prompt "..."] [--effort low|medium|high]
 bria_delayer_submit() {
   local image prompt effort payload_file body http_code status_url result_url backoff
   image="$1"; shift
@@ -107,7 +107,7 @@ bria_delayer_submit() {
   local remaining="$BRIA_RETRY_BACKOFF"
   while : ; do
     http_code=$(curl -s -o "$response_file" -w '%{http_code}' -X POST \
-      "${BRIA_API_BASE}/v2/ads/image_to_layers" \
+      "${BRIA_API_BASE}/v2/ads/delayer" \
       -H "api_token: $BRIA_API_KEY" \
       -H "Content-Type: application/json" \
       -H "User-Agent: $BRIA_USER_AGENT" \
