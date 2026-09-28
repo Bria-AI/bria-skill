@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.9](https://github.com/Bria-AI/bria-skill/compare/v1.3.8...v1.3.9) (2026-09-28)
+
+
+### Bug Fixes
+
+* correct repository org case for provenance ([#76](https://github.com/Bria-AI/bria-skill/issues/76)) ([7be4ca0](https://github.com/Bria-AI/bria-skill/commit/7be4ca0919f16ab59e238514e5dac38edf208f52))
+
 ## [1.3.8](https://github.com/Bria-AI/bria-skill/compare/v1.3.7...v1.3.8) (2026-09-28)
 
 
