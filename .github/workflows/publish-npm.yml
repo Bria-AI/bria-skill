@@ -1,41 +1,53 @@
 name: Publish to npm
 
 on:
-  workflow_run:
-    workflows: ["Release Skills"]
-    types: [completed]
+  release:
+    types: [published]
 
-permissions:
-  id-token: write  # Required for OIDC
-  contents: read
-
+# release-please cuts bare vX.Y.Z tags for this package.
 jobs:
-  publish:
-    # Release Skills can fail and still fire workflow_run, which would publish an unreleased tree.
-    if: github.event.workflow_run.conclusion == 'success'
+  npm:
+    name: Publish to npm
+    if: startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # npm trusted publishing (OIDC)
+      contents: read
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
+      # OIDC trusted publishing needs npm >= 11.5.1. Pin to 11.x: `npm@latest`
+      # (12.x) requires a newer Node and can EBADENGINE on the runner.
+      - run: npm install -g npm@^11.5.1
       - run: npm install --ignore-scripts
       - run: npm run build --if-present
-      # Most runs carry a version npm already has; skipping keeps red meaning auth or network.
-      - id: target
-        run: |
-          name=$(node -p "require('./package.json').name")
-          version=$(node -p "require('./package.json').version")
-          if [ -n "$(npm view "$name@$version" version 2>/dev/null)" ]; then
-            echo "$name@$version is already on npm - nothing to publish."
-            echo "publish=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "publish=true" >> "$GITHUB_OUTPUT"
-          fi
+      # Tokenless OIDC trusted publishing (no NODE_AUTH_TOKEN); npm mints a
+      # short-lived credential and attaches provenance automatically.
+      - run: npm publish
 
-      - if: steps.target.outputs.publish == 'true'
-        run: npm publish
+  skills:
+    name: Attach skill assets
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # upload .skill assets to the release
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package skills
+        run: |
+          mkdir -p release-assets
+          for dir in skills/*/; do
+            if [ -f "${dir}SKILL.md" ]; then
+              skill_name=$(basename "$dir")
+              echo "Zipping skill: $skill_name"
+              (cd skills && zip -r "../release-assets/${skill_name}.skill" "$skill_name" \
+                -x "*/.DS_Store" "*/__pycache__/*" "*.pyc")
+            fi
+          done
+      - name: Upload skill assets to release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.event.release.tag_name }}" release-assets/*.skill --clobber

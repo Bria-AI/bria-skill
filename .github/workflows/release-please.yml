@@ -1,0 +1,25 @@
+name: release-please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  # Maintains a release PR from Conventional Commits. Merging it bumps the
+  # version in package.json + package-lock.json, updates CHANGELOG.md, and
+  # cuts the vX.Y.Z tag and GitHub release. Runs with a PAT (RELEASE_TOKEN) so
+  # the release it creates triggers the separate Publish to npm workflow — a
+  # release created by GITHUB_TOKEN would not.
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
