@@ -19,8 +19,9 @@ jobs:
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
-      # OIDC trusted publishing requires npm >= 11.5.1.
-      - run: npm install -g npm@latest
+      # OIDC trusted publishing needs npm >= 11.5.1. Pin to 11.x: `npm@latest`
+      # (12.x) requires a newer Node and can EBADENGINE on the runner.
+      - run: npm install -g npm@^11.5.1
       - run: npm install --ignore-scripts
       - run: npm run build --if-present
       # Tokenless OIDC trusted publishing (no NODE_AUTH_TOKEN); npm mints a
