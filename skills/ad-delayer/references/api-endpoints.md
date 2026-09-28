@@ -30,9 +30,8 @@ User-Agent: BriaSkills/1.3.7
 Takes one flat ad image apart into layers. Asynchronous: returns HTTP 202 with a `request_id` and
 a `status_url` to poll. A typical ad takes **2–3 minutes**.
 
-Use this path, not `/v2/ads/image_to_layers`. The two were aliases of one handler until the
-paths were split: `/v2/ads/image_to_layers` now runs the agentic engine, which writes HTML only
-and answers `output_format: "json"` with a 422 before any work starts.
+`/v2/ads/image_to_layers` is the other engine: it writes HTML only, and answers
+`output_format: "json"` with a 422 before any work starts.
 
 **Request:**
 ```json
