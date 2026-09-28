@@ -85,9 +85,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bria-ai/bria-skill.git"
+    "url": "git+https://github.com/Bria-AI/bria-skill.git"
   },
-  "homepage": "https://github.com/bria-ai/bria-skill#readme",
+  "homepage": "https://github.com/Bria-AI/bria-skill#readme",
   "scripts": {
     "prepare": "husky"
   },
