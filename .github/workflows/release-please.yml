@@ -1,0 +1,71 @@
+name: release-please
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  # Maintains a release PR from Conventional Commits. Merging it bumps the
+  # version in package.json + package-lock.json, updates CHANGELOG.md, and
+  # cuts the vX.Y.Z tag and GitHub release.
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Runs only on the push that merges the release PR (i.e. once a release is
+  # cut). Publishing lives in the same workflow because a release created by
+  # GITHUB_TOKEN cannot trigger a separate `on: release` workflow.
+  publish:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # upload .skill assets to the release
+      id-token: write   # npm trusted publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+
+      # Trusted publishing requires npm >= 11.5.1.
+      - run: npm install -g npm@latest
+
+      - run: npm install --ignore-scripts
+      - run: npm run build --if-present
+
+      # No NODE_AUTH_TOKEN: authentication is via OIDC trusted publishing,
+      # which also attaches provenance automatically.
+      - run: npm publish
+
+      # Zip each skill and attach it to the release release-please just cut.
+      - name: Package skills
+        run: |
+          mkdir -p release-assets
+          for dir in skills/*/; do
+            if [ -f "${dir}SKILL.md" ]; then
+              skill_name=$(basename "$dir")
+              echo "Zipping skill: $skill_name"
+              (cd skills && zip -r "../release-assets/${skill_name}.skill" "$skill_name" \
+                -x "*/.DS_Store" "*/__pycache__/*" "*.pyc")
+            fi
+          done
+
+      - name: Upload skill assets to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ needs.release-please.outputs.tag_name }}" release-assets/*.skill --clobber
