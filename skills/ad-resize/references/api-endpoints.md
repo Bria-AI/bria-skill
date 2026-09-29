@@ -5,6 +5,13 @@
 > request model (`services/ads/app/parse_api_input.py`, `AdsResizeRequest`) and its response model
 > (`services/ads/app/parse_api_outputs.py`, `AdsResizeResponse`) in Bria-AI/spring.
 
+## Contents
+
+- Base URL & Authentication
+- Resizing: `POST /v2/ads/resize` (request, parameters, 202 response)
+- Status: `GET /v2/status/{request_id}` (completed body, per-size fields, failed job)
+- Errors
+
 ## Base URL & Authentication
 
 **Base URL:** `https://engine.prod.bria-api.com`
