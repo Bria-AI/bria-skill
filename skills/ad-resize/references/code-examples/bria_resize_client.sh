@@ -196,7 +196,8 @@ bria_resize_wait() {
 # Save every finished size into <input-stem>-sizes/ as <name>-<width>x<height>.png, plus result.json.
 #   bria_resize_download <completed-status-json> <original-input> [output-dir]
 bria_resize_download() {
-  local result input out_dir stem fields name width height status url saved failed note line value
+  # `status` is read-only in zsh, and this file is sourced into whichever shell the agent runs.
+  local result input out_dir stem fields name width height target_status url saved failed note line value
   result="$1"; input="$2"; out_dir="$3"
 
   stem="${input##*/}"; stem="${stem%%\?*}"; stem="${stem%.*}"
@@ -211,17 +212,17 @@ bria_resize_download() {
   # Each target is emitted as name, width, height, status, strategy, url, error in that order,
   # so walking the keys in document order rebuilds one target at a time.
   fields=$(printf '%s' "$result" | grep -oE '"(name|width|height|status|url|error)" *: *("[^"]*"|[0-9]+|null)')
-  name=""; width=""; height=""; status=""; saved=0; failed=0
+  name=""; width=""; height=""; target_status=""; saved=0; failed=0
   while IFS= read -r line; do
     value=$(printf '%s' "$line" | sed 's/^[^:]*: *//; s/^"//; s/"$//')
     case "$line" in
       '"name"'*) name="$value" ;;
       '"width"'*) width="$value" ;;
       '"height"'*) height="$value" ;;
-      '"status"'*) status="$value" ;;
+      '"status"'*) target_status="$value" ;;
       '"url"'*)
         [ -z "$name" ] && continue
-        if [ "$status" = "ok" ] && [ "$value" != "null" ]; then
+        if [ "$target_status" = "ok" ] && [ "$value" != "null" ]; then
           if curl -sfL "$value" -H "User-Agent: $BRIA_USER_AGENT" -o "$out_dir/${name}-${width}x${height}.png"; then
             echo "saved $out_dir/${name}-${width}x${height}.png"; saved=$((saved + 1))
           else
@@ -229,10 +230,10 @@ bria_resize_download() {
           fi
         fi ;;
       '"error"'*)
-        if [ "$status" = "failed" ]; then
+        if [ "$target_status" = "failed" ]; then
           echo "Size '$name' (${width}x${height}) failed: $value" >&2; failed=$((failed + 1))
         fi
-        name=""; width=""; height=""; status="" ;;
+        name=""; width=""; height=""; target_status="" ;;
     esac
   done <<< "$fields"
 
