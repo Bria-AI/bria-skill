@@ -76,7 +76,10 @@
     "layer-extraction",
     "psd-recovery",
     "editable-ad",
-    "ad-resizing"
+    "ad-resizing",
+    "ad-resize",
+    "resize-ad",
+    "ad-sizes"
   ],
   "author": {
     "name": "Bria AI",
