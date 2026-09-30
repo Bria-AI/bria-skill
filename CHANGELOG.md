@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.0](https://github.com/Bria-AI/bria-skill/compare/v1.3.9...v1.4.0) (2026-09-30)
+
+
+### Features
+
+* ad-resize skill ([#80](https://github.com/Bria-AI/bria-skill/issues/80)) ([c7863ac](https://github.com/Bria-AI/bria-skill/commit/c7863acc7b69ec3d1021db60b1e4bcf7f056b6f1))
+* product-holding-and-virtual-tryon-skills ([#70](https://github.com/Bria-AI/bria-skill/issues/70)) ([71ee22b](https://github.com/Bria-AI/bria-skill/commit/71ee22bf492df8e67f6e602b2a783667a75138d9))
+
 ## [1.3.9](https://github.com/Bria-AI/bria-skill/compare/v1.3.8...v1.3.9) (2026-09-28)
 
 
