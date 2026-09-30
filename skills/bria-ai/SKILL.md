@@ -171,6 +171,8 @@ Interpret the output:
 | Product shadow | Product Shadow | Add a realistic drop or float shadow to a cutout |
 | Create product lifestyle shots | Lifestyle Shot | Place products in scenes for e-commerce |
 | Integrate products into scenes | Product Integrate | Embed products at exact coordinates |
+| Put a product in someone's hands | Product Holding | Person + product photo → person naturally holding/carrying it |
+| Put garments on a model | Virtual Try-On | Person + garment photo(s) → person wearing them |
 | Add dimension callouts to products | Product Dimensions | Marketplace-style measurement images with size/weight/capacity labels |
 | Build a full product catalog | Catalog Pipeline | Batch a folder of photos → packshots, dimensions, lifestyle, marketplace variants |
 
@@ -212,6 +214,18 @@ RESULT=$(bria_call /v1/product/packshot "$CUTOUT" --key image_url '"background_c
 # Lifestyle shot
 RESULT=$(bria_call /v1/product/lifestyle_shot_by_text "/path/to/product.png" '"scene_description": "modern kitchen countertop"')
 
+# Product holding — person + product photo, no prompt needed
+RESULT=$(bria_call /v2/image/edit/product/holding "/path/to/person.jpg" --key person_image \
+  --array-key product_images --image "https://example.com/product.png" \
+  '"instruction": "Replace the paper coffee cup in her right hand with the can, logo facing the camera."')
+
+# Virtual try-on — person + garment photo(s), no prompt needed. Send a full outfit together
+# to change several items in one call.
+RESULT=$(bria_call /v2/image/edit/product/virtual-tryon "/path/to/person.jpg" --key person_image \
+  --array-key garment_images --image "https://example.com/blazer.png" \
+  --image "https://example.com/trousers.png" \
+  '"instruction": "He wears the navy blazer over the white t-shirt he already has, and the grey tailored trousers instead of his jeans."')
+
 # Product dimensions — auto-removes background, draws measurement callouts.
 # Dual cm / in labels: repeat each dimension with the same name+position in both
 # units and set "units_display": "dual_slash" so they merge into one "12 cm / 4.7 in" label.
@@ -226,6 +240,9 @@ echo "$RESULT"
 - Use `--key images` when the endpoint expects an `images` array instead of `image`
 - Add `--image <url_or_path>` once per extra reference image (`--key images`, up to 4 in total).
   Order is preserved: the positional image is "image 1", the first `--image` is "image 2", …
+- Use `--array-key <name>` when an endpoint keys the main image and its references separately
+  (e.g. `person_image` + `product_images`/`garment_images`): the positional image goes under
+  `--key`, and every `--image` goes into the `--array-key` array instead
 - Extra JSON fields are appended as key-value pairs: `'"key": "value"'`
 - Returns the result image URL on success, or prints an error to stderr
 
@@ -236,9 +253,8 @@ position in the instruction: *"dress the man in image 1 in the santa outfit from
 each reference contributes ("the background of image 3"), in plain prose. A single-image edit needs
 no positional wording: *"change the mug color to red"*.
 
-**Generation options:** Aspect ratios `1:1`, `16:9`, `4:3`, `9:16`, `3:4`. Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for a single generated image. Editing endpoints are the other way round —
-they answer with a `status_url` you poll, and `"sync": true` on an edit fails with a gateway
-timeout.
+**Generation options:** Aspect ratios `1:1`, `16:9`, `4:3`, `9:16`, `3:4`. Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for a single generated image. `/v2/image/edit` (instruction-based FIBO-Edit) is the other way round — it always answers with a `status_url` you poll, and `"sync": true` there fails with a gateway
+timeout. Product Holding and Virtual Try-On accept `"sync": true` if you'd rather wait for the final image than poll — `bria_call` polls for you either way, so this only matters if you're calling the API directly.
 
 > **Advanced**: For precise control over generation, use the **vgl** skill for structured VGL JSON prompts instead of natural language.
 
