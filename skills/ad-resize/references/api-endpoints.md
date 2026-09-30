@@ -33,9 +33,8 @@ User-Agent: BriaSkills/1.3.7
 ### POST /v2/ads/resize
 
 Resizes one flat ad into up to ten target sizes. Asynchronous: returns HTTP 202 with a
-`request_id` and a `status_url` to poll. A direct size takes **about a minute**; a size that
-needs the layered route takes **five to seven minutes**, and the job finishes when its slowest
-size does.
+`request_id` and a `status_url` to poll. Every size is laid out again from the ad's layers, so a
+job takes **several minutes** and finishes when its slowest size does.
 
 **Request:**
 ```json
@@ -87,8 +86,8 @@ means the id is not on file any more, about a day after the run.
   "result": {
     "status": "completed",
     "results": [
-      {"name": "feed", "width": 1080, "height": 1080, "status": "ok", "strategy": "ai_image_models", "url": "https://editor-media.bria.ai/inventory/.../assets/7b4549c2.png", "error": null},
-      {"name": "story", "width": 1080, "height": 1920, "status": "ok", "strategy": "ai_image_models", "url": "https://editor-media.bria.ai/inventory/.../assets/ee056ad7.png", "error": null},
+      {"name": "feed", "width": 1080, "height": 1080, "status": "ok", "strategy": "delayer_dispatch", "url": "https://editor-media.bria.ai/inventory/.../assets/7b4549c2.png", "error": null},
+      {"name": "story", "width": 1080, "height": 1920, "status": "ok", "strategy": "delayer_dispatch", "url": "https://editor-media.bria.ai/inventory/.../assets/ee056ad7.png", "error": null},
       {"name": "leaderboard", "width": 970, "height": 90, "status": "ok", "strategy": "delayer_dispatch", "url": "https://editor-media.bria.ai/inventory/.../assets/86086542.png", "error": null}
     ],
     "text": "Your source image was downscaled to fit within 1350 px per dimension before resizing, because your plan caps resolution at that size. Full-resolution resizing requires a Bria enterprise plan."
@@ -100,7 +99,7 @@ means the id is not on file any more, about a day after the run.
 |-------|-------------|
 | `result.results[]` | One entry per requested size, in request order, carrying the request's `name` |
 | `results[].status` | `ok` or `failed`. Sizes are independent: one can fail while the rest succeed |
-| `results[].strategy` | `ai_image_models` (direct image-model pass, ratios between 1:3 and 3:1) or `delayer_dispatch` (layered route through the Ad Delayer, every other ratio). Chosen by Bria per size |
+| `results[].strategy` | `delayer_dispatch`: the layered route through the Ad Delayer, which produces every size on the API. `ai_image_models` names a direct image-model pass the API does not offer |
 | `results[].url` | The hosted image at exactly the requested pixels. Present when `status` is `ok` |
 | `results[].error` | Why the size failed. Present when `status` is `failed` |
 | `result.text` | Present only when the source was downscaled on a capped plan, or a font the ad uses was unavailable and a default was rendered |

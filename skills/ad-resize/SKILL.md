@@ -158,7 +158,7 @@ bria_resize "/path/to/summer-sale.jpg" --size feed=1080x1080 --size story=1080x1
 bria_resize "https://example.com/creatives/summer-sale.jpg" --size square=1200x1200
 ```
 
-**That's it.** One function call. Resizing is asynchronous. A size the image models can handle directly takes **about a minute**; a banner or leaderboard shape goes through the layered route and takes **five to seven minutes**. The helper polls for up to 15 minutes and tells the user when it is still working.
+**That's it.** One function call. Resizing is asynchronous and takes **several minutes**: every size is laid out again from the ad's layers, and the run finishes when its slowest size does. The helper polls for up to 15 minutes and tells the user when it is still working.
 
 ### Input
 
@@ -173,7 +173,7 @@ Supported formats: **PNG and JPEG**. Ads larger than **1350 px on either side** 
 
 | Option | Values | Default | Notes |
 |--------|--------|---------|-------|
-| `--size` | `name=WIDTHxHEIGHT` | required, repeatable | One per target size, up to ten. The name comes back on the file: `feed-1080x1080.png`. Any pixel size works; the shape decides the route (below). |
+| `--size` | `name=WIDTHxHEIGHT` | required, repeatable | One per target size, up to ten. The name comes back on the file: `feed-1080x1080.png`. Any pixel size works. |
 | `--prompt` | free text | none | Guidance for the adaptation — "keep the logo in the top-left corner", "the price badge must stay visible". Not needed for a normal run. |
 | `--out-dir` | path | `<input-stem>-sizes` | Where the sizes land. |
 
@@ -199,7 +199,7 @@ summer-sale-sizes/
   "result": {
     "status": "completed",
     "results": [
-      {"name": "feed", "width": 1080, "height": 1080, "status": "ok", "strategy": "ai_image_models", "url": "https://...", "error": null},
+      {"name": "feed", "width": 1080, "height": 1080, "status": "ok", "strategy": "delayer_dispatch", "url": "https://...", "error": null},
       {"name": "leaderboard", "width": 970, "height": 90, "status": "ok", "strategy": "delayer_dispatch", "url": "https://...", "error": null}
     ]
   }
@@ -208,16 +208,11 @@ summer-sale-sizes/
 
 Sizes are independent: one can fail with an `error` while the rest come back fine. The helper saves what succeeded and reports what did not.
 
-### Two routes, picked by Bria
+### How a size is made
 
-Each size is produced by one of two routes, and `strategy` in `result.json` says which. The caller never chooses.
+Every size is produced the same way: Bria's Ad Delayer takes the ad apart into layers, the layout engine composes them for the new shape, and the text stays text. `strategy` in `result.json` names that route, `delayer_dispatch`. Every image is Bria-made.
 
-| `strategy` | Used when | What happens |
-|---|---|---|
-| `ai_image_models` | The target ratio is between 1:3 and 3:1: feeds, stories, most placements | An image model redraws the ad at the new size, keeping content and composition. About a minute. |
-| `delayer_dispatch` | Wider or taller than that: banners, leaderboards, skyscrapers | Bria's Ad Delayer takes the ad apart into layers, the layout engine composes them for the new shape, and the text stays text. Five to seven minutes. |
-
-When the user asks for a very wide or very tall size, say up front that it takes a few minutes.
+Say up front that a run takes a few minutes.
 
 ---
 
@@ -268,7 +263,7 @@ If it still times out, the helper prints the exact command to resume checking th
 
 1. The ad and its sizes are sent to Bria's resize endpoint (`POST /v2/ads/resize`) — a local file is encoded into the request, a URL is passed through
 2. The API accepts the job with HTTP 202 and a `status_url`; the work runs asynchronously
-3. For each size Bria picks the direct or the layered route and produces the image
+3. Bria takes the ad apart into layers and lays them out again at every requested size
 4. The helper polls the status URL every 10 seconds until the run reaches a terminal state
 5. On completion every size's `url` is downloaded next to `result.json`, named after the size
 
