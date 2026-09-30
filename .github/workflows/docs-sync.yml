@@ -31,7 +31,7 @@ name: Docs Sync
 on:
   pull_request:
     branches:
-      - main
+      - dev
     types: [opened, synchronize, reopened]
     paths:
       - 'skills/**'
