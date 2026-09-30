@@ -1,6 +1,6 @@
 {
   "name": "bria-skills",
-  "version": "1.3.7",
+  "version": "1.3.9",
   "description": "Official Bria AI skills for Claude Code - image generation, editing, background removal, VGL structured prompts, and image utilities",
   "bin": {
     "bria-skills": "bin/cli.js"
@@ -88,9 +88,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bria-ai/bria-skill.git"
+    "url": "git+https://github.com/Bria-AI/bria-skill.git"
   },
-  "homepage": "https://github.com/bria-ai/bria-skill#readme",
+  "homepage": "https://github.com/Bria-AI/bria-skill#readme",
   "scripts": {
     "prepare": "husky"
   },

@@ -448,6 +448,118 @@ Integrate and embed one or more products into a predefined scene at precise user
 }
 ```
 
+### POST /v2/image/edit/product/holding
+
+Put a product in someone's hands. Send `person_image` and one to three `product_images`, and the endpoint returns the person naturally holding or carrying the product. No prompt is needed — a person photo and a product photo are a complete request. The person's identity, pose, background, and original aspect ratio are preserved, and the product keeps its exact geometry, colours, branding, and label text. Several product references in one call can compose packaging, a second angle, or a companion item into a single shot. Add an optional `instruction` to art-direct a specific shot (e.g. "Replace the paper coffee cup in her right hand with the can, logo facing the camera.").
+
+**Request:**
+```json
+{
+  "person_image": "https://person-image-url",
+  "product_images": [
+    "https://product-image-url"
+  ],
+  "instruction": "Replace the paper coffee cup in her right hand with the can, logo facing the camera."
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `person_image` | string | required | Photo of the person to edit. URL or base64. Accepted formats: jpeg, jpg, png, webp |
+| `product_images` | array | required | One to three product images: packaging, a second angle, or a companion item. Each entry is a URL or base64, same as `person_image` |
+| `instruction` | string | - | Extra direction for this shot. Optional — send only the detail to steer, not a full prompt |
+| `aspect_ratio` | string | `person_image`'s aspect ratio | `1:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9` |
+| `seed` | int | random | Seed for deterministic generation |
+| `sync` | bool | false | `true` holds the connection open and returns the final image; `false` returns a `status_url` to poll |
+| `webhook_url` | string | - | Receive the result via webhook when the async job completes |
+| `output_type` | string | - | `png` or `jpeg` |
+| `visual_output_content_moderation` | bool | false | If true, returns 422 on visual output moderation failure |
+
+By default (`sync` omitted or `false`) this endpoint is asynchronous: it answers with `request_id` and `status_url`, which you poll.
+
+**Async Response (202):**
+```json
+{
+  "request_id": "uuid",
+  "status_url": "https://..."
+}
+```
+
+**Completed Result:**
+```json
+{
+  "status": "COMPLETED",
+  "result": {
+    "image_url": "https://...",
+    "seed": 1234,
+    "structured_prompt": "{...}",
+    "warning": null
+  }
+}
+```
+
+The result also carries the structured prompt the shot was rendered from, in `structured_prompt`
+(same field name and meaning as on `/v2/image/edit`). `warning` is set when a parameter was
+accepted but not honored — relay it to the user rather than dropping it.
+
+### POST /v2/image/edit/product/virtual-tryon
+
+Put garments on a model. Send `person_image` and one to three `garment_images`, and the endpoint returns the person wearing them. No prompt is needed — a person photo and the garments are a complete request. Garment fidelity carries through: print scale, stripe alignment across seams, collar and closure type, and how a garment reads from behind. The person's identity, pose, background, and original aspect ratio are preserved. Send a full outfit together to change several items in one call instead of stacking edits. Add an optional `instruction` to direct the styling (e.g. "He wears the navy blazer over the white t-shirt he already has, and the grey tailored trousers instead of his jeans.").
+
+**Request:**
+```json
+{
+  "person_image": "https://person-image-url",
+  "garment_images": [
+    "https://garment-image-url"
+  ],
+  "instruction": "He wears the navy blazer over the white t-shirt he already has."
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `person_image` | string | required | Photo of the person to edit. URL or base64. Accepted formats: jpeg, jpg, png, webp |
+| `garment_images` | array | required | One to three garment or accessory images to put on the person. Each entry is a URL or base64, same as `person_image` |
+| `instruction` | string | - | Extra direction for this shot. Optional — send only the detail to steer, not a full prompt |
+| `aspect_ratio` | string | `person_image`'s aspect ratio | `1:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9` |
+| `seed` | int | random | Seed for deterministic generation |
+| `sync` | bool | false | `true` holds the connection open and returns the final image; `false` returns a `status_url` to poll |
+| `webhook_url` | string | - | Receive the result via webhook when the async job completes |
+| `output_type` | string | - | `png` or `jpeg` |
+| `visual_output_content_moderation` | bool | false | If true, returns 422 on visual output moderation failure |
+
+By default (`sync` omitted or `false`) this endpoint is asynchronous: it answers with `request_id` and `status_url`, which you poll.
+
+**Async Response (202):**
+```json
+{
+  "request_id": "uuid",
+  "status_url": "https://..."
+}
+```
+
+**Completed Result:**
+```json
+{
+  "status": "COMPLETED",
+  "result": {
+    "image_url": "https://...",
+    "seed": 1234,
+    "structured_prompt": "{...}",
+    "warning": null
+  }
+}
+```
+
+The result also carries the structured prompt the shot was rendered from, in `structured_prompt`
+(same field name and meaning as on `/v2/image/edit`). `warning` is set when a parameter was
+accepted but not honored — relay it to the user rather than dropping it.
+
 ### POST /v2/image/edit/product/generate/dimensions
 
 Render a marketplace-ready dimension image from a product photo. (The older
@@ -689,7 +801,7 @@ Generate a structured JSON instruction from natural language (no image generated
 
 ## Ad Delayer - Flat Ad to Editable Layers
 
-### POST /v2/ads/image_to_layers
+### POST /v2/ads/delayer
 
 Take a finished, flat ad apart into layers. Asynchronous, and a typical ad takes **2-3 minutes**.
 
@@ -710,7 +822,7 @@ Take a finished, flat ad apart into layers. Asynchronous, and a typical ad takes
 |-----------|------|-------------|
 | `attachments` | array | The source ad. **Exactly one** entry: a public direct image URL, raw base64, or a `data:` URI |
 | `prompt` | string | Optional natural-language guidance for the extraction |
-| `thinking_effort` | string | `minimal`, `low`, `medium` (default), `high` |
+| `thinking_effort` | string | `low`, `medium` (default), `high` |
 | `output_format` | string | `json` for the layer manifest (default), `html` for the reconstructed render |
 | `sync` | boolean | Send `false` — the run is far longer than an HTTP response can wait |
 

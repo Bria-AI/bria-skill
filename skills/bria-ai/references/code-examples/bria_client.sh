@@ -11,9 +11,15 @@
 #   RESULT=$(bria_call /v2/image/edit "https://example.com/man.jpg" --key images \
 #     --image "https://example.com/santa.png" \
 #     '"instruction":"dress the man in image 1 in the santa outfit from image 2"')
+#   RESULT=$(bria_call /v2/image/edit/product/holding "/path/to/person.jpg" --key person_image \
+#     --array-key product_images --image "https://example.com/product.png" \
+#     '"instruction":"logo facing the camera"')
 #
 # Each extra --image adds the next reference image, in order: the positional image is "image 1",
-# the first --image is "image 2", and so on. Only the images array (--key images) takes references.
+# the first --image is "image 2", and so on. Only the images array (--key images) takes references
+# under that same key. Use --array-key <name> when the endpoint keys the main image and its
+# references separately (e.g. person_image + product_images) — the positional image is sent under
+# --key, and every --image goes into the --array-key array instead.
 #
 # BRIA_API_KEY is auto-loaded from ~/.bria/credentials if not already set.
 
@@ -21,14 +27,15 @@ BRIA_API_BASE="${BRIA_API_BASE:-https://engine.prod.bria-api.com}"
 BRIA_USER_AGENT="BriaSkills/1.3.7"
 
 bria_call() {
-  local endpoint image key extra payload result http_code body url status_url poll i img
+  local endpoint image key array_key extra payload result http_code body url status_url poll i img
   local references=()
   endpoint="$1"; image="$2"; shift 2
 
-  key="image"; extra=""
+  key="image"; array_key=""; extra=""
   while [ $# -gt 0 ]; do
     case "$1" in
       --key) key="$2"; shift 2 ;;
+      --array-key) array_key="$2"; shift 2 ;;
       --image) references+=("$2"); shift 2 ;;
       *) extra="${extra:+$extra, }$1"; shift ;;
     esac
@@ -51,6 +58,31 @@ bria_call() {
     i=0
     # ${arr[@]+"${arr[@]}"} expands to nothing for an empty array instead of failing under `set -u`.
     for img in "$image" ${references[@]+"${references[@]}"}; do
+      [ "$i" -gt 0 ] && printf ', ' >> "$payload"
+      if printf '%s' "$img" | grep -qE '^https?://'; then
+        printf '"%s"' "$img" >> "$payload"
+      else
+        [ ! -f "$img" ] && { echo "ERROR: File not found: $img" >&2; return 1; }
+        printf '"' >> "$payload"
+        base64 < "$img" | tr -d '\n' >> "$payload"
+        printf '"' >> "$payload"
+      fi
+      i=$((i + 1))
+    done
+    printf ']' >> "$payload"
+  elif [ -n "$array_key" ]; then
+    # Main image and its references are keyed separately (e.g. person_image + product_images).
+    if printf '%s' "$image" | grep -qE '^https?://'; then
+      printf '{"%s": "%s"' "$key" "$image" > "$payload"
+    else
+      [ ! -f "$image" ] && { echo "ERROR: File not found: $image" >&2; return 1; }
+      printf '{"%s": "' "$key" > "$payload"
+      base64 < "$image" | tr -d '\n' >> "$payload"
+      printf '"' >> "$payload"
+    fi
+    printf ', "%s": [' "$array_key" >> "$payload"
+    i=0
+    for img in ${references[@]+"${references[@]}"}; do
       [ "$i" -gt 0 ] && printf ', ' >> "$payload"
       if printf '%s' "$img" | grep -qE '^https?://'; then
         printf '"%s"' "$img" >> "$payload"
