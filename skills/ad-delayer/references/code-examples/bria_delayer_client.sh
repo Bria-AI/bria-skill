@@ -16,7 +16,7 @@
 # BRIA_API_KEY is auto-loaded from ~/.bria/credentials if not already set.
 
 BRIA_API_BASE="${BRIA_API_BASE:-https://engine.prod.bria-api.com}"
-BRIA_USER_AGENT="BriaSkills/1.3.7"
+BRIA_USER_AGENT="BriaSkills/1.4.0"
 BRIA_POLL_INTERVAL="${BRIA_POLL_INTERVAL:-10}"     # seconds between status polls
 BRIA_POLL_ATTEMPTS="${BRIA_POLL_ATTEMPTS:-36}"     # max polls (default 36 x 10s = 6 min)
 BRIA_RETRY_BACKOFF="${BRIA_RETRY_BACKOFF:-20 40 60}"  # rate-limit backoff schedule, in seconds
@@ -46,8 +46,8 @@ _bria_report_error() {
       echo "That image format is not supported. Save the ad as PNG, JPEG or WEBP and try again." >&2; return ;;
     *"could not be fetched"*)
       echo "That image URL could not be fetched — it needs to be a public, direct link to the image file. Attach the file instead." >&2; return ;;
-    *"capped at 800 px"*)
-      echo "This ad is over 800 px on a side, which is more than this account's plan allows for delayering. Resize it to 800 px or less on its longest side and try again, or ask Bria about an enterprise plan for full-resolution delayering." >&2; return ;;
+    *"capped at 1350 px"*)
+      echo "This ad is over 1350 px on a side, which is more than this account's plan allows for delayering. Resize it to 1350 px or less on its longest side and try again, or ask Bria about an enterprise plan for full-resolution delayering." >&2; return ;;
   esac
   case "$code" in
     400|422)
@@ -57,7 +57,7 @@ _bria_report_error() {
     403)
       echo "This Bria account is not permitted to run this request — check the plan and billing status at https://platform.bria.ai/pricing" >&2 ;;
     413)
-      echo "This ad is too large for this account's plan to delayer — the limit is 800 px per dimension. Resize it and try again, or ask Bria about an enterprise plan." >&2 ;;
+      echo "This ad is too large for this account's plan to delayer — the limit is 1350 px per dimension. Resize it and try again, or ask Bria about an enterprise plan." >&2 ;;
     429)
       echo "Bria is rate-limiting this account (9 delayering submits a minute by default). Wait a minute and try again." >&2 ;;
     5*)

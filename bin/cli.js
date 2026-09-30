@@ -5,7 +5,7 @@ const path = require("path");
 const os = require("os");
 
 const PACKAGE_NAME = "bria-skills";
-const SKILLS = ["bria-ai", "vgl", "image-utils", "remove-background", "ad-delayer"];
+const SKILLS = ["bria-ai", "vgl", "image-utils", "remove-background", "ad-delayer", "ad-resize"];
 
 // Where the skill files live relative to this script
 const packageRoot = path.resolve(__dirname, "..");
@@ -84,6 +84,7 @@ Skills included:
   image-utils        Classic image manipulation (resize, crop, composite)
   remove-background  Background removal for transparent PNGs and cutouts (RMBG-2.0)
   ad-delayer         Flat ads back into editable layers (Ad Delayer)
+  ad-resize          One finished ad at every size (Ad Resize)
 
 More info: https://github.com/bria-ai/bria-skills
 `);
