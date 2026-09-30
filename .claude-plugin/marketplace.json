@@ -10,7 +10,7 @@
     "version": "1.3.7",
     "repository": "https://github.com/bria-ai/bria-skill",
     "license": "MIT",
-    "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "background-replacement", "image-editing", "vgl", "product-photography", "packshot", "lifestyle-shot", "visual-assets", "text-to-image", "photo-editing", "transparent-png", "upscale", "outpaint", "inpaint", "object-removal", "restyle", "e-commerce", "marketing", "marketing-visuals", "social-media", "thumbnail", "banner", "hero-image", "ad-creative", "photo-restoration", "style-transfer", "royalty-free", "commercial-license", "brand-safe", "batch-generation", "bulk-generation", "image-variations", "compositing", "image-api", "pipeline", "visual-content-creation", "generate-image", "create-image", "ai-art", "photo-retouching", "image-enhancement", "relight", "reseason", "sketch-to-photo", "colorize", "web-design", "content-creation", "cutout", "product-placement", "scene-generation", "ad-delayer", "delayering", "de-layer", "image-to-layers", "layer-extraction", "psd-recovery", "editable-ad", "ad-resizing"]
+    "keywords": ["image-generation", "ai-images", "bria", "fibo", "rmbg", "background-removal", "background-replacement", "image-editing", "vgl", "product-photography", "packshot", "lifestyle-shot", "visual-assets", "text-to-image", "photo-editing", "transparent-png", "upscale", "outpaint", "inpaint", "object-removal", "restyle", "e-commerce", "marketing", "marketing-visuals", "social-media", "thumbnail", "banner", "hero-image", "ad-creative", "photo-restoration", "style-transfer", "royalty-free", "commercial-license", "brand-safe", "batch-generation", "bulk-generation", "image-variations", "compositing", "image-api", "pipeline", "visual-content-creation", "generate-image", "create-image", "ai-art", "photo-retouching", "image-enhancement", "relight", "reseason", "sketch-to-photo", "colorize", "web-design", "content-creation", "cutout", "product-placement", "scene-generation", "ad-delayer", "delayering", "de-layer", "image-to-layers", "layer-extraction", "psd-recovery", "editable-ad", "ad-resizing", "ad-resize", "resize-ad", "ad-sizes"]
   },
   "dependencies": [
     {
@@ -109,6 +109,25 @@
       "strict": false,
       "skills": [
         "./skills/ad-delayer"
+      ],
+      "dependencies": [
+        {
+          "type": "env",
+          "name": "BRIA_API_KEY",
+          "description": "Bria AI API key (get one at https://platform.bria.ai/console/account/api-keys)"
+        }
+      ],
+      "author": {
+        "name": "Bria AI"
+      }
+    },
+    {
+      "name": "ad-resize",
+      "description": "Resize a finished, flat ad image into other sizes with the layout redone for each shape, not cropped or stretched — feed, story, landscape, banner, leaderboard, any pixel size, up to ten per call. Dedicated ad resizing skill for adapting a creative to other placements and aspect ratios and producing a campaign's full size set. Powered by Bria's Ad Resize.",
+      "source": "./skills/ad-resize",
+      "strict": false,
+      "skills": [
+        "./skills/ad-resize"
       ],
       "dependencies": [
         {
