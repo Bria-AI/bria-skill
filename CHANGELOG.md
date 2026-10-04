@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/Bria-AI/bria-skill/compare/v1.4.0...v1.4.1) (2026-10-04)
+
+
+### Bug Fixes
+
+* **skills:** state the 2048 px ceiling, and stop matching on the number ([#81](https://github.com/Bria-AI/bria-skill/issues/81)) ([321161e](https://github.com/Bria-AI/bria-skill/commit/321161e41a543f4fe4d362cd95242c451b8d2911))
+
 ## [1.4.0](https://github.com/Bria-AI/bria-skill/compare/v1.3.9...v1.4.0) (2026-09-30)
 
 
