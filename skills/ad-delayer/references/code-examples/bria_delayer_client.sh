@@ -46,8 +46,11 @@ _bria_report_error() {
       echo "That image format is not supported. Save the ad as PNG, JPEG or WEBP and try again." >&2; return ;;
     *"could not be fetched"*)
       echo "That image URL could not be fetched — it needs to be a public, direct link to the image file. Attach the file instead." >&2; return ;;
-    *"capped at 1350 px"*)
-      echo "This ad is over 1350 px on a side, which is more than this account's plan allows for delayering. Resize it to 1350 px or less on its longest side and try again, or ask Bria about an enterprise plan for full-resolution delayering." >&2; return ;;
+    # Match the wording, never the number, and quote Bria's own message back: the ceiling is
+    # configurable, so a pattern carrying it stops matching the day it moves and this arm goes
+    # silently dead, dropping the caller into the generic 4xx text.
+    *"capped at "*" px per dimension"*)
+      echo "$message Resize the ad to fit that limit on its longest side and try again." >&2; return ;;
   esac
   case "$code" in
     400|422)
@@ -57,7 +60,7 @@ _bria_report_error() {
     403)
       echo "This Bria account is not permitted to run this request — check the plan and billing status at https://platform.bria.ai/pricing" >&2 ;;
     413)
-      echo "This ad is too large for this account's plan to delayer — the limit is 1350 px per dimension. Resize it and try again, or ask Bria about an enterprise plan." >&2 ;;
+      echo "This ad is too large for this account's plan to delayer. Resize it and try again, or ask Bria about an enterprise plan." >&2 ;;
     429)
       echo "Bria is rate-limiting this account (9 delayering submits a minute by default). Wait a minute and try again." >&2 ;;
     5*)

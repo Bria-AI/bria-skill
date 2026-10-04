@@ -169,7 +169,7 @@ bria_delayer "https://example.com/creatives/summer-sale.jpg"
 
 **One ad per call** — the API takes exactly one image per request. To do several, loop (see Examples).
 
-Supported formats: **PNG, JPEG, WEBP, AVIF, GIF, TIFF, BMP, SVG, PDF**. There is no file-size limit. Ads larger than **1350 px on either side** need an enterprise plan; on other plans they are rejected before any work is done, so resize the ad first if the account is capped.
+Supported formats: **PNG, JPEG, WEBP, AVIF, GIF, TIFF, BMP, SVG, PDF**. There is no file-size limit. Ads larger than **2048 px on either side** need an enterprise plan; on other plans they are rejected before any work is done, so resize the ad first if the account is capped.
 
 ### Options
 
@@ -319,7 +319,7 @@ Two rules for handling any of these:
 | `422` "could not be fetched" | The URL is not a public, direct link to the image | Attach the file itself instead of a link. No retry |
 | `400` / `422` on a request the skill built | Malformed request | Try once more; if it repeats it is an ad-delayer skill issue. No retry |
 | `401` / `403` | API key missing, invalid, or the account is not permitted | Delete `~/.bria/credentials` and run the authentication step again |
-| `413` | The ad is over 1350 px per dimension and the account's plan is capped there | Resize the ad to 1350 px or less on its longest side, or move to an enterprise plan. No retry — it cannot succeed as-is |
+| `413` | The ad is over 2048 px per dimension and the account's plan is capped there | Resize the ad to 2048 px or less on its longest side, or move to an enterprise plan. No retry — it cannot succeed as-is |
 | `429` | Too many delayering submits in a minute for this account (9 by default) | The helper waits and retries automatically (20s, 40s, 60s) |
 | Job status `ERROR` / `500` | The delayering pipeline failed | The helper retries the ad exactly once, then reports the `request_id` to give Bria support |
 | Job status `UNKNOWN` | Bria keeps job status for about a day; this one has aged out | Run the ad again |

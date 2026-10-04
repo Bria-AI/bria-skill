@@ -57,7 +57,7 @@ a `status_url` to poll. A typical ad takes **2–3 minutes**.
 
 Unknown fields are rejected (`extra="forbid"`).
 Supported input formats: PNG, JPEG, WEBP, AVIF, GIF, TIFF, BMP, SVG, PDF. There is no file-size
-limit. Dimensions are capped at **1350 px per side** unless the requesting organisation has
+limit. Dimensions are capped at **2048 px per side** unless the requesting organisation has
 enterprise-tier entitlement; the check runs before any billable work, so a rejection costs nothing
 but is also unrecoverable without resizing the ad.
 
@@ -210,7 +210,7 @@ raised before the job starts come back on the submit; the rest arrive on the sta
 | `422` | status poll | "The uploaded file appears corrupt or empty" | No |
 | `422` | status poll | "Unsupported image format. Supported formats include: PNG, JPEG, WEBP, AVIF, GIF, TIFF, BMP, SVG, PDF" | No |
 | `422` | status poll | "The image URL could not be fetched" — not a public direct link, or resolves to a non-global address | No |
-| `413` | status poll | Over 1350 px per side on a plan that is capped there. Two wordings — a plan-upgrade message, or a lite-version message for limited-distribution partner organisations | No |
+| `413` | status poll | Over 2048 px per side on a plan that is capped there. Two wordings — a plan-upgrade message, or a lite-version message for limited-distribution partner organisations | No |
 | `500` | status poll | Pipeline failure; `details` names the stage that failed | Once |
 
 The 4xx messages above are Bria's validator messages, passed through unchanged.
