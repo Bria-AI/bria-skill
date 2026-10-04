@@ -826,7 +826,7 @@ Take a finished, flat ad apart into layers. Asynchronous, and a typical ad takes
 | `output_format` | string | `json` for the layer manifest (default), `html` for the reconstructed render |
 | `sync` | boolean | Send `false` — the run is far longer than an HTTP response can wait |
 
-Unknown fields are rejected. Dimensions are capped at 800 px per side unless the organisation has
+Unknown fields are rejected. Dimensions are capped at 2048 px per side unless the organisation has
 enterprise-tier entitlement.
 
 **The result is a pointer, not the layers.** On completion the status response carries

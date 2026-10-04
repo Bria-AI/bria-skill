@@ -167,7 +167,7 @@ bria_resize "https://example.com/creatives/summer-sale.jpg" --size square=1200x1
 
 **One ad per call** — the API takes exactly one image per request. To do several ads, loop (see Examples). Up to **ten sizes** per call.
 
-Supported formats: **PNG and JPEG**. Ads larger than **1350 px on either side** are downscaled to fit before resizing unless the account is on an Enterprise plan; the outputs still come back at the exact sizes requested, and the helper prints Bria's note when that happened.
+Supported formats: **PNG and JPEG**. Ads larger than **2048 px on either side** are downscaled to fit before resizing unless the account is on an Enterprise plan; the outputs still come back at the exact sizes requested, and the helper prints Bria's note when that happened.
 
 ### Options
 

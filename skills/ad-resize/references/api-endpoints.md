@@ -62,7 +62,7 @@ size does.
 | `webhook_url` | string | No | — | Delivers the completion body instead of requiring polling |
 
 Unknown fields are rejected (`extra="forbid"`). Supported input formats: PNG and JPEG. Ads over
-**1350 px per side** are downscaled to fit before resizing on plans that are not Enterprise; the
+**2048 px per side** are downscaled to fit before resizing on plans that are not Enterprise; the
 outputs still come back at the requested sizes and the completed body says so in `result.text`.
 
 **Response (202):**
@@ -91,7 +91,7 @@ means the id is not on file any more, about a day after the run.
       {"name": "story", "width": 1080, "height": 1920, "status": "ok", "strategy": "ai_image_models", "url": "https://editor-media.bria.ai/inventory/.../assets/ee056ad7.png", "error": null},
       {"name": "leaderboard", "width": 970, "height": 90, "status": "ok", "strategy": "delayer_dispatch", "url": "https://editor-media.bria.ai/inventory/.../assets/86086542.png", "error": null}
     ],
-    "text": "Your source image was downscaled to fit within 1350 px per dimension before resizing, because your plan caps resolution at that size. Full-resolution resizing requires a Bria enterprise plan."
+    "text": "Your source image was downscaled to fit within 2048 px per dimension before resizing, because your plan caps resolution at that size. Full-resolution resizing requires a Bria enterprise plan."
   }
 }
 ```
