@@ -11,7 +11,7 @@ Content-Type: application/json
 User-Agent: BriaSkills/<version>
 ```
 
-> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.4.0`) in every API call, including status polling requests.
+> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.5.0`) in every API call, including status polling requests.
 
 ---
 
@@ -114,6 +114,54 @@ Remove background from image. Returns PNG with transparency.
   }
 }
 ```
+
+### POST /v2/image/edit/remove_background/guided
+
+Remove the background while following a plain-English instruction for what to keep, drop, or narrow
+to — e.g. "without the dog", "only the chair". Starts from the same cut as plain remove background,
+then adjusts only what the instruction names. Returns PNG with transparency, same as the plain route.
+
+**Request:**
+```json
+{
+  "image": "https://publicly-accessible-image-url",
+  "instruction": "only the laptop"
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `image` | string | Source image URL (JPEG, PNG, WEBP) |
+| `instruction` | string | Plain-English instruction naming what to keep, drop, or narrow to |
+
+Any remove-background option that still applies to a cutout (e.g. output format) carries over unchanged.
+
+Takes **15-20 seconds** — call with `"sync": false` and poll `status_url`, same as any other async
+endpoint.
+
+**Response:**
+```json
+{
+  "request_id": "uuid",
+  "status_url": "https://..."
+}
+```
+
+**Completed Result:**
+```json
+{
+  "status": "COMPLETED",
+  "result": {
+    "image_url": "https://...png"
+  }
+}
+```
+
+**404 means the rollout flag is off for this organization**, not a bad request — it is not enrolled
+in the guided-remove-background rollout yet. Don't retry the guided route; fall back to plain
+`/v2/image/edit/remove_background` and say so in one line.
 
 ---
 
@@ -871,7 +919,7 @@ Check async request status.
 import requests, time
 
 def poll(status_url, api_key, timeout=120):
-    headers = {"api_token": api_key, "User-Agent": "BriaSkills/1.4.0"}
+    headers = {"api_token": api_key, "User-Agent": "BriaSkills/1.5.0"}
     for _ in range(timeout // 2):
         r = requests.get(status_url, headers=headers)
         data = r.json()

@@ -4,7 +4,7 @@ description: Remove backgrounds from images — background removal API for trans
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.4.0"
+  version: "1.5.0"
 ---
 
 # Remove Background — Transparent PNGs & Cutouts with RMBG 2.0
@@ -17,7 +17,8 @@ Use this skill when the user wants to:
 - **Remove a background** — "remove the background", "make the background transparent", "delete the background"
 - **Create a transparent PNG** — "give me a PNG with no background", "transparent version", "cutout"
 - **Create a cutout** — "cut out the person", "cutout of the product", "photo cutout", "image cutout"
-- **Extract the foreground subject** — "isolate the product", "extract the object", "foreground extraction"
+- **Extract the foreground subject** — "isolate the product", "foreground extraction"
+- **Keep or drop something specific (guided)** — "remove the background but keep the mat", "without the dog", "only the chair", "background removal but leave the shadow"
 - **Product cutout for e-commerce** — "product photo with transparent background", "packshot cutout", "catalog cutout image"
 - **Portrait and headshot cutout** — "remove background from headshot", "portrait with no background"
 - **Batch background removal** — "remove backgrounds from all these images", "process in bulk"
@@ -32,8 +33,19 @@ For other image operations, use the **bria-ai** skill instead:
 - **Blur** background → bria-ai (`blur_background`)
 - **Generate** images from text → bria-ai (`generate`)
 - **Edit** images with instructions → bria-ai (`edit`)
+- **Pull one named thing out of a scene** ("extract the tree", "extract the car") → bria-ai (`POST /v2/image/edit/extract_object`), not this skill — see Routing below.
 
-This skill does one thing: **remove backgrounds to produce transparent PNGs and cutouts**.
+This skill does one thing: **remove backgrounds to produce transparent PNGs and cutouts**, including the guided variant that keeps or drops something specific on request.
+
+### Routing: plain, guided, or extract-object
+
+Three different requests sound alike but hit three different routes. Decide by what the user names, and who it's named relative to:
+
+1. **The user names something to keep or drop, relative to the whole scene** — "remove the background but keep the mat", "without the dog", "only the chair" → **guided remove background** (`POST /v2/image/edit/remove_background/guided`, see below). The result is still a full background-removal cutout; the instruction only adjusts what counts as foreground.
+2. **The user names one specific thing to pull out of a scene, not "the background"** — "extract the tree", "extract the car" → `POST /v2/image/edit/extract_object` (bria-ai skill, not this one). This is lifting a single object out, not removing a background.
+3. **Anything else** — "remove the background", "cut out the product", "transparent PNG" → plain **remove background** (`POST /v2/image/edit/remove_background`, below).
+
+If a guided call 404s, the organization isn't on the rollout flag yet — see "If the guided route 404s" below; fall back to plain remove background rather than retrying the guided route.
 
 ---
 
@@ -179,6 +191,45 @@ curl -sL "$RESULT_URL" -o output.png
 
 ---
 
+## Guided Background Removal — Keep, Drop, or Narrow
+
+When the user names what to keep or drop relative to the scene (not a plain "remove the background"), use the guided route instead: `POST /v2/image/edit/remove_background/guided`. It starts from the same reliable cut as plain remove background, then adjusts only what the instruction names — add something that would have been dropped, drop something that would have been kept, or narrow down to just one named item.
+
+```bash
+source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
+
+# "Remove the background but keep the mat"
+RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/desk.jpg" '"instruction":"only the laptop"')
+echo "$RESULT_URL"  # → https://...transparent.png
+```
+
+### Input
+
+- **`image`** — local file path or URL, same as plain remove background.
+- **`instruction`** — plain English naming what to keep, drop, or narrow to (e.g. "without the dog", "only the chair"). No fixed vocabulary or mode parameter.
+- Any remove-background option that still applies to a cutout (e.g. output format) carries over unchanged.
+
+### Timing
+
+A guided call takes **15-20 seconds** — noticeably longer than plain remove background. It is called with `sync: false` and polled, same as any other async Bria endpoint. `bria_call` already handles this: it submits, reads `status_url` from the response, and polls automatically — no extra code needed on top of the call above.
+
+### If the guided route 404s
+
+A 404 from `/v2/image/edit/remove_background/guided` means the organization isn't enrolled in the guided-remove-background rollout yet — not a bad request. Don't retry the guided route and don't treat it as an error to surface as-is. Instead, fall back to plain remove background and say so in one line, e.g.:
+
+> This workspace doesn't have guided background removal enabled yet, so here's a plain background removal instead.
+
+```bash
+source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
+RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/desk.jpg" '"instruction":"only the laptop"')
+if [ $? -ne 0 ]; then
+  # A 404 here means the rollout flag isn't on for this org — fall back, don't retry.
+  RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/desk.jpg")
+fi
+```
+
+---
+
 ## Examples
 
 ### Product cutout for e-commerce
@@ -230,6 +281,20 @@ Segment and extract the foreground from any photo to create a cutout for layerin
 source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
 RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/scene.jpg")
 curl -sL "$RESULT_URL" -o foreground_cutout.png
+```
+
+### Guided removal — keep or drop something specific
+
+The user names what to keep or drop relative to the scene, so this routes to the guided endpoint instead of plain remove background:
+
+```bash
+source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
+RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/desk.jpg" '"instruction":"without the dog"')
+if [ $? -ne 0 ]; then
+  RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/desk.jpg")
+  echo "Guided removal isn't enabled for this workspace yet — used plain background removal instead."
+fi
+curl -sL "$RESULT_URL" -o guided_cutout.png
 ```
 
 ---

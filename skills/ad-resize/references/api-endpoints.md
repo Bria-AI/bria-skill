@@ -20,10 +20,10 @@
 ```
 api_token: YOUR_BRIA_API_KEY
 Content-Type: application/json
-User-Agent: BriaSkills/1.4.0
+User-Agent: BriaSkills/1.5.0
 ```
 
-> **Required:** always include the `User-Agent: BriaSkills/1.4.0` header on every call, including
+> **Required:** always include the `User-Agent: BriaSkills/1.5.0` header on every call, including
 > status polls. It is how resize traffic from this skill is identified server-side.
 
 ---
