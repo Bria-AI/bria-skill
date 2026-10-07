@@ -11,7 +11,7 @@ Content-Type: application/json
 User-Agent: BriaSkills/<version>
 ```
 
-> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.5.0`) in every API call, including status polling requests.
+> **Required:** Always include the `User-Agent: BriaSkills/<version>` header (where `<version>` is the current skill version from `package.json`, e.g. `BriaSkills/1.4.0`) in every API call, including status polling requests.
 
 ---
 
@@ -671,6 +671,29 @@ Poll `status_url` for the result. `dual` output returns two images: `[composite,
 ---
 
 ## Text-Based Object Editing
+
+### POST /v2/image/edit/extract_object
+
+Pull one named object out of a scene as its own cutout — not a background-removal call, a
+single-object extraction. Use this when the user names a specific thing to lift out (e.g. "extract
+the tree"), as opposed to adjusting what a background-removal cutout keeps.
+
+**Request:**
+```json
+{
+  "image": "base64-or-url",
+  "prompt": "the tree"
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `image` | string | required | Source image URL or base64 |
+| `prompt` | string | required | What to extract, in natural language (e.g. "the red car") |
+| `autocrop` | bool | false | If true, tightly crop the output PNG to the cutout's bounding box |
+| `remove_background` | bool | false | If true, refine the cutout alpha with background removal; if false, uses SAM segmentation instead |
 
 ### POST /v2/image/edit/add_object_by_text
 

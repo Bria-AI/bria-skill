@@ -4,7 +4,7 @@ description: Remove backgrounds from images — background removal API for trans
 license: MIT
 metadata:
   author: Bria AI
-  version: "1.5.0"
+  version: "1.4.0"
 ---
 
 # Remove Background — Transparent PNGs & Cutouts with RMBG 2.0
@@ -39,13 +39,27 @@ This skill does one thing: **remove backgrounds to produce transparent PNGs and 
 
 ### Routing: plain, guided, or extract-object
 
-Three different requests sound alike but hit three different routes. Decide by what the user names, and who it's named relative to:
+Three different requests sound alike but hit three different routes. "Only the X" can mean either
+of the last two — don't route on wording alone. Decide by whether X is part of the **obvious
+foreground**: what a plain background-removal call would already keep as the subject.
 
-1. **The user names something to keep or drop, relative to the whole scene** — "remove the background but keep the mat", "without the dog", "only the chair" → **guided remove background** (`POST /v2/image/edit/remove_background/guided`, see below). The result is still a full background-removal cutout; the instruction only adjusts what counts as foreground.
-2. **The user names one specific thing to pull out of a scene, not "the background"** — "extract the tree", "extract the car" → `POST /v2/image/edit/extract_object` (bria-ai skill, not this one). This is lifting a single object out, not removing a background.
-3. **Anything else** — "remove the background", "cut out the product", "transparent PNG" → plain **remove background** (`POST /v2/image/edit/remove_background`, below).
+1. **X is the obvious foreground, or part of it** — the instruction adds to it, drops part of it,
+   or narrows down to one piece of it: "remove the background but keep the mat", "without the dog",
+   "only the chair" (when the chair is one of the salient subjects a plain cutout would already
+   keep) → **guided remove background** (`POST /v2/image/edit/remove_background/guided`, see
+   below). Still a full background-removal cutout; the instruction only adjusts what counts as
+   foreground.
+2. **X is *not* part of the obvious foreground** — a background or peripheral object a plain cutout
+   would never have kept on its own: "extract the tree", "only the sign in the background" →
+   `POST /v2/image/edit/extract_object` (bria-ai skill, not this one). This pulls one specific,
+   named thing out of the scene regardless of what's salient.
+3. **Anything else** — "remove the background", "cut out the product", "transparent PNG" → plain
+   **remove background** (`POST /v2/image/edit/remove_background`, below).
 
-If a guided call 404s, the organization isn't on the rollout flag yet — see "If the guided route 404s" below; fall back to plain remove background rather than retrying the guided route.
+If a guided call 404s specifically, the organization isn't on the rollout flag yet — see "If the
+guided route 404s" below; fall back to plain remove background rather than retrying the guided
+route. Any other failure (auth, validation, server error, timeout) is a real error — surface it,
+don't treat it as "not enabled."
 
 ---
 
@@ -215,16 +229,24 @@ A guided call takes **15-20 seconds** — noticeably longer than plain remove ba
 
 ### If the guided route 404s
 
-A 404 from `/v2/image/edit/remove_background/guided` means the organization isn't enrolled in the guided-remove-background rollout yet — not a bad request. Don't retry the guided route and don't treat it as an error to surface as-is. Instead, fall back to plain remove background and say so in one line, e.g.:
+A 404 from `/v2/image/edit/remove_background/guided` means the organization isn't enrolled in the guided-remove-background rollout yet — not a bad request. Fall back to plain remove background only for that specific case, and say so in one line, e.g.:
 
 > This workspace doesn't have guided background removal enabled yet, so here's a plain background removal instead.
 
+**Only a 404 means "not enabled."** Anything else — a bad token (401), a bad instruction (422), a server error (5xx), a timeout — is a real failure, not a rollout gate, and must not be silently swallowed into the same "isn't enabled" message. Check the error text for `404` specifically before falling back; for every other error, surface it as-is:
+
 ```bash
 source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
-RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/desk.jpg" '"instruction":"only the laptop"')
+RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/desk.jpg" '"instruction":"only the laptop"' 2>/tmp/guided_err.txt)
 if [ $? -ne 0 ]; then
-  # A 404 here means the rollout flag isn't on for this org — fall back, don't retry.
-  RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/desk.jpg")
+  if grep -q "^ERROR 404" /tmp/guided_err.txt; then
+    # Only a 404 means the rollout flag isn't on for this org — fall back, don't retry.
+    RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/desk.jpg")
+  else
+    # Any other error (401, 422, 5xx, timeout) is real — surface it, don't call it "not enabled."
+    cat /tmp/guided_err.txt >&2
+    return 1
+  fi
 fi
 ```
 
@@ -289,10 +311,15 @@ The user names what to keep or drop relative to the scene, so this routes to the
 
 ```bash
 source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
-RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/desk.jpg" '"instruction":"without the dog"')
+RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/desk.jpg" '"instruction":"without the dog"' 2>/tmp/guided_err.txt)
 if [ $? -ne 0 ]; then
-  RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/desk.jpg")
-  echo "Guided removal isn't enabled for this workspace yet — used plain background removal instead."
+  if grep -q "^ERROR 404" /tmp/guided_err.txt; then
+    RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/desk.jpg")
+    echo "Guided removal isn't enabled for this workspace yet — used plain background removal instead."
+  else
+    cat /tmp/guided_err.txt >&2
+    return 1
+  fi
 fi
 curl -sL "$RESULT_URL" -o guided_cutout.png
 ```
