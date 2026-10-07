@@ -18,7 +18,7 @@ Use this skill when the user wants to:
 - **Create a transparent PNG** — "give me a PNG with no background", "transparent version", "cutout"
 - **Create a cutout** — "cut out the person", "cutout of the product", "photo cutout", "image cutout"
 - **Extract the foreground subject** — "isolate the product", "foreground extraction"
-- **Keep or drop something specific (guided)** — "remove the background but keep the mat", "without the dog", "only the chair", "background removal but leave the shadow"
+- **Keep or drop something specific (guided)** — "remove the background but keep the mat", "without the dog", "only the chair"
 - **Product cutout for e-commerce** — "product photo with transparent background", "packshot cutout", "catalog cutout image"
 - **Portrait and headshot cutout** — "remove background from headshot", "portrait with no background"
 - **Batch background removal** — "remove backgrounds from all these images", "process in bulk"
@@ -212,8 +212,8 @@ When the user names what to keep or drop relative to the scene (not a plain "rem
 ```bash
 source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
 
-# "Remove the background but keep the mat"
-RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/desk.jpg" '"instruction":"only the laptop"')
+# "Remove the background but keep the mat and the plant"
+RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/yoga.jpg" '"instruction":"the person with the mat and the plant"')
 echo "$RESULT_URL"  # → https://...transparent.png
 ```
 
@@ -225,11 +225,11 @@ echo "$RESULT_URL"  # → https://...transparent.png
 
 ### Timing
 
-A guided call takes **15-20 seconds** — noticeably longer than plain remove background. It is called with `sync: false` and polled, same as any other async Bria endpoint. `bria_call` already handles this: it submits, reads `status_url` from the response, and polls automatically — no extra code needed on top of the call above.
+A guided call takes **15-20 seconds**, noticeably longer than plain remove background. The route answers asynchronously by default; `bria_call` submits, reads `status_url` from the response and polls automatically, so no extra code is needed on top of the call above.
 
 ### If the guided route 404s
 
-A 404 from `/v2/image/edit/remove_background/guided` means the organization isn't enrolled in the guided-remove-background rollout yet — not a bad request. Fall back to plain remove background only for that specific case, and say so in one line, e.g.:
+A 404 from `/v2/image/edit/remove_background/guided` means guided removal isn't enabled for this organization yet, not a bad request. Fall back to plain remove background only for that specific case, and say so in one line, e.g.:
 
 > This workspace doesn't have guided background removal enabled yet, so here's a plain background removal instead.
 
@@ -237,15 +237,15 @@ A 404 from `/v2/image/edit/remove_background/guided` means the organization isn'
 
 ```bash
 source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
-RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/desk.jpg" '"instruction":"only the laptop"' 2>/tmp/guided_err.txt)
+RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/yoga.jpg" '"instruction":"the person with the mat and the plant"' 2>/tmp/guided_err.txt)
 if [ $? -ne 0 ]; then
   if grep -q "^ERROR 404" /tmp/guided_err.txt; then
-    # Only a 404 means the rollout flag isn't on for this org — fall back, don't retry.
-    RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/desk.jpg")
+    # Only a 404 means guided removal isn't enabled for this org: fall back, don't retry.
+    RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/yoga.jpg")
   else
-    # Any other error (401, 422, 5xx, timeout) is real — surface it, don't call it "not enabled."
+    # Any other error (401, 422, 5xx, timeout) is real: surface it, don't call it "not enabled."
     cat /tmp/guided_err.txt >&2
-    return 1
+    exit 1
   fi
 fi
 ```
@@ -311,14 +311,14 @@ The user names what to keep or drop relative to the scene, so this routes to the
 
 ```bash
 source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
-RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/desk.jpg" '"instruction":"without the dog"' 2>/tmp/guided_err.txt)
+RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/photo.jpg" '"instruction":"the woman at her desk without the lamp"' 2>/tmp/guided_err.txt)
 if [ $? -ne 0 ]; then
   if grep -q "^ERROR 404" /tmp/guided_err.txt; then
-    RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/desk.jpg")
+    RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/photo.jpg")
     echo "Guided removal isn't enabled for this workspace yet — used plain background removal instead."
   else
     cat /tmp/guided_err.txt >&2
-    return 1
+    exit 1
   fi
 fi
 curl -sL "$RESULT_URL" -o guided_cutout.png
