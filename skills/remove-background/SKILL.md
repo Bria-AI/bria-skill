@@ -43,11 +43,11 @@ Three different requests sound alike but hit three different routes. "Only the X
 of the last two — don't route on wording alone. Decide by whether X is part of the **obvious
 foreground**: what a plain background-removal call would already keep as the subject.
 
-1. **X is the obvious foreground, or part of it** — the instruction adds to it, drops part of it,
+1. **X is the obvious foreground, or part of it**: the prompt adds to it, drops part of it,
    or narrows down to one piece of it: "remove the background but keep the mat", "without the dog",
    "only the chair" (when the chair is one of the salient subjects a plain cutout would already
    keep) → **guided remove background** (`POST /v2/image/edit/remove_background/guided`, see
-   below). Still a full background-removal cutout; the instruction only adjusts what counts as
+   below). Still a full background-removal cutout; the prompt only adjusts what counts as
    foreground.
 2. **X is *not* part of the obvious foreground** — a background or peripheral object a plain cutout
    would never have kept on its own: "extract the tree", "only the sign in the background" →
@@ -207,20 +207,21 @@ curl -sL "$RESULT_URL" -o output.png
 
 ## Guided Background Removal — Keep, Drop, or Narrow
 
-When the user names what to keep or drop relative to the scene (not a plain "remove the background"), use the guided route instead: `POST /v2/image/edit/remove_background/guided`. It starts from the same reliable cut as plain remove background, then adjusts only what the instruction names — add something that would have been dropped, drop something that would have been kept, or narrow down to just one named item.
+When the user names what to keep or drop relative to the scene (not a plain "remove the background"), use the guided route instead: `POST /v2/image/edit/remove_background/guided`. It starts from the same reliable cut as plain remove background, then adjusts only what the prompt names: add something that would have been dropped, drop something that would have been kept, or narrow down to just one named item.
 
 ```bash
 source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
 
 # "Remove the background but keep the mat and the plant"
-RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/yoga.jpg" '"instruction":"the person with the mat and the plant"')
+RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/yoga.jpg" '"prompt":"the person with the mat and the plant"')
 echo "$RESULT_URL"  # → https://...transparent.png
 ```
 
 ### Input
 
 - **`image`** — local file path or URL, same as plain remove background.
-- **`instruction`** — plain English naming what to keep, drop, or narrow to (e.g. "without the dog", "only the chair"). No fixed vocabulary or mode parameter.
+- **`prompt`** (optional): plain English naming what to keep, drop, or narrow to (e.g. "without the dog", "only the chair"). No fixed vocabulary or mode parameter.
+- An omitted or blank `prompt` returns the plain cut, still billed as a guided call. Send plain requests to plain remove background instead.
 - Any remove-background option that still applies to a cutout (e.g. output format) carries over unchanged.
 
 ### Timing
@@ -233,11 +234,11 @@ A 404 from `/v2/image/edit/remove_background/guided` means guided removal isn't 
 
 > This workspace doesn't have guided background removal enabled yet, so here's a plain background removal instead.
 
-**Only a 404 means "not enabled."** Anything else — a bad token (401), a bad instruction (422), a server error (5xx), a timeout — is a real failure, not a rollout gate, and must not be silently swallowed into the same "isn't enabled" message. Check the error text for `404` specifically before falling back; for every other error, surface it as-is:
+**Only a 404 means "not enabled."** Anything else, such as a bad token (401), a bad request (422), a server error (5xx) or a timeout, is a real failure, not a rollout gate, and must not be silently swallowed into the same "isn't enabled" message. Check the error text for `404` specifically before falling back; for every other error, surface it as-is:
 
 ```bash
 source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
-RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/yoga.jpg" '"instruction":"the person with the mat and the plant"' 2>/tmp/guided_err.txt)
+RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/yoga.jpg" '"prompt":"the person with the mat and the plant"' 2>/tmp/guided_err.txt)
 if [ $? -ne 0 ]; then
   if grep -q "^ERROR 404" /tmp/guided_err.txt; then
     # Only a 404 means guided removal isn't enabled for this org: fall back, don't retry.
@@ -311,7 +312,7 @@ The user names what to keep or drop relative to the scene, so this routes to the
 
 ```bash
 source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
-RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/photo.jpg" '"instruction":"the woman at her desk without the lamp"' 2>/tmp/guided_err.txt)
+RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/photo.jpg" '"prompt":"the woman at her desk without the lamp"' 2>/tmp/guided_err.txt)
 if [ $? -ne 0 ]; then
   if grep -q "^ERROR 404" /tmp/guided_err.txt; then
     RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/photo.jpg")

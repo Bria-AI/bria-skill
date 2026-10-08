@@ -96,7 +96,7 @@ Remove background from image. Returns PNG with transparency.
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `image` | string | Source image URL (JPEG, PNG, WEBP) |
-| `prompt` | string | Optional. Same as `instruction` on `/remove_background/guided` below: add, drop or narrow what the cut keeps. Priced as a guided call. |
+| `prompt` | string | Optional. Same as `prompt` on `/remove_background/guided` below: add, drop or narrow what the cut keeps. |
 
 **Response:**
 ```json
@@ -118,15 +118,15 @@ Remove background from image. Returns PNG with transparency.
 
 ### POST /v2/image/edit/remove_background/guided
 
-Remove the background while following a plain-English instruction for what to keep, drop, or narrow
-to — e.g. "without the dog", "only the chair". Starts from the same cut as plain remove background,
-then adjusts only what the instruction names. Returns PNG with transparency, same as the plain route.
+Remove the background, optionally following a plain-English prompt for what to keep, drop, or narrow
+to, e.g. "without the dog", "only the chair". Starts from the same cut as plain remove background,
+then adjusts only what the prompt names. Returns PNG with transparency, same as the plain route.
 
 **Request:**
 ```json
 {
   "image": "https://publicly-accessible-image-url",
-  "instruction": "only the laptop"
+  "prompt": "only the laptop"
 }
 ```
 
@@ -135,7 +135,7 @@ then adjusts only what the instruction names. Returns PNG with transparency, sam
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `image` | string | Source image URL (JPEG, PNG, WEBP) |
-| `instruction` | string | Plain-English instruction naming what to keep, drop, or narrow to |
+| `prompt` | string | Optional. Plain-English text naming what to keep, drop, or narrow to. Omitted or blank returns the plain cut, still billed as a guided call. |
 
 Any remove-background option that still applies to a cutout (e.g. output format) carries over unchanged.
 
