@@ -56,7 +56,7 @@ foreground**: what a plain background-removal call would already keep as the sub
 3. **Anything else** — "remove the background", "cut out the product", "transparent PNG" → plain
    **remove background** (`POST /v2/image/edit/remove_background`, below).
 
-If a guided call 404s specifically, the organization isn't on the rollout flag yet — see "If the
+If a guided call 404s specifically, the organization doesn't have guided removal enabled yet — see "If the
 guided route 404s" below; fall back to plain remove background rather than retrying the guided
 route. Any other failure (auth, validation, server error, timeout) is a real error — surface it,
 don't treat it as "not enabled."
@@ -234,7 +234,7 @@ A 404 from `/v2/image/edit/remove_background/guided` means guided removal isn't 
 
 > This workspace doesn't have guided background removal enabled yet, so here's a plain background removal instead.
 
-**Only a 404 means "not enabled."** Anything else, such as a bad token (401), a bad request (422), a server error (5xx) or a timeout, is a real failure, not a rollout gate, and must not be silently swallowed into the same "isn't enabled" message. Check the error text for `404` specifically before falling back; for every other error, surface it as-is:
+**Only a 404 means "not enabled."** Anything else, such as a bad token (401), a bad request (422), a server error (5xx) or a timeout, is a real failure, not a missing enablement, and must not be silently swallowed into the same "isn't enabled" message. Check the error text for `404` specifically before falling back; for every other error, surface it as-is:
 
 ```bash
 source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh

@@ -96,7 +96,7 @@ Remove background from image. Returns PNG with transparency.
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `image` | string | Source image URL (JPEG, PNG, WEBP) |
-| `prompt` | string | Optional. Same as `prompt` on `/remove_background/guided` below: add, drop or narrow what the cut keeps. Priced as a guided call. |
+| `prompt` | string | Optional. A filled `prompt` runs the guided cut (add, drop or narrow what the cut keeps) and is priced as a guided call. Omitted or blank, it is the plain cut at the plain price. |
 
 **Response:**
 ```json
@@ -160,8 +160,8 @@ endpoint.
 }
 ```
 
-**404 means the rollout flag is off for this organization**, not a bad request — it is not enrolled
-in the guided-remove-background rollout yet. Don't retry the guided route; fall back to plain
+**A 404 means guided removal isn't enabled for this organization yet**, not a bad request.
+Don't retry the guided route; fall back to plain
 `/v2/image/edit/remove_background` and say so in one line.
 
 ---
