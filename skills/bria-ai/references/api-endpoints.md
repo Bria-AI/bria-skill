@@ -96,7 +96,7 @@ Remove background from image. Returns PNG with transparency.
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `image` | string | Source image URL (JPEG, PNG, WEBP) |
-| `prompt` | string | Optional. Same as `prompt` on `/remove_background/guided` below: add, drop or narrow what the cut keeps. |
+| `prompt` | string | Optional. Same as `prompt` on `/remove_background/guided` below: add, drop or narrow what the cut keeps. Priced as a guided call. |
 
 **Response:**
 ```json
