@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/Bria-AI/bria-skill/compare/v1.4.1...v1.5.0) (2026-10-09)
+
+
+### Features
+
+* AG-204 ([#83](https://github.com/Bria-AI/bria-skill/issues/83)) ([5172718](https://github.com/Bria-AI/bria-skill/commit/5172718046494f3f3cbda661076a5d8e9444f854))
+
 ## [1.4.1](https://github.com/Bria-AI/bria-skill/compare/v1.4.0...v1.4.1) (2026-10-04)
 
 
