@@ -96,6 +96,7 @@ Remove background from image. Returns PNG with transparency.
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `image` | string | Source image URL (JPEG, PNG, WEBP) |
+| `prompt` | string | Optional. A filled `prompt` runs the guided cut (add, drop or narrow what the cut keeps) and is priced as a guided call. Omitted or blank, it is the plain cut at the plain price. |
 
 **Response:**
 ```json
@@ -114,6 +115,54 @@ Remove background from image. Returns PNG with transparency.
   }
 }
 ```
+
+### POST /v2/image/edit/remove_background/guided
+
+Remove the background, optionally following a plain-English prompt for what to keep, drop, or narrow
+to, e.g. "without the dog", "only the chair". Starts from the same cut as plain remove background,
+then adjusts only what the prompt names. Returns PNG with transparency, same as the plain route.
+
+**Request:**
+```json
+{
+  "image": "https://publicly-accessible-image-url",
+  "prompt": "only the laptop"
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `image` | string | Source image URL (JPEG, PNG, WEBP) |
+| `prompt` | string | Optional. Plain-English text naming what to keep, drop, or narrow to. Omitted or blank returns the plain cut, still billed as a guided call. |
+
+Any remove-background option that still applies to a cutout (e.g. output format) carries over unchanged.
+
+Takes **15-20 seconds** — call with `"sync": false` and poll `status_url`, same as any other async
+endpoint.
+
+**Response:**
+```json
+{
+  "request_id": "uuid",
+  "status_url": "https://..."
+}
+```
+
+**Completed Result:**
+```json
+{
+  "status": "COMPLETED",
+  "result": {
+    "image_url": "https://...png"
+  }
+}
+```
+
+**A 404 means guided removal isn't enabled for this organization yet**, not a bad request.
+Don't retry the guided route; fall back to plain
+`/v2/image/edit/remove_background` and say so in one line.
 
 ---
 
@@ -623,6 +672,29 @@ Poll `status_url` for the result. `dual` output returns two images: `[composite,
 ---
 
 ## Text-Based Object Editing
+
+### POST /v2/image/edit/extract_object
+
+Pull one named object out of a scene as its own cutout — not a background-removal call, a
+single-object extraction. Use this when the user names a specific thing to lift out (e.g. "extract
+the tree"), as opposed to adjusting what a background-removal cutout keeps.
+
+**Request:**
+```json
+{
+  "image": "base64-or-url",
+  "prompt": "the tree"
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `image` | string | required | Source image URL or base64 |
+| `prompt` | string | required | What to extract, in natural language (e.g. "the red car") |
+| `autocrop` | bool | false | If true, tightly crop the output PNG to the cutout's bounding box |
+| `remove_background` | bool | false | If true, refine the cutout alpha with background removal; if false, uses SAM segmentation instead |
 
 ### POST /v2/image/edit/add_object_by_text
 
