@@ -56,10 +56,10 @@ foreground**: what a plain background-removal call would already keep as the sub
 3. **Anything else** — "remove the background", "cut out the product", "transparent PNG" → plain
    **remove background** (`POST /v2/image/edit/remove_background`, below).
 
-If a guided call 404s specifically, the organization doesn't have guided removal enabled yet — see "If the
+If a guided call 404s specifically, guided removal is unavailable for the organization right now. See "If the
 guided route 404s" below; fall back to plain remove background rather than retrying the guided
-route. Any other failure (auth, validation, server error, timeout) is a real error — surface it,
-don't treat it as "not enabled."
+route. Any other failure (auth, validation, server error, timeout) is a real error: surface it,
+don't treat it as "unavailable."
 
 ---
 
@@ -230,21 +230,21 @@ A guided call takes **15-20 seconds**, noticeably longer than plain remove backg
 
 ### If the guided route 404s
 
-A 404 from `/v2/image/edit/remove_background/guided` means guided removal isn't enabled for this organization yet, not a bad request. Fall back to plain remove background only for that specific case, and say so in one line, e.g.:
+A 404 from `/v2/image/edit/remove_background/guided` means guided removal is unavailable for this organization right now, not a bad request. Fall back to plain remove background only for that specific case, and say so in one line, e.g.:
 
-> This workspace doesn't have guided background removal enabled yet, so here's a plain background removal instead.
+> Guided background removal isn't available right now, so here's a plain background removal instead.
 
-**Only a 404 means "not enabled."** Anything else, such as a bad token (401), a bad request (422), a server error (5xx) or a timeout, is a real failure, not a missing enablement, and must not be silently swallowed into the same "isn't enabled" message. Check the error text for `404` specifically before falling back; for every other error, surface it as-is:
+**Only a 404 means "unavailable."** Anything else, such as a bad token (401), a bad request (422), a server error (5xx) or a timeout, is a real failure and must not be silently swallowed into the same "unavailable" message. Check the error text for `404` specifically before falling back; for every other error, surface it as-is:
 
 ```bash
 source ~/.agents/skills/remove-background/references/code-examples/bria_client.sh
 RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/yoga.jpg" '"prompt":"the person with the mat and the plant"' 2>/tmp/guided_err.txt)
 if [ $? -ne 0 ]; then
   if grep -q "^ERROR 404" /tmp/guided_err.txt; then
-    # Only a 404 means guided removal isn't enabled for this org: fall back, don't retry.
+    # Only a 404 means guided removal is unavailable for this org: fall back, don't retry.
     RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/yoga.jpg")
   else
-    # Any other error (401, 422, 5xx, timeout) is real: surface it, don't call it "not enabled."
+    # Any other error (401, 422, 5xx, timeout) is real: surface it, don't call it "unavailable."
     cat /tmp/guided_err.txt >&2
     exit 1
   fi
@@ -316,7 +316,7 @@ RESULT_URL=$(bria_call /v2/image/edit/remove_background/guided "/path/to/photo.j
 if [ $? -ne 0 ]; then
   if grep -q "^ERROR 404" /tmp/guided_err.txt; then
     RESULT_URL=$(bria_call /v2/image/edit/remove_background "/path/to/photo.jpg")
-    echo "Guided removal isn't enabled for this workspace yet — used plain background removal instead."
+    echo "Guided removal isn't available right now, so plain background removal was used instead."
   else
     cat /tmp/guided_err.txt >&2
     exit 1

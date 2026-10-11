@@ -160,7 +160,7 @@ endpoint.
 }
 ```
 
-**A 404 means guided removal isn't enabled for this organization yet**, not a bad request.
+**A 404 means guided removal is unavailable for this organization right now**, not a bad request.
 Don't retry the guided route; fall back to plain
 `/v2/image/edit/remove_background` and say so in one line.
 
