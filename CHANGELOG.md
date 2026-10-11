@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/Bria-AI/bria-skill/compare/v1.5.0...v1.5.1) (2026-10-11)
+
+
+### Bug Fixes
+
+* **remove-background:** guided 404 means unavailable, not "not enabled yet" ([#85](https://github.com/Bria-AI/bria-skill/issues/85)) ([bc8550f](https://github.com/Bria-AI/bria-skill/commit/bc8550f8e5e15c858b265947f7dde945c5f69f78))
+
 ## [1.5.0](https://github.com/Bria-AI/bria-skill/compare/v1.4.1...v1.5.0) (2026-10-09)
 
 
