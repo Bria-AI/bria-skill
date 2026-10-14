@@ -293,7 +293,7 @@ bria_erase() {
   image_url=$(bria_resolve_image "$1")
   local mask_url
   mask_url=$(bria_resolve_image "$2")
-  local composite="${3:-true}"
+  local composite="${3:-false}"
 
   local data
   data=$(jq -n \
