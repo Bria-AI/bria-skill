@@ -114,6 +114,9 @@ Edit existing image with text instruction?
 Combine 2-4 images — outfit, product, logo, style, or background from one into another?
   → /v2/image/edit  (--key images, then one --image per extra reference)
 
+Remove an object and its shadow or reflection ("remove the bike and its shadow")?
+  → /v2/image/edit/erase  ("composite": false, mask only the object)
+
 Change / replace / blur background?
   → /v2/image/edit/replace_background  (prompt: "blur" or describe new bg)
 
