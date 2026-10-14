@@ -362,7 +362,7 @@ export class BriaClient {
    * @param imageUrl - Source image URL
    * @param maskUrl - Mask URL (white=erase), covering only the object
    * @param wait - Wait for completion
-   * @param composite - true keeps every pixel outside the mask; false also removes the object's shadow or reflection
+   * @param composite - true keeps everything outside the mask as it was; false also removes the object's shadow or reflection
    * @returns Response with edited image_url
    */
   async erase(

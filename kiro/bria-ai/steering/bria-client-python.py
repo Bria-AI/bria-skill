@@ -318,7 +318,7 @@ class BriaClient:
             image_url: Source image URL
             mask_url: Mask URL (white=erase), covering only the object
             wait: Wait for completion
-            composite: True keeps every pixel outside the mask; False also removes
+            composite: True keeps everything outside the mask as it was; False also removes
                 the object's shadow or reflection
 
         Returns:
