@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/Bria-AI/bria-skill/compare/v1.5.1...v1.6.0) (2026-10-14)
+
+
+### Features
+
+* **erase:** context aware and pixel perfect modes ([#87](https://github.com/Bria-AI/bria-skill/issues/87)) ([c314bdc](https://github.com/Bria-AI/bria-skill/commit/c314bdc2835f3bf796efb276a1cc99f28375b0e5))
+
 ## [1.5.1](https://github.com/Bria-AI/bria-skill/compare/v1.5.0...v1.5.1) (2026-10-11)
 
 
