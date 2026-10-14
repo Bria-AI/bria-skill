@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/Bria-AI/bria-skill/compare/v1.6.0...v1.6.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* **erase:** context aware by default in the skill and helpers ([#89](https://github.com/Bria-AI/bria-skill/issues/89)) ([f89ec38](https://github.com/Bria-AI/bria-skill/commit/f89ec383a966d654e87b63eea7589c74031fcbd8))
+
 ## [1.6.0](https://github.com/Bria-AI/bria-skill/compare/v1.5.1...v1.6.0) (2026-10-14)
 
 
