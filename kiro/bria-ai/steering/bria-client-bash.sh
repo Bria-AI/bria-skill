@@ -293,12 +293,14 @@ bria_erase() {
   image_url=$(bria_resolve_image "$1")
   local mask_url
   mask_url=$(bria_resolve_image "$2")
+  local composite="${3:-true}"
 
   local data
   data=$(jq -n \
     --arg image "$image_url" \
     --arg mask "$mask_url" \
-    '{image: $image, mask: $mask}')
+    --argjson composite "$composite" \
+    '{image: $image, mask: $mask, composite: $composite}')
 
   bria_request "/v2/image/edit/erase" "$data"
 }
@@ -705,7 +707,8 @@ curl -X POST "https://engine.prod.bria-api.com/v2/image/edit/erase" \
   -H "User-Agent: BriaSkills/1.3.7" \
   -d '{
     "image": "https://example.com/image.jpg",
-    "mask": "https://example.com/mask.png"
+    "mask": "https://example.com/mask.png",
+    "composite": false
   }'
 
 # --- Replace Background ---

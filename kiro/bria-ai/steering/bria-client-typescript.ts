@@ -360,18 +360,20 @@ export class BriaClient {
   /**
    * Erase objects defined by mask.
    * @param imageUrl - Source image URL
-   * @param maskUrl - Mask URL (white=erase)
+   * @param maskUrl - Mask URL (white=erase), covering only the object
    * @param wait - Wait for completion
+   * @param composite - true keeps every pixel outside the mask; false also removes the object's shadow or reflection
    * @returns Response with edited image_url
    */
   async erase(
     imageUrl: string,
     maskUrl: string,
-    wait = true
+    wait = true,
+    composite = true
   ): Promise<BriaResponse> {
     return this.request(
       "/v2/image/edit/erase",
-      { image: this.resolveImage(imageUrl), mask: this.resolveImage(maskUrl) },
+      { image: this.resolveImage(imageUrl), mask: this.resolveImage(maskUrl), composite },
       wait
     );
   }

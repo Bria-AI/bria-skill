@@ -152,6 +152,7 @@ Interpret the output:
 | Edit images by text instruction | FIBO-Edit | Change colors, modify objects, transform scenes |
 | Combine 2–4 images in one edit | FIBO-Edit multi-reference | Put the outfit, product, logo, style, or background of one image into another |
 | Edit image region with mask | GenFill/Erase | Precise inpainting, add/replace specific regions |
+| Remove an object and its shadow or reflection | Erase, `composite: false` | Mask only the object: "remove the bike and its shadow" |
 | Add/Replace/Remove objects | Text-based editing | Add vase, replace apple with pear, remove table |
 | Remove background (transparent PNG) | RMBG-2.0 | Extract subjects for overlays, logos, cutouts |
 | Turn a finished ad back into layers | Ad Delayer |  make a shipped creative editable, resize or localise an ad |
