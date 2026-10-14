@@ -309,7 +309,7 @@ class BriaClient:
         return self._request("/v2/image/edit/gen_fill", data, wait)
 
     def erase(
-        self, image_url: str, mask_url: str, wait: bool = True, composite: bool = True
+        self, image_url: str, mask_url: str, wait: bool = True, composite: bool = False
     ) -> Dict[str, Any]:
         """
         Erase objects defined by mask.
@@ -318,8 +318,8 @@ class BriaClient:
             image_url: Source image URL
             mask_url: Mask URL (white=erase), covering only the object
             wait: Wait for completion
-            composite: True keeps everything outside the mask as it was; False also removes
-                the object's shadow or reflection
+            composite: False (default) is context aware and also removes the object's
+                shadow or reflection; True keeps everything outside the mask as it was
 
         Returns:
             Dict with edited image_url
