@@ -224,7 +224,7 @@ export class BriaClient {
     throw new Error("Request timed out");
   }
 
-  // ==================== FIBO - Image Generation ====================
+  // ==================== Fibo 2 - Image Generation ====================
 
   /**
    * Generate images from text prompt.
@@ -328,7 +328,7 @@ export class BriaClient {
     return this.request("/v2/image/edit/remove_background", { image: this.resolveImage(imageUrl) }, wait);
   }
 
-  // ==================== FIBO-Edit - Image Editing ====================
+  // ==================== Fibo 2 - Image Editing ====================
 
   /**
    * Generate content in masked region (inpainting).

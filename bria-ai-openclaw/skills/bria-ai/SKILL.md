@@ -203,5 +203,5 @@ timeout.
 
 ## Related Skills
 
-- **vgl** — Structured VGL JSON prompts for precise, deterministic control over FIBO image generation
+- **vgl** — Structured VGL JSON prompts for precise, deterministic control over Fibo image generation
 - **image-utils** — Classic image manipulation (resize, crop, composite, watermarks) for post-processing

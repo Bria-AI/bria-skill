@@ -15,11 +15,11 @@ User-Agent: BriaSkills/<version>
 
 ---
 
-## FIBO - Image Generation
+## Fibo 2 - Image Generation
 
 ### POST /v2/image/generate
 
-Generate images from text prompts using FIBO's structured prompt system.
+Generate images from text prompts using Fibo's structured prompt system.
 
 **Request:**
 ```json
@@ -117,7 +117,7 @@ Remove background from image. Returns PNG with transparency.
 
 ---
 
-## FIBO-Edit - Image Editing
+## Fibo 2 - Image Editing
 
 ### POST /v2/image/edit
 

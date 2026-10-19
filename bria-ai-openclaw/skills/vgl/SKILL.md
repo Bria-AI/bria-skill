@@ -1,6 +1,6 @@
 ---
 name: vgl
-description: Maximum control over AI image generation — write structured VGL (Visual Generation Language) JSON that explicitly controls every visual attribute. Define exact object placement, lighting direction, camera angle, lens focal length, composition, color scheme, and artistic style as deterministic JSON instead of ambiguous natural language. Use this skill when you need reproducible image generation, precise control over scene composition, or want to convert a natural language image request into a structured JSON schema for Bria FIBO models. Triggers on requests for structured prompts, controllable generation, VGL JSON, deterministic image descriptions, or Bria/FIBO structured_prompt format.
+description: Maximum control over AI image generation — write structured VGL (Visual Generation Language) JSON that explicitly controls every visual attribute. Define exact object placement, lighting direction, camera angle, lens focal length, composition, color scheme, and artistic style as deterministic JSON instead of ambiguous natural language. Use this skill when you need reproducible image generation, precise control over scene composition, or want to convert a natural language image request into a structured JSON schema for Bria Fibo models. Triggers on requests for structured prompts, controllable generation, VGL JSON, deterministic image descriptions, or Bria/FIBO structured_prompt format.
 license: MIT
 metadata:
   author: Bria AI
@@ -9,7 +9,7 @@ metadata:
 
 # Bria VGL — Full Control Over Image Generation
 
-Define every visual attribute as structured JSON instead of hoping natural language gets it right. VGL (Visual Generation Language) gives you explicit, deterministic control over objects, lighting, camera settings, composition, and style for Bria's FIBO models.
+Define every visual attribute as structured JSON instead of hoping natural language gets it right. VGL (Visual Generation Language) gives you explicit, deterministic control over objects, lighting, camera settings, composition, and style for Bria's Fibo models.
 
 > **Related Skill**: Use **[bria-ai](../bria-ai/SKILL.md)** to execute these VGL prompts via the Bria API. VGL defines the structured control format; bria-ai handles generation, editing, and background removal.
 
