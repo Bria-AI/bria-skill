@@ -138,7 +138,7 @@ class BriaClient:
 
         raise TimeoutError("Request timed out")
 
-    # ==================== FIBO - Image Generation ====================
+    # ==================== Fibo 2 - Image Generation ====================
 
     def generate(
         self,
@@ -272,7 +272,7 @@ class BriaClient:
             wait,
         )
 
-    # ==================== FIBO-Edit - Image Editing ====================
+    # ==================== Fibo 2 - Image Editing ====================
 
     def gen_fill(
         self,

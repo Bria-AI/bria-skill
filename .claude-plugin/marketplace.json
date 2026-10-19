@@ -22,7 +22,7 @@
   "plugins": [
     {
       "name": "bria-ai",
-      "description": "AI image generation and editing API via Bria.ai — generate images from text prompts, edit photos with natural language instructions, remove or replace backgrounds for transparent PNGs, create product photography and lifestyle shots, upscale resolution, restyle, and batch-generate visual assets. Commercially safe, royalty-free, brand-safe. 20+ endpoints for e-commerce product photos, hero images, banners, social media visuals, illustrations, icons, ad creatives, and automated image pipelines. Powered by FIBO (text-to-image), FIBO-Edit (instruction-based editing), and RMBG-2.0 (background removal).",
+      "description": "AI image generation and editing API via Bria.ai — generate images from text prompts, edit photos with natural language instructions, remove or replace backgrounds for transparent PNGs, create product photography and lifestyle shots, upscale resolution, restyle, and batch-generate visual assets. Commercially safe, royalty-free, brand-safe. 20+ endpoints for e-commerce product photos, hero images, banners, social media visuals, illustrations, icons, ad creatives, and automated image pipelines. Powered by Fibo (text-to-image), Fibo Edit (instruction-based editing), and RMBG-2.0 (background removal).",
       "source": "./skills/bria-ai",
       "strict": false,
       "skills": [

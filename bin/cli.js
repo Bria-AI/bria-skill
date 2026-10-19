@@ -79,7 +79,7 @@ Usage:
   npx ${PACKAGE_NAME} --help       Show this help
 
 Skills included:
-  bria-ai            AI-powered image generation and editing (FIBO, RMBG-2.0)
+  bria-ai            AI-powered image generation and editing (Fibo, RMBG-2.0)
   vgl                Visual Generation Language structured prompts
   image-utils        Classic image manipulation (resize, crop, composite)
   remove-background  Background removal for transparent PNGs and cutouts (RMBG-2.0)

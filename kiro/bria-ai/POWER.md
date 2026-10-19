@@ -147,9 +147,9 @@ Interpret the output:
 
 | Need | Capability | Use Case |
 |------|------------|----------|
-| Generate images from text | FIBO Generate | Hero images, product shots, illustrations, social media images, banners |
-| Edit images by text instruction | FIBO-Edit | Change colors, modify objects, transform scenes |
-| Combine 2–4 images in one edit | FIBO-Edit multi-reference | Put the outfit, product, logo, style, or background of one image into another |
+| Generate images from text | Fibo 2 Image Generate | Hero images, product shots, illustrations, social media images, banners |
+| Edit images by text instruction | Fibo 2 Image Edit | Change colors, modify objects, transform scenes |
+| Combine 2–4 images in one edit | Fibo 2 Image Edit multi-reference | Put the outfit, product, logo, style, or background of one image into another |
 | Edit image region with mask | GenFill/Erase | Precise inpainting, add/replace specific regions |
 | Remove an object and its shadow or reflection | Erase, `composite: false` | Mask only the object: "remove the bike and its shadow" |
 | Add/Replace/Remove objects | Text-based editing | Add vase, replace apple with pear, remove table |
@@ -266,7 +266,7 @@ See `steering/api-endpoints.md` for complete endpoint documentation.
 **Image Generation**
 | Endpoint | Purpose |
 |----------|---------|
-| `POST /v2/image/generate` | Generate images from text (FIBO) |
+| `POST /v2/image/generate` | Generate images from text (Fibo 2) |
 
 **Edit by Text (No Mask)**
 | Endpoint | Purpose |
@@ -346,7 +346,7 @@ User-Agent: BriaSkills/<version>
 
 ## Related Powers
 
-- **vgl** — Write structured VGL JSON prompts for precise, deterministic control over FIBO image generation
+- **vgl** — Write structured VGL JSON prompts for precise, deterministic control over Fibo image generation
 - **image-utils** — Classic image manipulation (resize, crop, composite, watermarks) for post-processing
 
 ## License & Attribution

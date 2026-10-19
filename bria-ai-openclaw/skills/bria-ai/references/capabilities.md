@@ -16,9 +16,9 @@
 
 | Need | Capability | Endpoint |
 |------|------------|----------|
-| Generate images from text | FIBO Generate | `/v2/image/generate` |
-| Edit images by text instruction | FIBO-Edit | `/v2/image/edit` |
-| Combine 2-4 images in one edit | FIBO-Edit multi-reference | `/v2/image/edit` (ordered `images` array) |
+| Generate images from text | Fibo 2 Image Generate | `/v2/image/generate` |
+| Edit images by text instruction | Fibo 2 Image Edit | `/v2/image/edit` |
+| Combine 2-4 images in one edit | Fibo 2 Image Edit multi-reference | `/v2/image/edit` (ordered `images` array) |
 | Edit image region with mask | GenFill/Erase | `/v2/image/edit/gen_fill` |
 | Add/Replace/Remove objects | Text-based editing | `/v2/image/edit` |
 | Remove background (transparent PNG) | RMBG-2.0 | `/v2/image/edit/remove_background` |

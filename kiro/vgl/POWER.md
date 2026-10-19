@@ -1,14 +1,14 @@
 ---
 name: "vgl"
 displayName: "Bria VGL"
-description: "Maximum control over AI image generation — write structured VGL (Visual Generation Language) JSON that explicitly controls every visual attribute for Bria FIBO models."
+description: "Maximum control over AI image generation — write structured VGL (Visual Generation Language) JSON that explicitly controls every visual attribute for Bria Fibo models."
 keywords: ["vgl", "structured-prompt", "image-generation", "bria", "fibo", "controllable-generation", "deterministic-image"]
 author: "Bria AI"
 ---
 
 # Bria VGL — Full Control Over Image Generation
 
-Define every visual attribute as structured JSON instead of hoping natural language gets it right. VGL (Visual Generation Language) gives you explicit, deterministic control over objects, lighting, camera settings, composition, and style for Bria's FIBO models.
+Define every visual attribute as structured JSON instead of hoping natural language gets it right. VGL (Visual Generation Language) gives you explicit, deterministic control over objects, lighting, camera settings, composition, and style for Bria's Fibo models.
 
 > **Related Power**: Use **bria-ai** to execute these VGL prompts via the Bria API. VGL defines the structured control format; bria-ai handles generation, editing, and background removal.
 

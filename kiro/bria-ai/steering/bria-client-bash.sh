@@ -169,7 +169,7 @@ bria_poll() {
   return 1
 }
 
-# ==================== FIBO - Image Generation ====================
+# ==================== Fibo 2 - Image Generation ====================
 
 bria_generate() {
   local prompt="$1"
@@ -262,7 +262,7 @@ bria_remove_background() {
   bria_request "/v2/image/edit/remove_background" "$data"
 }
 
-# ==================== FIBO-Edit - Image Editing ====================
+# ==================== Fibo 2 - Image Editing ====================
 
 bria_gen_fill() {
   local image_url

@@ -277,4 +277,4 @@ Pair `shot_by_text` for the environment with `harmonize` for a final lighting pa
 
 - **bria-ai** — General image generation, editing, and background removal for non-vehicle subjects
 - **remove-background** — Dedicated transparent PNG / cutout skill
-- **vgl** — Structured VGL prompts for deterministic FIBO generation (pairs well with `shot_by_text`)
+- **vgl** — Structured VGL prompts for deterministic Fibo generation (pairs well with `shot_by_text`)
