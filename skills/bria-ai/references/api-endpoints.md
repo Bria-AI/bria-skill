@@ -38,7 +38,7 @@ Generate images from text prompts using Fibo's structured prompt system.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `prompt` | string | required* | Image description (* or use `structured_prompt`) |
-| `aspect_ratio` | string | "1:1" | "1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9" |
+| `aspect_ratio` | string | "1:1" | "1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "16:10", "10:16", "2:1", "1:2", "21:9", "9:21", "3:1", "1:3", "4:1", "1:4", "5:1", "1:5" |
 | `resolution` | string | "1MP" | Output image resolution. "1MP" or "4MP". "4MP" improves image details, especially for photorealism, but increases latency by ~30 seconds. |
 | `negative_prompt` | string | - | What to exclude |
 | `seed` | int | random | For reproducibility |
@@ -199,7 +199,7 @@ position — the first is "image 1", the second "image 2", and so on:
 | `images` | array | required | 1–4 image URLs or base64 data URLs. **Order matters** — the instruction refers to them as "image 1", "image 2", … in the order they are sent |
 | `instruction` | string | required | Edit instruction in natural language. Refer to additional images by position |
 | `seed` | int | random | For reproducibility — the same images, instruction and seed reproduce the same result |
-| `aspect_ratio` | string | - | Output ratio: "1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9". Honored only with 2 or more images. Do not send it on a single-image request — the output follows that image regardless and the response carries a `warning`; to change one image's ratio, use `/v2/image/edit/expand` |
+| `aspect_ratio` | string | - | Output ratio: "1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "16:10", "10:16", "2:1", "1:2", "21:9", "9:21", "3:1", "1:3", "4:1", "1:4", "5:1", "1:5". Honored only with 2 or more images. Do not send it on a single-image request — the output follows that image regardless and the response carries a `warning`; to change one image's ratio, use `/v2/image/edit/expand` |
 | `model_version` | string | - | Deprecated and ignored — the service picks the edit model from the request contents. A value that is sent comes back with a notice in `warning`; omit it |
 
 **Writing a multi-reference instruction:**
