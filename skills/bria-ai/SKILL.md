@@ -254,7 +254,7 @@ position in the instruction: *"dress the man in image 1 in the santa outfit from
 each reference contributes ("the background of image 3"), in plain prose. A single-image edit needs
 no positional wording: *"change the mug color to red"*.
 
-**Generation options:** Aspect ratios `1:1`, `16:9`, `4:3`, `9:16`, `3:4`. Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for a single generated image. `/v2/image/edit` (instruction-based Fibo 2 Image Edit) is the other way round — it always answers with a `status_url` you poll, and `"sync": true` there fails with a gateway
+**Generation options:** Aspect ratios `1:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, plus `16:10`, `10:16`, `2:1`, `1:2`, `21:9`, `9:21`, `3:1`, `1:3`, `4:1`, `1:4`, `5:1`, `1:5` (not with `4MP`, a style, or a reference image beside a VGL). Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for a single generated image. `/v2/image/edit` (instruction-based Fibo 2 Image Edit) is the other way round — it always answers with a `status_url` you poll, and `"sync": true` there fails with a gateway
 timeout. Product Holding and Virtual Try-On accept `"sync": true` if you'd rather wait for the final image than poll — `bria_call` polls for you either way, so this only matters if you're calling the API directly.
 
 > **Advanced**: For precise control over generation, use the **vgl** skill for structured VGL JSON prompts instead of natural language.
