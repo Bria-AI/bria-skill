@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.2](https://github.com/Bria-AI/bria-skill/compare/v1.6.1...v1.6.2) (2026-10-20)
+
+
+### Bug Fixes
+
+* **skills:** list Fibo 2's 21 aspect ratios for generate and multi-image edit ([#93](https://github.com/Bria-AI/bria-skill/issues/93)) ([184a837](https://github.com/Bria-AI/bria-skill/commit/184a8379436b38fecf578471339978ef2f3c3f48))
+
 ## [1.6.1](https://github.com/Bria-AI/bria-skill/compare/v1.6.0...v1.6.1) (2026-10-14)
 
 
