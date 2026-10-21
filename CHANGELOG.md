@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/Bria-AI/bria-skill/compare/v1.6.2...v1.7.0) (2026-10-21)
+
+
+### Features
+
+* **skills:** add Fibo 2 style to image generate ([#95](https://github.com/Bria-AI/bria-skill/issues/95)) ([a5373b4](https://github.com/Bria-AI/bria-skill/commit/a5373b4e44dc1a4c0b753ce61b7a11ab09092e96))
+
 ## [1.6.2](https://github.com/Bria-AI/bria-skill/compare/v1.6.1...v1.6.2) (2026-10-20)
 
 
