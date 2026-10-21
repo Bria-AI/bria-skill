@@ -140,6 +140,9 @@ source ~/.agents/skills/bria-ai/references/code-examples/bria_client.sh
 # Generate (no image input)
 RESULT=$(bria_call /v2/image/generate "" '"prompt": "your description", "aspect_ratio": "16:9", "sync": true')
 
+# Generate with a photographic look (style: kodak_film, hard_flash, hazy_dreamy or rough_realism)
+RESULT=$(bria_call /v2/image/generate "" '"prompt": "a woman reading on a city bus", "style": "kodak_film", "seed": 5555, "sync": true')
+
 # Remove background
 RESULT=$(bria_call /v2/image/edit/remove_background "/path/to/local/image.png")
 
@@ -174,7 +177,7 @@ echo "$RESULT"
 address them by position — *"dress the man in image 1 in the santa outfit from image 2"*. Say what
 each reference contributes, in plain prose. Single-image edits need no positional wording.
 
-**Generation options:** Aspect ratios `1:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, plus `16:10`, `10:16`, `2:1`, `1:2`, `21:9`, `9:21`, `3:1`, `1:3`, `4:1`, `1:4`, `5:1`, `1:5` (not with `4MP`, a style, or a reference image beside a VGL). Resolution `1MP` (default) or `4MP` (more detail, +30s). Pass `"sync": true` for a single generated image. Editing endpoints are the other way round —
+**Generation options:** Aspect ratios `1:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, plus `16:10`, `10:16`, `2:1`, `1:2`, `21:9`, `9:21`, `3:1`, `1:3`, `4:1`, `1:4`, `5:1`, `1:5` (not with `4MP`, a `style_id`, or a reference image beside a VGL). Resolution `1MP` (default) or `4MP` (more detail, +30s). For a photographic look, add `"style"`: `kodak_film`, `hard_flash`, `hazy_dreamy` or `rough_realism`. It is text-to-image only, so not with `style_id`, a VGL, reference images, `4MP` or lite. Pass `"sync": true` for a single generated image. Editing endpoints are the other way round —
 they answer with a `status_url` you poll, and `"sync": true` on an edit fails with a gateway
 timeout.
 
