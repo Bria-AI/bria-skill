@@ -43,6 +43,7 @@ Generate images from text prompts using Fibo's structured prompt system.
 | `negative_prompt` | string | - | What to exclude |
 | `seed` | int | random | For reproducibility |
 | `style_id` | string | "default" | Named prompt style that shapes how the prompt becomes the image. `"default"` (standard) or `"photoreal"` (tuned for photorealistic results). Optional — omit for the standard style. |
+| `style` | string | - | Photographic look for text-to-image: `"kodak_film"`, `"hard_flash"`, `"hazy_dreamy"` or `"rough_realism"`. Use it when the user asks for one of these looks. Prompt only: rejected with `style_id`, `structured_prompt`, `images`, `"4MP"`, lite or tailored. |
 | `structured_prompt` | string | - | JSON from previous generation (for refinement). Use with `prompt` to refine, or alone with `seed` to recreate. |
 | `images` | array | - | Reference image for inspire mode: an array holding one image URL or base64 string |
 
@@ -53,7 +54,7 @@ Generate images from text prompts using Fibo's structured prompt system.
 - `structured_prompt` + `seed` — Recreate a previous image exactly
 - `structured_prompt` + `prompt` + `seed` — Refine a previous image with new instructions
 
-All combinations support `aspect_ratio`, `negative_prompt`, `seed`, and `style_id`. Note that `"sync": true`
+All combinations support `aspect_ratio`, `negative_prompt`, `seed`, and `style_id`. `style` works only with `prompt` alone. Note that `"sync": true`
 cannot be combined with `"resolution": "4MP"` — that pairing is rejected.
 
 **Response:**
